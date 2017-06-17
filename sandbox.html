@@ -6,13 +6,14 @@
 
 <table border="1" >
 <tr>
-<td><input id="recall_input_0" type="text" maxlength="1"></input></td><td><input id="recall_input_1" type="text" maxlength="1"></input></td><td><input id="recall_input_2" type="text" maxlength="1"></input></td>
+<td><input class="recall_input" id="recall_input_0" type="text" maxlength="1"></input></td>
+<td><input class="recall_input" id="recall_input_1" type="text" maxlength="1"></input></td>
+<td><input class="recall_input" id="recall_input_2" type="text" maxlength="1"></input></td>
 </tr>
 <tr>
-<td><input id="recall_input_3" type="text" maxlength="1"></input></td><td><input id="recall_input_4" type="text" maxlength="1"></input></td><td><input id="recall_input_5" type="text" maxlength="1"></input></td>
-</tr>
-<tr>
-<td id="X" contenteditable='true'></td><td id="Y" contenteditable='true'></td><td id="Z" contenteditable='true'>asdf</td>
+<td><input class="recall_input" id="recall_input_3" type="text" maxlength="1"></input></td>
+<td><input class="recall_input" id="recall_input_4" type="text" maxlength="1"></input></td>
+<td><input class="recall_input" id="recall_input_5" type="text" maxlength="1"></input></td>
 </tr>
 </table>
 
@@ -21,28 +22,15 @@
 <script>
 $(document).ready(function(){
 
-	$('#daniel').val("hejsan");
-	$('#andersson').val("power");
-
    // User clicks on a cell
-   $('#recall_input_0').keydown(function(e) {
+   $('.recall_input').keydown(function(e) {
 	   e.preventDefault();
 	   $(this).val(e.which - 48);
-       $('#recall_input_1').select();
-   });
-   
-   // User clicks on a cell
-   $('#X').keydown(function(e) {
-	   e.preventDefault();
-	   $(this).text(e.which - 48);
-       $('#Y').focus();
-   });
-   
-   // User clicks on a cell
-   $('#Y').keydown(function(e) {
-	   e.preventDefault();
-	   $(this).text(e.which - 48);
-       $('#Z').focus();
+	   var current_id = $(this).attr('id');
+	   console.log(current_id);
+	   var new_id = current_id.replace( /(\d+)/, function(){return arguments[1]*1+1} );
+	   console.log(new_id);
+       $('#' + new_id).select();
    });
 
    // User navigates table using keyboard
