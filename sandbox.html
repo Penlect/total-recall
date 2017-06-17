@@ -75,63 +75,22 @@ $(document).ready(function(){
 			   console.log(new_id);
 			   $('#' + new_id).select();
 				break;
+			case 80: // P character
+			   var current_id = $(this).attr('id');
+			   var new_value = '';
+			   var prev_value = null;
+			   for(i = parseInt(current_id.split('_')[2]); i < 6; i++){
+					var cell_id = '#recall_input_' + i.toString();
+					prev_value = $(cell_id).val();
+					$(cell_id).val(new_value);
+					new_value = prev_value;
+			   }
+				break;
 			default:
 				console.log("INVALID KEY");
 		}
    });
-
-   // User navigates table using keyboard
-   $('tabldfge').keydown(function (e) {
-       var c = "";
-       if (e.which == 39) {
-           // Right Arrow
-           c = currCell.next();
-       } else if (e.which == 37) { 
-           // Left Arrow
-           c = currCell.prev();
-       } else if (e.which == 38) { 
-           // Up Arrow
-           c = currCell.closest('tr').prev().find('td:eq(' + 
-             currCell.index() + ')');
-       } else if (e.which == 40) { 
-           // Down Arrow
-           c = currCell.closest('tr').next().find('td:eq(' + 
-             currCell.index() + ')');
-       } else if (e.which == 13) { 
-           // Enter
-           e.preventDefault();
-           c = currCell.closest('tr').next().find('td:eq(' + 
-             currCell.index() + ')');
-       } else if (!editing && (e.which == 13 || e.which == 32)) { 
-           // Enter or Spacebar - edit cell
-           e.preventDefault();
-           edit();
-       } else if (!editing && (e.which == 9 && !e.shiftKey)) { 
-           // Tab
-           e.preventDefault();
-           c = currCell.next();
-       } else if (!editing && (e.which == 9 && e.shiftKey)) { 
-           // Shift + Tab
-           e.preventDefault();
-           c = currCell.prev();
-       } 
-
-       // If we didn't hit a boundary, update the current cell
-       if (c.length > 0) {
-           currCell = c;
-           currCell.focus();
-       }
-   });
-
-   // User can cancel edit by pressing escape
-   $('#edit').keydown(function (e) {
-       if (editing && e.which == 27) { 
-           editing = false;
-           $('#edit').hide();
-           currCell.toggleClass("editing");
-           currCell.focus();
-       }
-   });
+   
 });
 </script>
 </body>
