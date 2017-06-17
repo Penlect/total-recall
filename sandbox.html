@@ -20,52 +20,68 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 <script>
-$(document).ready(function(){
 
-	class RecallGrid {
-		constructor(rows, columns, cell){
-			this.rows = rows;
-			this.columns = columns;
-			this.size = rows*columns;
-			this.cell = cell;
-		}
-		
-		select_next(){
-		   var current_id = this.cell.attr('id');
-		   console.log(current_id);
-		   var size = this.size;
-		   var new_id = current_id.replace( /(\d+)/, function(){return Math.min(arguments[1]*1+1, size) });
-		   console.log(new_id);
-		   $('#' + new_id).select();
-		}
-		
-		select_previous(){
-		   var current_id = this.cell.attr('id');
-		   console.log(current_id);
-		   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1-1, 0) });
-		   console.log(new_id);
-		   $('#' + new_id).select();
-		}
-		
-		select_up(){
-		   var current_id = this.cell.attr('id');
-		   console.log(current_id);
-		   var self = this;
-		   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1-self.columns, 0) });
-		   console.log(new_id);
-		   $('#' + new_id).select();
-		}
-		
-		select_down(){
-		   var current_id = this.cell.attr('id');
-		   console.log(current_id);
-		   var self = this;
-		   var size = this.size;
-		   var new_id = current_id.replace( /(\d+)/, function(){return Math.min(arguments[1]*1 + self.columns, size) });
-		   console.log(new_id);
-		   $('#' + new_id).select();
-		}
+class RecallGrid {
+	constructor(rows, columns, cell){
+		this.rows = rows;
+		this.columns = columns;
+		this.size = rows*columns;
+		this.cell = cell;
 	}
+	
+	navigate(step){
+	   var current_id = parseInt(this.cell.attr('id').split('_')[2]);
+	   current_id = current_id + step;
+	   if(current_id < 0 || current_id > this.size){
+			return this.cell;
+	   }
+	   else{
+			return $('#recall_input_' + current_id.toString());
+	   }
+	}
+	
+	select_next(){
+		this.navigate(1).select();
+	}
+	
+	select_previous(){
+		this.navigate(-1).select();
+	}
+	
+	select_up(){
+		this.navigate(-this.columns).select();
+	}
+	
+	select_down(){
+		this.navigate(this.columns).select();
+	}
+	
+	shift_left(){
+	   var current_id = this.cell.attr('id');
+	   var new_value = '';
+	   var prev_value = null;
+	   for(var i = parseInt(current_id.split('_')[2]); i >= 0; i--){
+			var cell_id = '#recall_input_' + i.toString();
+			prev_value = $(cell_id).val();
+			$(cell_id).val(new_value);
+			new_value = prev_value;
+	   }
+	}
+	
+	shift_right(){
+	   var current_id = this.cell.attr('id');
+	   var new_value = '';
+	   var prev_value = null;
+	   for(var i = parseInt(current_id.split('_')[2]); i < this.size; i++){
+			var cell_id = '#recall_input_' + i.toString();
+			prev_value = $(cell_id).val();
+			$(cell_id).val(new_value);
+			new_value = prev_value;
+	   }
+	}
+}
+	
+$(document).ready(function(){
 
    // User clicks on a cell
    $('.recall_input').keydown(function(e) {
@@ -85,44 +101,32 @@ $(document).ready(function(){
 			case 55:
 			case 56:
 			case 57: // 9
-				console.log("NUMERIC KEY");
+				console.log("NUMERIC KEY: " + e.which);
 				var digit = e.which - 48;
 			   $(this).val(digit);
 			   grid.select_next();
 				break;
 			case 39: // Right Arrow
+				console.log("RIGHT ARROW KEY: " + e.which);
 			   grid.select_next();
 				break;
 			case 37: // Left Arrow
+				console.log("LEFT ARROW KEY: " + e.which);
 			   grid.select_previous();
 				break;
 			case 38: // Up Arrow
+				console.log("UP ARROW KEY: " + e.which);
 			    grid.select_up();
 				break;
 			case 40: // Down Arrow
+				console.log("DOWN ARROW KEY: " + e.which);
 				grid.select_down();
 				break;
 			case 80: // P character
-			   var current_id = $(this).attr('id');
-			   var new_value = '';
-			   var prev_value = null;
-			   for(i = parseInt(current_id.split('_')[2]); i < 6; i++){
-					var cell_id = '#recall_input_' + i.toString();
-					prev_value = $(cell_id).val();
-					$(cell_id).val(new_value);
-					new_value = prev_value;
-			   }
+				grid.shift_right()
 				break;
 			case 77: // m character
-			   var current_id = $(this).attr('id');
-			   var new_value = '';
-			   var prev_value = null;
-			   for(i = parseInt(current_id.split('_')[2]); i >= 0; i--){
-					var cell_id = '#recall_input_' + i.toString();
-					prev_value = $(cell_id).val();
-					$(cell_id).val(new_value);
-					new_value = prev_value;
-			   }
+				grid.shift_left()
 				break;
 			case 8: // backspace
 				console.log("BACKSPACE KEY");
