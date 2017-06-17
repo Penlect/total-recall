@@ -22,10 +22,57 @@
 <script>
 $(document).ready(function(){
 
+	class RecallGrid {
+		constructor(rows, columns, cell){
+			this.rows = rows;
+			this.columns = columns;
+			this.size = rows*columns;
+			this.cell = cell;
+		}
+		
+		select_next(){
+		   var current_id = this.cell.attr('id');
+		   console.log(current_id);
+		   var size = this.size;
+		   var new_id = current_id.replace( /(\d+)/, function(){return Math.min(arguments[1]*1+1, size) });
+		   console.log(new_id);
+		   $('#' + new_id).select();
+		}
+		
+		select_previous(){
+		   var current_id = this.cell.attr('id');
+		   console.log(current_id);
+		   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1-1, 0) });
+		   console.log(new_id);
+		   $('#' + new_id).select();
+		}
+		
+		select_up(){
+		   var current_id = this.cell.attr('id');
+		   console.log(current_id);
+		   var self = this;
+		   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1-self.columns, 0) });
+		   console.log(new_id);
+		   $('#' + new_id).select();
+		}
+		
+		select_down(){
+		   var current_id = this.cell.attr('id');
+		   console.log(current_id);
+		   var self = this;
+		   var size = this.size;
+		   var new_id = current_id.replace( /(\d+)/, function(){return Math.min(arguments[1]*1 + self.columns, size) });
+		   console.log(new_id);
+		   $('#' + new_id).select();
+		}
+	}
+
    // User clicks on a cell
    $('.recall_input').keydown(function(e) {
 	   e.preventDefault();
 	   console.log("Key pressed = " + e.which)
+	   
+	   var grid = new RecallGrid(2, 3, $(this));
 	   
 		switch(e.which) {
 			case 48: // 0
@@ -41,39 +88,19 @@ $(document).ready(function(){
 				console.log("NUMERIC KEY");
 				var digit = e.which - 48;
 			   $(this).val(digit);
-			   var current_id = $(this).attr('id');
-			   console.log(current_id);
-			   var new_id = current_id.replace( /(\d+)/, function(){return Math.min(arguments[1]*1+1, 5) });
-			   console.log(new_id);
-			   $('#' + new_id).select();
+			   grid.select_next();
 				break;
 			case 39: // Right Arrow
-			   var current_id = $(this).attr('id');
-			   console.log(current_id);
-			   var new_id = current_id.replace( /(\d+)/, function(){return Math.min(arguments[1]*1+1, 5) });
-			   console.log(new_id);
-			   $('#' + new_id).select();
+			   grid.select_next();
 				break;
 			case 37: // Left Arrow
-			   var current_id = $(this).attr('id');
-			   console.log(current_id);
-			   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1-1, 0) });
-			   console.log(new_id);
-			   $('#' + new_id).select();
+			   grid.select_previous();
 				break;
 			case 38: // Up Arrow
-			   var current_id = $(this).attr('id');
-			   console.log(current_id);
-			   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1-3, 0) });
-			   console.log(new_id);
-			   $('#' + new_id).select();
+			    grid.select_up();
 				break;
 			case 40: // Down Arrow
-			   var current_id = $(this).attr('id');
-			   console.log(current_id);
-			   var new_id = current_id.replace( /(\d+)/, function(){return Math.min(arguments[1]*1+3, 5) });
-			   console.log(new_id);
-			   $('#' + new_id).select();
+				grid.select_down();
 				break;
 			case 80: // P character
 			   var current_id = $(this).attr('id');
@@ -100,20 +127,12 @@ $(document).ready(function(){
 			case 8: // backspace
 				console.log("BACKSPACE KEY");
 			   $(this).val('');
-			   var current_id = $(this).attr('id');
-			   console.log(current_id);
-			   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1-1, 0) });
-			   console.log(new_id);
-			   $('#' + new_id).select();
+			   grid.select_previous();
 			   break;
 			case 46: // del key
 				console.log("DELETE KEY");
 			   $(this).val('');
-			   var current_id = $(this).attr('id');
-			   console.log(current_id);
-			   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1+1, 0) });
-			   console.log(new_id);
-			   $('#' + new_id).select();
+			   grid.select_next();
 			   break;
 			default:
 				console.log("INVALID KEY");
