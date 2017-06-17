@@ -25,12 +25,59 @@ $(document).ready(function(){
    // User clicks on a cell
    $('.recall_input').keydown(function(e) {
 	   e.preventDefault();
-	   $(this).val(e.which - 48);
-	   var current_id = $(this).attr('id');
-	   console.log(current_id);
-	   var new_id = current_id.replace( /(\d+)/, function(){return arguments[1]*1+1} );
-	   console.log(new_id);
-       $('#' + new_id).select();
+	   console.log("Key pressed = " + e.which)
+	   
+		switch(e.which) {
+			case 48: // 0
+			case 49:
+			case 50:
+			case 51:
+			case 52:
+			case 53:
+			case 54:
+			case 55:
+			case 56:
+			case 57: // 9
+				console.log("NUMERIC KEY");
+				var digit = e.which - 48;
+			   $(this).val(digit);
+			   var current_id = $(this).attr('id');
+			   console.log(current_id);
+			   var new_id = current_id.replace( /(\d+)/, function(){return Math.min(arguments[1]*1+1, 5) });
+			   console.log(new_id);
+			   $('#' + new_id).select();
+				break;
+			case 39: // Right Arrow
+			   var current_id = $(this).attr('id');
+			   console.log(current_id);
+			   var new_id = current_id.replace( /(\d+)/, function(){return Math.min(arguments[1]*1+1, 5) });
+			   console.log(new_id);
+			   $('#' + new_id).select();
+				break;
+			case 37: // Left Arrow
+			   var current_id = $(this).attr('id');
+			   console.log(current_id);
+			   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1-1, 0) });
+			   console.log(new_id);
+			   $('#' + new_id).select();
+				break;
+			case 38: // Up Arrow
+			   var current_id = $(this).attr('id');
+			   console.log(current_id);
+			   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1-3, 0) });
+			   console.log(new_id);
+			   $('#' + new_id).select();
+				break;
+			case 40: // Down Arrow
+			   var current_id = $(this).attr('id');
+			   console.log(current_id);
+			   var new_id = current_id.replace( /(\d+)/, function(){return Math.min(arguments[1]*1+3, 5) });
+			   console.log(new_id);
+			   $('#' + new_id).select();
+				break;
+			default:
+				console.log("INVALID KEY");
+		}
    });
 
    // User navigates table using keyboard
