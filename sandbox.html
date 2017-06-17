@@ -97,6 +97,24 @@ $(document).ready(function(){
 					new_value = prev_value;
 			   }
 				break;
+			case 8: // backspace
+				console.log("BACKSPACE KEY");
+			   $(this).val('');
+			   var current_id = $(this).attr('id');
+			   console.log(current_id);
+			   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1-1, 0) });
+			   console.log(new_id);
+			   $('#' + new_id).select();
+			   break;
+			case 46: // del key
+				console.log("DELETE KEY");
+			   $(this).val('');
+			   var current_id = $(this).attr('id');
+			   console.log(current_id);
+			   var new_id = current_id.replace( /(\d+)/, function(){return Math.max(arguments[1]*1+1, 0) });
+			   console.log(new_id);
+			   $('#' + new_id).select();
+			   break;
 			default:
 				console.log("INVALID KEY");
 		}
