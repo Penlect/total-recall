@@ -86,6 +86,17 @@ $(document).ready(function(){
 					new_value = prev_value;
 			   }
 				break;
+			case 77: // m character
+			   var current_id = $(this).attr('id');
+			   var new_value = '';
+			   var prev_value = null;
+			   for(i = parseInt(current_id.split('_')[2]); i >= 0; i--){
+					var cell_id = '#recall_input_' + i.toString();
+					prev_value = $(cell_id).val();
+					$(cell_id).val(new_value);
+					new_value = prev_value;
+			   }
+				break;
 			default:
 				console.log("INVALID KEY");
 		}
