@@ -20,16 +20,13 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 <script>
-
-class RecallGrid {
-	constructor(rows, columns, cell){
-		this.rows = rows;
-		this.columns = columns;
-		this.size = rows*columns;
-		this.cell = cell;
-	}
+function RecallGrid(rows, columns, cell) {
+	this.rows = rows;
+	this.columns = columns;
+	this.size = rows*columns;
+	this.cell = cell;
 	
-	navigate(step){
+	this.navigate = function(step){
 	   var current_id = parseInt(this.cell.attr('id').split('_')[2]);
 	   current_id = current_id + step;
 	   if(current_id < 0 || current_id > this.size){
@@ -40,23 +37,23 @@ class RecallGrid {
 	   }
 	}
 	
-	select_next(){
+	this.select_next = function(){
 		this.navigate(1).select();
 	}
 	
-	select_previous(){
+	this.select_previous = function(){
 		this.navigate(-1).select();
 	}
 	
-	select_up(){
+	this.select_up = function(){
 		this.navigate(-this.columns).select();
 	}
 	
-	select_down(){
+	this.select_down = function(){
 		this.navigate(this.columns).select();
 	}
 	
-	shift_left(){
+	this.shift_left = function(){
 	   var current_id = this.cell.attr('id');
 	   var new_value = '';
 	   var prev_value = null;
@@ -68,7 +65,7 @@ class RecallGrid {
 	   }
 	}
 	
-	shift_right(){
+	this.shift_right = function(){
 	   var current_id = this.cell.attr('id');
 	   var new_value = '';
 	   var prev_value = null;
@@ -82,7 +79,6 @@ class RecallGrid {
 }
 	
 $(document).ready(function(){
-
    // User clicks on a cell
    $('.recall_input').keydown(function(e) {
 	   e.preventDefault();
@@ -144,6 +140,7 @@ $(document).ready(function(){
 				console.log("INVALID KEY");
 		}
    });
+   
 });
 </script>
 </body>
