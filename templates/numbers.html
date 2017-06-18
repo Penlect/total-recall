@@ -3,16 +3,13 @@
     <h1>Hello, World!</h1>
 
     <table id="recall_table">
-    <tr class="recall_row">
-        {% for i in range(5) %}
-            <td><input class="recall_cell" id="recall_cell_{{ i }}" type="text" maxlength="1"></input></td>
-        {% endfor %}
-    </tr>
-    <tr class="recall_row">
-        {% for i in range(5, 10) %}
-            <td><input class="recall_cell" id="recall_cell_{{ i }}" type="text" maxlength="1"></input></td>
-        {% endfor %}
-    </tr>
+    {% for row_i in range(nr_rows) %}
+        <tr class="recall_row">
+            {% for col_i in range(nr_cols) %}
+                <td><input class="recall_cell" id="recall_cell_{{ row_i*nr_cols + col_i }}" type="text" maxlength="1"></input></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
     </table>
 {% endblock %}
 
