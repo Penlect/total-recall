@@ -123,17 +123,19 @@ $(document).ready(function(){
 				grid.select_down();
 				break;
 			case 80: // P character
+				console.log("RIGHT SHIFT KEY");
 				grid.shift_right()
 				break;
-			case 77: // m character
+			case 77: // M character
+				console.log("LEFT SHIFT KEY");
 				grid.shift_left()
 				break;
-			case 8: // backspace
+			case 8: // Backspace
 				console.log("BACKSPACE KEY");
 			   $(this).val('');
 			   grid.select_previous();
 			   break;
-			case 46: // del key
+			case 46: // Del key
 				console.log("DELETE KEY");
 			   $(this).val('');
 			   grid.select_next();
@@ -142,7 +144,6 @@ $(document).ready(function(){
 				console.log("INVALID KEY");
 		}
    });
-   
 });
 </script>
 </body>
