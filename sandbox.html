@@ -5,20 +5,20 @@
 <body>
 
 <table border="1" id="recall_table">
-<tr class="row">
-<td><input class="recall_input" id="recall_input_0" type="text" maxlength="1"></input></td>
-<td><input class="recall_input" id="recall_input_1" type="text" maxlength="1"></input></td>
-<td><input class="recall_input" id="recall_input_2" type="text" maxlength="1"></input></td>
+<tr class="recall_row">
+<td><input class="recall_cell" id="recall_cell_0" type="text" maxlength="1"></input></td>
+<td><input class="recall_cell" id="recall_cell_1" type="text" maxlength="1"></input></td>
+<td><input class="recall_cell" id="recall_cell_2" type="text" maxlength="1"></input></td>
 </tr>
-<tr class="row">
-<td><input class="recall_input" id="recall_input_3" type="text" maxlength="1"></input></td>
-<td><input class="recall_input" id="recall_input_4" type="text" maxlength="1"></input></td>
-<td><input class="recall_input" id="recall_input_5" type="text" maxlength="1"></input></td>
+<tr class="recall_row">
+<td><input class="recall_cell" id="recall_cell_3" type="text" maxlength="1"></input></td>
+<td><input class="recall_cell" id="recall_cell_4" type="text" maxlength="1"></input></td>
+<td><input class="recall_cell" id="recall_cell_5" type="text" maxlength="1"></input></td>
 </tr>
-<tr class="row">
-<td><input class="recall_input" id="recall_input_6" type="text" maxlength="1"></input></td>
-<td><input class="recall_input" id="recall_input_7" type="text" maxlength="1"></input></td>
-<td><input class="recall_input" id="recall_input_8" type="text" maxlength="1"></input></td>
+<tr class="recall_row">
+<td><input class="recall_cell" id="recall_cell_6" type="text" maxlength="1"></input></td>
+<td><input class="recall_cell" id="recall_cell_7" type="text" maxlength="1"></input></td>
+<td><input class="recall_cell" id="recall_cell_8" type="text" maxlength="1"></input></td>
 </tr>
 </table>
 
@@ -38,7 +38,7 @@ function RecallGrid(rows, columns, cell) {
 			return this.cell;
 	   }
 	   else{
-			return $('#recall_input_' + current_id.toString());
+			return $('#recall_cell_' + current_id.toString());
 	   }
 	}
 	
@@ -63,7 +63,7 @@ function RecallGrid(rows, columns, cell) {
 	   var new_value = '';
 	   var prev_value = null;
 	   for(var i = parseInt(current_id.split('_')[2]); i >= 0; i--){
-			var cell_id = '#recall_input_' + i.toString();
+			var cell_id = '#recall_cell_' + i.toString();
 			prev_value = $(cell_id).val();
 			$(cell_id).val(new_value);
 			new_value = prev_value;
@@ -75,7 +75,7 @@ function RecallGrid(rows, columns, cell) {
 	   var new_value = '';
 	   var prev_value = null;
 	   for(var i = parseInt(current_id.split('_')[2]); i < this.size; i++){
-			var cell_id = '#recall_input_' + i.toString();
+			var cell_id = '#recall_cell_' + i.toString();
 			prev_value = $(cell_id).val();
 			$(cell_id).val(new_value);
 			new_value = prev_value;
@@ -146,12 +146,12 @@ function keydownHandler(event, grid){
 	
 $(document).ready(function(){
    // User clicks on a cell
-   var nrRows = $('#recall_table .row').length;
-   var nrCells = $('#recall_table .recall_input').length;
+   var nrRows = $('#recall_table .recall_row').length;
+   var nrCells = $('#recall_table .recall_cell').length;
    console.log("Rows = " + nrRows);
    console.log("Cells = " + nrCells);
    
-   $('.recall_input').keydown(function(e) {
+   $('.recall_cell').keydown(function(e) {
 	   e.preventDefault();
 	   var grid = new RecallGrid(nrRows, nrCells/nrRows, $(this));
 	   keydownHandler(event, grid);
