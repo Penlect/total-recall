@@ -4,16 +4,21 @@
 
 <body>
 
-<table border="1" >
-<tr>
+<table border="1" id="recall_table">
+<tr class="row">
 <td><input class="recall_input" id="recall_input_0" type="text" maxlength="1"></input></td>
 <td><input class="recall_input" id="recall_input_1" type="text" maxlength="1"></input></td>
 <td><input class="recall_input" id="recall_input_2" type="text" maxlength="1"></input></td>
 </tr>
-<tr>
+<tr class="row">
 <td><input class="recall_input" id="recall_input_3" type="text" maxlength="1"></input></td>
 <td><input class="recall_input" id="recall_input_4" type="text" maxlength="1"></input></td>
 <td><input class="recall_input" id="recall_input_5" type="text" maxlength="1"></input></td>
+</tr>
+<tr class="row">
+<td><input class="recall_input" id="recall_input_6" type="text" maxlength="1"></input></td>
+<td><input class="recall_input" id="recall_input_7" type="text" maxlength="1"></input></td>
+<td><input class="recall_input" id="recall_input_8" type="text" maxlength="1"></input></td>
 </tr>
 </table>
 
@@ -76,11 +81,13 @@ function RecallGrid(rows, columns, cell) {
 			new_value = prev_value;
 	   }
 	}
+	
+	this.set = function(value){
+		this.cell.val(value);
+	}
 }
 
-function keydownHandler(event, cell){
-
-   var grid = new RecallGrid(2, 3, cell);
+function keydownHandler(event, grid){
 	   
 	switch(event.which) {
 		case 48: // 0
@@ -95,7 +102,7 @@ function keydownHandler(event, cell){
 		case 57: // 9
 			console.log("NUMERIC KEY: " + event.which);
 			var digit = event.which - 48;
-		   cell.val(digit);
+		   grid.set(digit);
 		   grid.select_next();
 			break;
 		case 39: // Right Arrow
@@ -124,12 +131,12 @@ function keydownHandler(event, cell){
 			break;
 		case 8: // Backspace
 			console.log("BACKSPACE KEY: " + event.which);
-		   cell.val('');
+		   grid.set('');
 		   grid.select_previous();
 		   break;
 		case 46: // Del key
 			console.log("DELETE KEY: " + event.which);
-		   cell.val('');
+		   grid.set('');
 		   grid.select_next();
 		   break;
 		default:
@@ -139,9 +146,15 @@ function keydownHandler(event, cell){
 	
 $(document).ready(function(){
    // User clicks on a cell
+   var nrRows = $('#recall_table .row').length;
+   var nrCells = $('#recall_table .recall_input').length;
+   console.log("Rows = " + nrRows);
+   console.log("Cells = " + nrCells);
+   
    $('.recall_input').keydown(function(e) {
 	   e.preventDefault();
-	   keydownHandler(event, $(this))
+	   var grid = new RecallGrid(nrRows, nrCells, $(this));
+	   keydownHandler(event, grid);
    });
 });
 </script>
