@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block body %}
+    <h1>Hello, World!</h1>
+
+    <table id="recall_table">
+    <tr class="recall_row">
+        {% for i in range(5) %}
+            <td><input class="recall_cell" id="recall_cell_{{ i }}" type="text" maxlength="1"></input></td>
+        {% endfor %}
+    </tr>
+    <tr class="recall_row">
+        {% for i in range(5, 10) %}
+            <td><input class="recall_cell" id="recall_cell_{{ i }}" type="text" maxlength="1"></input></td>
+        {% endfor %}
+    </tr>
+    </table>
+{% endblock %}
+
+{% block javascript%}
+<script src="{{ url_for('static', filename='js/recall.js') }}"></script>
+
+<script>
+$(document).ready(function(){
+   // User clicks on a cell
+   var nrRows = $('#recall_table .recall_row').length;
+   var nrCells = $('#recall_table .recall_cell').length;
+   console.log("Rows = " + nrRows);
+   console.log("Cells = " + nrCells);
+
+   $('.recall_cell').keydown(function(e) {
+	   e.preventDefault();
+	   var grid = new RecallGrid(nrRows, nrCells/nrRows, $(this));
+	   keydownHandler(event, grid);
+   });
+});
+</script>
+{% endblock %}
+

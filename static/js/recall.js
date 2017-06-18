@@ -116,17 +116,3 @@ function keydownHandler(event, grid){
 			console.log("INVALID KEY: " + event.which);
 	}
 }
-	
-$(document).ready(function(){
-   // User clicks on a cell
-   var nrRows = $('#recall_table .recall_row').length;
-   var nrCells = $('#recall_table .recall_cell').length;
-   console.log("Rows = " + nrRows);
-   console.log("Cells = " + nrCells);
-   
-   $('.recall_cell').keydown(function(e) {
-	   e.preventDefault();
-	   var grid = new RecallGrid(nrRows, nrCells/nrRows, $(this));
-	   keydownHandler(event, grid);
-   });
-});
