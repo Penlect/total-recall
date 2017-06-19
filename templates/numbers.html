@@ -1,19 +1,54 @@
 {% extends "base.html" %}
-{% block body %}
-    <h1>Hello, World!</h1>
 
+{% block css %}
+
+<style>
+input[type=text] {
+    text-align: center;
+	padding:0px;
+	margin:0px;
+	width: 18px;
+	font-size:18px;
+	border: 0px;
+}
+input[type=text]:focus {
+    background-color: lightblue;
+}
+table {
+	border-collapse: collapse;
+	margin-bottom: 20px;
+}
+tr, td {
+	padding:0px;
+	margin:0px;
+}
+body{
+color: black;
+margin-left: 20px;
+margin-bottom: 20px;
+}
+</style>
+
+{% endblock %}
+
+{% block body %}
+
+    <h1>Recall 5 min numbers</h1>
     <form action="{{ url_for('arbeiter') }}" method="post">
+        <fieldset>
         <table border="1px" id="recall_table">
         {% for row_i in range(nr_rows) %}
             <tr class="recall_row">
                 {% for col_i in range(nr_cols) %}
-                    <td><input class="recall_cell" id="recall_cell_{{ row_i*nr_cols + col_i }}" name="recall_cell_{{ row_i*nr_cols + col_i }}" type="text" maxlength="1"></input></td>
+                    <td><input class="recall_cell" id="recall_cell_{{ row_i*nr_cols + col_i }}" name="recall_cell_{{ row_i*nr_cols + col_i }}" type="text" maxlength="1" size="1" autocomplete="off"></input></td>
                 {% endfor %}
             </tr>
         {% endfor %}
         </table>
-        <input type="submit" value="Submit">
+        <button type="submit" class="btn btn-primary">Submit</button>
+        </fieldset>
     </form>
+
 {% endblock %}
 
 {% block javascript%}
@@ -40,10 +75,14 @@ $(document).ready(function(){
             for (var x in response){
                 console.log(response[x]);
                 if(response[x]){
-                    $('#' + x).val(0);
+                    $('#' + x).css('background-color', 'lime');
+                }
+                else{
+                    $('#' + x).css('background-color', '#ff0033');
                 }
             }
       }, 'json');
+      $('fieldset').prop('disabled', true);
       return false;
    });
 });
