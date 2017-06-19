@@ -33,7 +33,7 @@ margin-bottom: 20px;
 
 {% block body %}
 
-    <h1>Recall 5 min numbers</h1>
+    <h1>Recall 5 min numbers <small>(key={{ key }})</small></h1>
     <form action="{{ url_for('arbeiter') }}" method="post">
         <fieldset>
         <table border="1px" id="recall_table">
@@ -48,6 +48,8 @@ margin-bottom: 20px;
         <button type="submit" class="btn btn-primary">Submit</button>
         </fieldset>
     </form>
+	
+	<p id="result"></p>
 
 {% endblock %}
 
@@ -68,19 +70,31 @@ $(document).ready(function(){
 	   keydownHandler(event, grid);
    });
 
-   var $form = $('form');
-   $form.submit(function(){
+   $('form').submit(function(){
       $.post($(this).attr('action'), $(this).serialize(), function(response){
             console.log(response);
-            for (var x in response){
-                console.log(response[x]);
-                if(response[x]){
-                    $('#' + x).css('background-color', 'lime');
+			
+			var recall_correct = 0;
+			var recall_wrong = 0;
+			var recall_none = 0;
+			
+            for (var recall_cell_id in response){
+                if(response[recall_cell_id] == true){
+                    $('#' + recall_cell_id).css('background-color', 'lime');
+					recall_correct++;
                 }
-                else{
-                    $('#' + x).css('background-color', '#ff0033');
+                else if(response[recall_cell_id] == false){
+                    $('#' + recall_cell_id).css('background-color', '#ff0022');
+					recall_wrong++;
                 }
+				else if(response[recall_cell_id] == null){
+					recall_none++;
+				}
+				else{
+					console.log('Got unexpected response: ' + response[recall_cell_id]);
+				}
             }
+			$("#result").text(recall_correct + ', ' + recall_wrong + ', ' + recall_none);
       }, 'json');
       $('fieldset').prop('disabled', true);
       return false;
