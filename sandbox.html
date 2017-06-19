@@ -1,27 +1,53 @@
 <head>
 
+<style>
+input[type=text] {
+    text-align: center;
+	padding:0px;
+	margin:0px;
+	width: 18px;
+	font-size:18px;
+	border: 0px;
+}
+input[type=text]:focus {
+    background-color: lightblue;
+}
+table {
+	border-collapse: collapse;
+}
+tr, td {
+	padding:0px;
+	margin:0px;
+}
+input:disabled{
+    color: black;
+}
+</style>
+
 </head>
 
 <body>
-
+<form>
+<fieldset disabled>
 <table border="1" id="recall_table">
 <tr class="recall_row">
-<td><input class="recall_cell" id="recall_cell_0" type="text" maxlength="1"></input></td>
-<td><input class="recall_cell" id="recall_cell_1" type="text" maxlength="1"></input></td>
-<td><input class="recall_cell" id="recall_cell_2" type="text" maxlength="1"></input></td>
+<td><input class="recall_cell" id="recall_cell_0" type="text" maxlength="1" value="1" size="1" autocomplete="off"></input></td>
+<td><input class="recall_cell" id="recall_cell_1" type="text" maxlength="1" value="2" size="1" autocomplete="off"></input></td>
+<td><input class="recall_cell" id="recall_cell_2" type="text" maxlength="1" value="3" size="1" autocomplete="off"></input></td>
 </tr>
 <tr class="recall_row">
-<td><input class="recall_cell" id="recall_cell_3" type="text" maxlength="1"></input></td>
-<td><input class="recall_cell" id="recall_cell_4" type="text" maxlength="1"></input></td>
-<td><input class="recall_cell" id="recall_cell_5" type="text" maxlength="1"></input></td>
+<td><input class="recall_cell" id="recall_cell_3" type="text" maxlength="1" value="4" size="1" autocomplete="off" style="background-color:lightgreen;"></input></td>
+<td><input class="recall_cell" id="recall_cell_4" type="text" maxlength="1" size="1" autocomplete="off"style="background-color:red;"></input></td>
+<td><input class="recall_cell" id="recall_cell_5" type="text" maxlength="1" size="1" autocomplete="off"></input></td>
 </tr>
 <tr class="recall_row">
-<td><input class="recall_cell" id="recall_cell_6" type="text" maxlength="1"></input></td>
-<td><input class="recall_cell" id="recall_cell_7" type="text" maxlength="1"></input></td>
-<td><input class="recall_cell" id="recall_cell_8" type="text" maxlength="1"></input></td>
+<td><input class="recall_cell" id="recall_cell_6" type="text" maxlength="1" size="1" autocomplete="off"></input></td>
+<td><input class="recall_cell" id="recall_cell_7" type="text" maxlength="1" size="1" autocomplete="off"></input></td>
+<td><input class="recall_cell" id="recall_cell_8" type="text" maxlength="1" size="1" autocomplete="off"></input></td>
 </tr>
 </table>
-
+</fieldset>
+</form>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 <script src="static/js/recall.js"></script>
