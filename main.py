@@ -6,6 +6,12 @@ from pprint import pprint
 
 app = Flask(__name__)
 
+
+@app.route('/create')
+def create():
+    return render_template('create.html')
+
+
 @app.route('/recall/<string:key>')
 def recall(key):
     key_file = f'database/{key}.txt'

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Create recall sheet</h1>
+
+                <form class="form-horizontal">
+                  <div class="form-group">
+                    <label for="base" class="col-sm-2 control-label">Base</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" id="base">
+                          <option>Decimal</option>
+                          <option>Binary</option>
+                        </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="nrCols" class="col-sm-2 control-label">Nr Columns</label>
+                    <div class="col-sm-10">
+                      <input type="number" class="form-control" id="nrCols">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="nrRows" class="col-sm-2 control-label">Nr Rows</label>
+                    <div class="col-sm-10">
+                      <input type="number" class="form-control" id="nrRows">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="recallTime" class="col-sm-2 control-label">Recall time (min)</label>
+                    <div class="col-sm-10">
+                      <input type="number" class="form-control" id="recallTime">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="correction" class="col-sm-2 control-label">Recall correction</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" id="correction">
+                          <option>Harsh</option>
+                          <option>Kind</option>
+                        </select>
+                    </div>
+                  </div>
+                    <button type="button" class="btn btn-default">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascript%}
+{% endblock %}
+
