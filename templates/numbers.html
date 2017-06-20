@@ -34,6 +34,9 @@ margin-bottom: 20px;
 {% block body %}
 
     <h1>Recall 5 min numbers <small>(key={{ key }})</small></h1>
+	
+	<p>Seconds remaining: <span id="seconds_remaining">15</span></p>
+	
     <form action="{{ url_for('arbeiter') }}" method="post">
         <fieldset>
         <table border="1px" id="recall_table">
@@ -45,7 +48,7 @@ margin-bottom: 20px;
             </tr>
         {% endfor %}
         </table>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button id="recall_complete" type="submit" class="btn btn-primary">Submit</button>
         </fieldset>
     </form>
 	
@@ -57,46 +60,82 @@ margin-bottom: 20px;
 <script src="{{ url_for('static', filename='js/recall.js') }}"></script>
 
 <script>
+
+var SECOND = 1000 // milliseconds
+
+function getRecallTimer(recallTimeSec){
+	var secondsRemaining = recallTimeSec;
+	var interval = SECOND; // ms
+	var expected = Date.now() + interval;
+	function step() {
+		secondsRemaining--;
+		$('#seconds_remaining').text(secondsRemaining);
+		if(secondsRemaining <= 0){
+			console.log('Recall timeout -> Submit');
+			$('#recall_complete').submit();
+		}
+		else{
+			var dt = Date.now() - expected; // the drift (positive for overshooting)
+			if (dt > interval) {
+				console.log('Warning: dt = ' + dt);
+			}
+			expected += interval;
+			recallTimer = setTimeout(step, Math.max(0, interval - dt)); // take into account drift
+		}
+	}
+	return step;
+}
+
+
+function recallSubmit(data, status, xhr){
+	console.log(data);
+	console.log(status);
+	
+	var recall_correct = 0;
+	var recall_wrong = 0;
+	var recall_none = 0;
+	
+	for (var recall_cell_id in data){
+		if(data[recall_cell_id] == true){
+			$('#' + recall_cell_id).css('background-color', 'lime');
+			recall_correct++;
+		}
+		else if(data[recall_cell_id] == false){
+			$('#' + recall_cell_id).css('background-color', '#ff0022');
+			recall_wrong++;
+		}
+		else if(data[recall_cell_id] == null){
+			recall_none++;
+		}
+		else{
+			console.log('Got unexpected data: ' + data[recall_cell_id]);
+		}
+	}
+	$("#result").text(recall_correct + ', ' + recall_wrong + ', ' + recall_none);
+}
+
 $(document).ready(function(){
+
+	// Start count down clock for recall
+	recallTimer = setTimeout(getRecallTimer(15), SECOND);
+
    // User clicks on a cell
    var nrRows = $('#recall_table .recall_row').length;
    var nrCells = $('#recall_table .recall_cell').length;
    console.log("Rows = " + nrRows);
    console.log("Cells = " + nrCells);
 
-   $('.recall_cell').keydown(function(e) {
-	   e.preventDefault();
+   $('.recall_cell').keydown(function(event) {
+	   event.preventDefault();
 	   var grid = new RecallGrid(nrRows, nrCells/nrRows, $(this));
 	   keydownHandler(event, grid);
    });
 
-   $('form').submit(function(){
-      $.post($(this).attr('action'), $(this).serialize(), function(response){
-            console.log(response);
-			
-			var recall_correct = 0;
-			var recall_wrong = 0;
-			var recall_none = 0;
-			
-            for (var recall_cell_id in response){
-                if(response[recall_cell_id] == true){
-                    $('#' + recall_cell_id).css('background-color', 'lime');
-					recall_correct++;
-                }
-                else if(response[recall_cell_id] == false){
-                    $('#' + recall_cell_id).css('background-color', '#ff0022');
-					recall_wrong++;
-                }
-				else if(response[recall_cell_id] == null){
-					recall_none++;
-				}
-				else{
-					console.log('Got unexpected response: ' + response[recall_cell_id]);
-				}
-            }
-			$("#result").text(recall_correct + ', ' + recall_wrong + ', ' + recall_none);
-      }, 'json');
+   $('form').submit(function(event){
+	  event.preventDefault();
+      $.post($(this).attr('action'), $(this).serialize(), recallSubmit, 'json');
       $('fieldset').prop('disabled', true);
+	  clearTimeout(recallTimer);
       return false;
    });
 });
