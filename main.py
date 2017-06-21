@@ -11,6 +11,26 @@ app = Flask(__name__)
 def create():
     return render_template('create.html')
 
+@app.route('/numbers', methods=['POST'])
+def numbers():
+    if request.method == 'POST':
+        d = dict(request.form)
+        return str(d)
+    return 'Thanks!'
+
+@app.route('/words', methods=['POST'])
+def words():
+    if request.method == 'POST':
+        d = dict(request.form)
+        return str(d)
+    return 'Thanks!'
+
+@app.route('/dates', methods=['POST'])
+def dates():
+    if request.method == 'POST':
+        d = dict(request.form)
+        return str(d)
+    return 'Thanks!'
 
 @app.route('/recall/<string:key>')
 def recall(key):

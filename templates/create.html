@@ -9,51 +9,213 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h1>Create recall sheet</h1>
+                <div class="jumbotron">
+                  <h1>Create a memory discipline!</h1>
+                  <p>This page is used to create memorization data and recall settings.</p>
+                  <p>1. Pick a discipline below</p>
+                  <p>2. Enter desired values in the fields</p>
+                  <p>3. Click the "Create"-button</p>
+                  <p>4. Memorize the key ;)</p>
+                </div>
+            </div>
+        </div>
 
-                <form class="form-horizontal">
-                  <div class="form-group">
-                    <label for="base" class="col-sm-2 control-label">Base</label>
-                    <div class="col-sm-10">
-                        <select class="form-control" id="base">
-                          <option>Decimal</option>
-                          <option>Binary</option>
-                        </select>
-                    </div>
-                  </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Numbers</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="well">
+                    <form class="form-horizontal" action="{{ url_for('numbers') }}" method="post">
 
-                  <div class="form-group">
-                    <label for="nrCols" class="col-sm-2 control-label">Nr Columns</label>
-                    <div class="col-sm-10">
-                      <input type="number" class="form-control" id="nrCols">
-                    </div>
-                  </div>
+                      <div class="form-group">
+                        <label for="base_numbers" class="col-sm-4 control-label">Base</label>
+                        <div class="col-sm-8">
+                            <select name="base" class="form-control" id="base_numbers">
+                              <option>Decimal</option>
+                              <option>Binary</option>
+                            </select>
+                        </div>
+                      </div>
 
-                  <div class="form-group">
-                    <label for="nrRows" class="col-sm-2 control-label">Nr Rows</label>
-                    <div class="col-sm-10">
-                      <input type="number" class="form-control" id="nrRows">
-                    </div>
-                  </div>
+                      <div class="form-group">
+                        <label for="nrCols_numbers" class="col-sm-4 control-label">Nr Columns</label>
+                        <div class="col-sm-8">
+                          <input name="nr_cols" type="number" class="form-control" id="nrCols_numbers">
+                        </div>
+                      </div>
 
-                  <div class="form-group">
-                    <label for="recallTime" class="col-sm-2 control-label">Recall time (min)</label>
-                    <div class="col-sm-10">
-                      <input type="number" class="form-control" id="recallTime">
-                    </div>
-                  </div>
+                      <div class="form-group">
+                        <label for="nrRows_numbers" class="col-sm-4 control-label">Nr Rows</label>
+                        <div class="col-sm-8">
+                          <input name="nr_rows" type="number" class="form-control" id="nrRows_numbers">
+                        </div>
+                      </div>
 
-                  <div class="form-group">
-                    <label for="correction" class="col-sm-2 control-label">Recall correction</label>
-                    <div class="col-sm-10">
-                        <select class="form-control" id="correction">
-                          <option>Harsh</option>
-                          <option>Kind</option>
-                        </select>
-                    </div>
-                  </div>
-                    <button type="button" class="btn btn-default">Create</button>
-                </form>
+                      <div class="form-group">
+                        <label for="recallTime_numbers" class="col-sm-4 control-label">Recall time (min)</label>
+                        <div class="col-sm-8">
+                          <input name="recall_time" type="number" class="form-control" id="recallTime_numbers">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="correction_numbers" class="col-sm-4 control-label">Correction</label>
+                        <div class="col-sm-8">
+                            <select name="correction" class="form-control" id="correction_numbers">
+                              <option>Harsh</option>
+                              <option>Kind</option>
+                            </select>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label class="col-sm-4 control-label"></label>
+                        <div class="col-sm-8">
+                            <button type="submit" type="button" class="btn btn-default btn-block">Create</button>
+                        </div>
+                      </div>
+
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h3>Instructions</h3>
+                <p>The <strong>base</strong> will be the numerical base of the numbers to memorize.
+                    Decimal = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}.
+                    Binary = {0, 1}.
+                    The <strong>nr columns</strong> and <strong>nr rows</strong> must be positive integers.
+                    The <strong>recall time</strong> must be given in whole minutes.</p>
+            </div>
+        </div>
+
+
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Words</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="well">
+                    <form class="form-horizontal" action="{{ url_for('words') }}" method="post">
+
+                      <div class="form-group">
+                        <label for="nrCols_words" class="col-sm-4 control-label">Nr Columns</label>
+                        <div class="col-sm-8">
+                          <input name="nr_cols" type="number" class="form-control" id="nrCols_words">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="nrRows_words" class="col-sm-4 control-label">Nr Rows</label>
+                        <div class="col-sm-8">
+                          <input name="nr_rows" type="number" class="form-control" id="nrRows_words">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="recallTime_words" class="col-sm-4 control-label">Recall time (min)</label>
+                        <div class="col-sm-8">
+                          <input name="recall_time" type="number" class="form-control" id="recallTime_words">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="correction_words" class="col-sm-4 control-label">Correction</label>
+                        <div class="col-sm-8">
+                            <select name="correction" class="form-control" id="correction_words">
+                              <option>Harsh</option>
+                              <option>Kind</option>
+                            </select>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="data_words" class="col-sm-4 control-label">Words</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" name="data" rows="40" id="data_words"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label class="col-sm-4 control-label"></label>
+                        <div class="col-sm-8">
+                            <button type="submit" type="button" class="btn btn-default btn-block">Create</button>
+                        </div>
+                      </div>
+
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h3>Instructions</h3>
+                <p>The <strong>base</strong> will be the numerical base of the numbers to memorize.
+                    Decimal = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}.
+                    Binary = {0, 1}.
+                    The <strong>nr columns</strong> and <strong>nr rows</strong> must be positive integers.
+                    The <strong>recall time</strong> must be given in whole minutes.</p>
+            </div>
+        </div>
+
+
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Historical Dates</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="well">
+                    <form class="form-horizontal" action="{{ url_for('dates') }}" method="post">
+
+                      <div class="form-group">
+                        <label for="recallTime_dates" class="col-sm-4 control-label">Recall time (min)</label>
+                        <div class="col-sm-8">
+                          <input name="recall_time" type="number" class="form-control" id="recallTime_dates">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="correction_dates" class="col-sm-4 control-label">Correction</label>
+                        <div class="col-sm-8">
+                            <select name="correction" class="form-control" id="correction_dates">
+                              <option>Harsh</option>
+                              <option>Kind</option>
+                            </select>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="data_dates" class="col-sm-4 control-label">Words</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" name="data" rows="40" id="data_dates"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label class="col-sm-4 control-label"></label>
+                        <div class="col-sm-8">
+                            <button type="submit" type="button" class="btn btn-default btn-block">Create</button>
+                        </div>
+                      </div>
+
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h3>Instructions</h3>
+                <p>The <strong>base</strong> will be the numerical base of the numbers to memorize.
+                    Decimal = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}.
+                    Binary = {0, 1}.
+                    The <strong>nr columns</strong> and <strong>nr rows</strong> must be positive integers.
+                    The <strong>recall time</strong> must be given in whole minutes.</p>
             </div>
         </div>
     </div>
