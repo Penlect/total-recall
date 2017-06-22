@@ -18,6 +18,13 @@ def numbers():
         return str(d)
     return 'Thanks!'
 
+@app.route('/cards', methods=['POST'])
+def cards():
+    if request.method == 'POST':
+        d = dict(request.form)
+        return str(d)
+    return 'Thanks!'
+
 @app.route('/words', methods=['POST'])
 def words():
     if request.method == 'POST':

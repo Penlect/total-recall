@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block css %}
@@ -26,7 +27,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-8">
                 <div class="well">
                     <form class="form-horizontal" action="{{ url_for('numbers') }}" method="post">
 
@@ -43,21 +44,21 @@
                       <div class="form-group">
                         <label for="nrCols_numbers" class="col-sm-4 control-label">Nr Columns</label>
                         <div class="col-sm-8">
-                          <input name="nr_cols" type="number" class="form-control" id="nrCols_numbers">
+                          <input name="nr_cols" type="number" min="1" max="50" required class="form-control" id="nrCols_numbers">
                         </div>
                       </div>
 
                       <div class="form-group">
                         <label for="nrRows_numbers" class="col-sm-4 control-label">Nr Rows</label>
                         <div class="col-sm-8">
-                          <input name="nr_rows" type="number" class="form-control" id="nrRows_numbers">
+                          <input name="nr_rows" type="number" min="1" max="1000" required class="form-control" id="nrRows_numbers">
                         </div>
                       </div>
 
                       <div class="form-group">
                         <label for="recallTime_numbers" class="col-sm-4 control-label">Recall time (min)</label>
                         <div class="col-sm-8">
-                          <input name="recall_time" type="number" class="form-control" id="recallTime_numbers">
+                          <input name="recall_time" type="number" min="1" max="1500" required class="form-control" id="recallTime_numbers">
                         </div>
                       </div>
 
@@ -81,7 +82,7 @@
                     </form>
                 </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <h3>Instructions</h3>
                 <p>The <strong>base</strong> will be the numerical base of the numbers to memorize.
                     Decimal = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}.
@@ -100,28 +101,21 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-8">
                 <div class="well">
                     <form class="form-horizontal" action="{{ url_for('words') }}" method="post">
 
                       <div class="form-group">
-                        <label for="nrCols_words" class="col-sm-4 control-label">Nr Columns</label>
-                        <div class="col-sm-8">
-                          <input name="nr_cols" type="number" class="form-control" id="nrCols_words">
-                        </div>
-                      </div>
-
-                      <div class="form-group">
                         <label for="nrRows_words" class="col-sm-4 control-label">Nr Rows</label>
                         <div class="col-sm-8">
-                          <input name="nr_rows" type="number" class="form-control" id="nrRows_words">
+                          <input name="nr_rows" type="number" min="1" max="1000" required class="form-control" id="nrRows_words">
                         </div>
                       </div>
 
                       <div class="form-group">
                         <label for="recallTime_words" class="col-sm-4 control-label">Recall time (min)</label>
                         <div class="col-sm-8">
-                          <input name="recall_time" type="number" class="form-control" id="recallTime_words">
+                          <input name="recall_time" type="number" min="1" max="1500" required class="form-control" id="recallTime_words">
                         </div>
                       </div>
 
@@ -152,7 +146,7 @@
                     </form>
                 </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <h3>Instructions</h3>
                 <p>The <strong>base</strong> will be the numerical base of the numbers to memorize.
                     Decimal = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}.
@@ -171,14 +165,14 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-8">
                 <div class="well">
                     <form class="form-horizontal" action="{{ url_for('dates') }}" method="post">
 
                       <div class="form-group">
                         <label for="recallTime_dates" class="col-sm-4 control-label">Recall time (min)</label>
                         <div class="col-sm-8">
-                          <input name="recall_time" type="number" class="form-control" id="recallTime_dates">
+                          <input name="recall_time" type="number" min="1" max="1500" required class="form-control" id="recallTime_dates">
                         </div>
                       </div>
 
@@ -193,7 +187,7 @@
                       </div>
 
                       <div class="form-group">
-                        <label for="data_dates" class="col-sm-4 control-label">Words</label>
+                        <label for="data_dates" class="col-sm-4 control-label">Historical Dates</label>
                         <div class="col-sm-8">
                             <textarea class="form-control" name="data" rows="40" id="data_dates"></textarea>
                         </div>
@@ -209,7 +203,7 @@
                     </form>
                 </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <h3>Instructions</h3>
                 <p>The <strong>base</strong> will be the numerical base of the numbers to memorize.
                     Decimal = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}.
