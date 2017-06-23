@@ -22,7 +22,7 @@ class RecallTable:
 
     def __init__(self, name, recall_key, title, recall_time, language,
                  nr_items_per_page, nr_rows_page, nr_cols_page,
-                 height_row):
+                 height_row, key_left_shift=1):
         self.recall_key = recall_key
         self.description = f'{recall_time} Min {name} Memorization, {language}'
         self.title = title
@@ -31,6 +31,8 @@ class RecallTable:
         self.nr_rows_page = nr_rows_page
         self.nr_cols_page = nr_cols_page
         self.height_row = height_row
+
+        self.key_left_shift = key_left_shift
 
         self.book = xlwt.Workbook(name.replace(' ', '_'))
         self.sheet = self.book.add_sheet(name.replace(' ', '_'))
@@ -67,7 +69,7 @@ class RecallTable:
         )
         self.sheet.write(
             self.page_offset + 1,
-            self.nr_cols_page - 1,
+            self.nr_cols_page - self.key_left_shift,
             f'Recall key: {self.recall_key}',
             self.style_header
         )
