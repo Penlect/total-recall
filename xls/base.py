@@ -16,16 +16,17 @@ class RecallTable:
         'font: name Arial, height 220;'
         'alignment: horizontal center;'
     )
-    style_header = xlwt.easyxf(
-        'font: italic True;'
+    style_description = xlwt.easyxf(
+    )
+    style_key = xlwt.easyxf(
     )
 
-    def __init__(self, name, recall_key, title, recall_time, language,
+    def __init__(self, name, recall_key, title, description,
                  nr_items_per_page, nr_rows_page, nr_cols_page,
                  height_row, key_left_shift=1):
         self.recall_key = recall_key
-        self.description = f'{recall_time} Min {name} Memorization, {language}'
         self.title = title
+        self.description = description
 
         self.nr_items_per_page = nr_items_per_page
         self.nr_rows_page = nr_rows_page
@@ -65,13 +66,13 @@ class RecallTable:
             self.page_offset + 1,
             0,
             self.description,
-            self.style_header
+            self.style_description
         )
         self.sheet.write(
             self.page_offset + 1,
             self.nr_cols_page - self.key_left_shift,
             f'Recall key: {self.recall_key}',
-            self.style_header
+            self.style_key
         )
 
     def save(self, filename):

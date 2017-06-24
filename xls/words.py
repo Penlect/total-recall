@@ -37,9 +37,8 @@ style_word = xlwt.easyxf(
 
 class WordTable(xls.base.RecallTable):
 
-    def __init__(self, *, name, recall_key, title='Svenska Minnesförbundet',
-                 recall_time='X', language='Unknown Language'):
-        super().__init__(name, recall_key, title, recall_time, language,
+    def __init__(self, *, name, recall_key, title, description):
+        super().__init__(name, recall_key, title, description,
                          NR_ITEMS_PER_PAGE, NR_PAGE_ROWS, NR_PAGE_COLS,
                          HEIGHT_ROW)
         self.sheet.portrait = False
@@ -67,7 +66,9 @@ if __name__ == '__main__':
     import random
     words = ['dator', 'kortlek', 'vattenfall', 'bacon', 'pizza']
 
-    w = WordTable(name='Words', recall_key='abc123')
+    w = WordTable(name='Words', recall_key='abc123',
+                  title='Svenska Minnesförbundet',
+                  description='Word description')
 
     for _ in range(20*5*5 + 23):
         w.add_item(random.choice(words))

@@ -55,6 +55,7 @@ def numbers():
         # The request form is a ImmutableMultiDict
         form = request.form
         if 'data' in form:
+            # CREATE BLOB
             blob = {
                 'discipline': form['base'].lower(),
                 'recall_time': int(form['recall_time']),
@@ -67,20 +68,24 @@ def numbers():
             if blob['discipline'] == 'binary' and len(set(blob['data'])) > 2:
                 return 'ERROR binary but decimal?'
 
+            # ADD BLOB TO DATABASE
             h = add_to_database(blob)
             app.logger.info(f'Created blob for numbers: {h}')
 
+            # CREATE XLS DOCUMENT
+            description = (
+                f"Memorization: {blob['discipline'].title()} Numbers, "
+                f"{len(blob['data'])} digits. "
+                f"Recall time: {blob['recall_time']} Min"
+            )
             w = xls.NumberTable(name='Numbers', recall_key=h.upper(),
-                                recall_time=blob['recall_time'],
-                                language=blob['discipline'])
-
+                                title='Svenska Minnesförbundet',
+                                description=description)
             for n in blob['data']:
                 w.add_item(n)
             w.save('static/sheets/' + blob['discipline'] + '.xls')
-
             return render_template('memorize.html',
                                    xls_download_link=url_for('static', filename='sheets/' + blob['discipline'] + '.xls'))
-
             return str(blob)
 
 
@@ -90,8 +95,10 @@ def words():
         # The request form is a ImmutableMultiDict
         form = request.form
         if 'data' in form:
+            # CREATE BLOB
             blob = {
                 'discipline': 'words',
+                'language': form['language'].lower(),
                 'recall_time': int(form['recall_time']),
                 'correction': form['correction'].lower(),
                 'data': tuple(
@@ -99,20 +106,24 @@ def words():
                     if word.strip())
             }
 
+            # ADD BLOB TO DATABASE
             h = add_to_database(blob)
             app.logger.info(f'Created blob for words: {h}')
 
+            # CREATE XLS DOCUMENT
+            description = (
+                f"Memorization: {len(blob['data'])} Words, "
+                f"{blob['language'].title()}. "
+                f"Recall time: {blob['recall_time']} Min"
+            )
             w = xls.WordTable(name='Words', recall_key=h.upper(),
-                                recall_time=blob['recall_time'],
-                                language=blob['discipline'])
-
+                                title='Svenska Minnesförbundet',
+                                description=description)
             for n in blob['data']:
                 w.add_item(n)
             w.save('static/sheets/' + blob['discipline'] + '.xls')
-
             return render_template('memorize.html',
                                    xls_download_link=url_for('static', filename='sheets/' + blob['discipline'] + '.xls'))
-
             return str(blob)
 
 
@@ -122,6 +133,7 @@ def dates():
         # The request form is a ImmutableMultiDict
         form = request.form
         if 'data' in form:
+            # CREATE BLOB
             historical_dates = list()
             for line in form['data'].split('\n'):
                 if line.strip():
@@ -129,25 +141,30 @@ def dates():
                     historical_dates.append((date.strip(), story.strip()))
             blob = {
                 'discipline': 'dates',
+                'language': form['language'].lower(),
                 'recall_time': int(form['recall_time']),
                 'correction': form['correction'].lower(),
                 'data': tuple(historical_dates)
             }
 
+            # ADD BLOB TO DATABASE
             h = add_to_database(blob)
             app.logger.info(f'Created blob for words: {h}')
 
+            # CREATE XLS DOCUMENT
+            description = (
+                f"Memorization: {len(blob['data'])} Historical Dates, "
+                f"{blob['language'].title()}. "
+                f"Recall time: {blob['recall_time']} Min"
+            )
             w = xls.DatesTable(name='Dates', recall_key=h.upper(),
-                                recall_time=blob['recall_time'],
-                                language=blob['discipline'])
-
+                                title='Svenska Minnesförbundet',
+                                description=description)
             for n in blob['data']:
                 w.add_item(n)
             w.save('static/sheets/' + blob['discipline'] + '.xls')
-
             return render_template('memorize.html',
                                    xls_download_link=url_for('static', filename='sheets/' + blob['discipline'] + '.xls'))
-
             return str(blob)
 
 

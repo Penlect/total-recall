@@ -25,9 +25,8 @@ style_number = xlwt.easyxf(
 
 class BinaryTable(xls.base.RecallTable):
 
-    def __init__(self, *, name, recall_key, title='Svenska Minnesförbundet',
-                 recall_time='X', language='Decimal'):
-        super().__init__(name, recall_key, title, recall_time, language,
+    def __init__(self, *, name, recall_key, title, description):
+        super().__init__(name, recall_key, title, description,
                          NR_ITEMS_PER_PAGE, NR_PAGE_ROWS, NR_PAGE_COLS,
                          HEIGHT_ROW, 4)
         self.sheet.portrait = True
@@ -56,7 +55,9 @@ if __name__ == '__main__':
     import random
     numbers = [random.randint(0,1) for _ in range(1234)]
 
-    w = BinaryTable(name='Numbers', recall_key='abc123')
+    w = BinaryTable(name='Numbers', recall_key='abc123',
+                    title='Svenska Minnesförbundet',
+                    description='Word description')
 
     for n in numbers:
         w.add_item(n)

@@ -38,9 +38,8 @@ style_story = xlwt.easyxf(
 
 class DatesTable(xls.base.RecallTable):
 
-    def __init__(self, *, name, recall_key, title='Svenska Minnesförbundet',
-                 recall_time='X', language='Unknown Language'):
-        super().__init__(name, recall_key, title, recall_time, language,
+    def __init__(self, *, name, recall_key, title, description):
+        super().__init__(name, recall_key, title, description,
                          NR_ITEMS_PER_PAGE, NR_PAGE_ROWS, NR_PAGE_COLS,
                          HEIGHT_ROW)
         self.sheet.portrait = True
@@ -77,7 +76,9 @@ if __name__ == '__main__':
         (random.randint(1000,2099), 'Nyheter på TV upphör'),
     ]
 
-    w = DatesTable(name='Dates', recall_key='abc123')
+    w = DatesTable(name='Dates', recall_key='abc123',
+                   title='Svenska Minnesförbundet',
+                   description='Word description')
 
     for _ in range(20*5*5 + 23):
         w.add_item(random.choice(dates))
