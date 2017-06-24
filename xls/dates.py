@@ -43,6 +43,7 @@ class DatesTable(xls.base.RecallTable):
         super().__init__(name, recall_key, title, recall_time, language,
                          NR_ITEMS_PER_PAGE, NR_PAGE_ROWS, NR_PAGE_COLS,
                          HEIGHT_ROW)
+        self.sheet.portrait = True
 
         self.sheet.col(0).width = WIDTH_INDEX
         self.sheet.col(1).width = WIDTH_DATE

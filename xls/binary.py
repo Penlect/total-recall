@@ -4,11 +4,11 @@ import xlwt
 import xls.base
 
 
-NR_ITEMS_ROW   = 40
+NR_ITEMS_ROW   = 30
 NR_ITEMS_COL   = 25
 NR_ITEMS_PER_PAGE = NR_ITEMS_ROW * NR_ITEMS_COL
 NR_PAGE_ROWS   = 34 # Depends on cell heights!
-NR_PAGE_COLS   = 43
+NR_PAGE_COLS   = 33
 NR_ROWS_HEADER = 4
 
 WIDTH_NUMBER  = xls.base.convert_row_width(0.381)
@@ -23,7 +23,7 @@ style_number = xlwt.easyxf(
 )
 
 
-class NumberTable(xls.base.RecallTable):
+class BinaryTable(xls.base.RecallTable):
 
     def __init__(self, *, name, recall_key, title='Svenska Minnesförbundet',
                  recall_time='X', language='Decimal'):
@@ -54,11 +54,11 @@ class NumberTable(xls.base.RecallTable):
 
 if __name__ == '__main__':
     import random
-    numbers = [random.randint(0,9) for _ in range(1234)]
+    numbers = [random.randint(0,1) for _ in range(1234)]
 
-    w = NumberTable(name='Numbers', recall_key='abc123')
+    w = BinaryTable(name='Numbers', recall_key='abc123')
 
     for n in numbers:
         w.add_item(n)
 
-    w.save('numbers.xls')
+    w.save('binary.xls')

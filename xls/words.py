@@ -42,6 +42,7 @@ class WordTable(xls.base.RecallTable):
         super().__init__(name, recall_key, title, recall_time, language,
                          NR_ITEMS_PER_PAGE, NR_PAGE_ROWS, NR_PAGE_COLS,
                          HEIGHT_ROW)
+        self.sheet.portrait = False
 
         for i in range(NR_ITEMS_COL):
             self.sheet.col(i*3).width = WIDTH_INDEX
