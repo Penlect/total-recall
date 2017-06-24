@@ -1,7 +1,7 @@
 
 import os
 import re
-from flask import Flask, render_template, request, jsonify, flash
+from flask import Flask, render_template, request, jsonify, flash, url_for
 
 import random
 from pprint import pprint
@@ -12,7 +12,6 @@ import xls
 
 app = Flask(__name__)
 app.secret_key = 'some_secret'
-
 
 def sha(string):
     h = hashlib.sha1(string.encode())
@@ -33,6 +32,11 @@ def add_to_database(blob):
     with open(output_file, 'w') as file:
         json.dump(blob, file)
     return h
+
+
+@app.route('/memorize')
+def memorize():
+    return render_template('memorize.html')
 
 
 @app.route('/generate')
@@ -72,7 +76,10 @@ def numbers():
 
             for n in blob['data']:
                 w.add_item(n)
-            w.save(blob['discipline'] + '.xls')
+            w.save('static/sheets/' + blob['discipline'] + '.xls')
+
+            return render_template('memorize.html',
+                                   xls_download_link=url_for('static', filename='sheets/' + blob['discipline'] + '.xls'))
 
             return str(blob)
 
@@ -101,7 +108,10 @@ def words():
 
             for n in blob['data']:
                 w.add_item(n)
-            w.save(blob['discipline'] + '.xls')
+            w.save('static/sheets/' + blob['discipline'] + '.xls')
+
+            return render_template('memorize.html',
+                                   xls_download_link=url_for('static', filename='sheets/' + blob['discipline'] + '.xls'))
 
             return str(blob)
 
@@ -133,7 +143,10 @@ def dates():
 
             for n in blob['data']:
                 w.add_item(n)
-            w.save(blob['discipline'] + '.xls')
+            w.save('static/sheets/' + blob['discipline'] + '.xls')
+
+            return render_template('memorize.html',
+                                   xls_download_link=url_for('static', filename='sheets/' + blob['discipline'] + '.xls'))
 
             return str(blob)
 
