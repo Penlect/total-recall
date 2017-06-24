@@ -2,31 +2,34 @@
 
 {% from 'memo.html' import common_fields %}
 
-{% macro language(item_name) %}
+{% macro nr_items(item_name, max) %}
 <div class="form-group">
-    <label for="language_{{ item_name }}" class="col-sm-3 control-label">Language</label>
+    <label for="nr{{ item_name }}" class="col-sm-3 control-label">Nr {{ item_name }}</label>
     <div class="col-sm-9">
-      <input name="language" type="string" required class="form-control" id="language_{{ item_name }}">
+      <input name="nr_items" type="number" min="1" max="{{ max }}" required class="form-control" id="nr{{ item_name }}">
     </div>
 </div>
 {% endmacro %}
 
-{% macro textarea(item_name, label, rows) %}
-  <div class="form-group">
-    <label for="data_{{ item_name }}" class="col-sm-3 control-label">{{ label }}</label>
+{% macro languages(item_name) %}
+<div class="form-group">
+    <label for="language_{{ item_name }}" class="col-sm-3 control-label">Language</label>
     <div class="col-sm-9">
-        <textarea class="form-control" name="data" rows="{{ rows }}" id="data_{{ item_name }}"></textarea>
+        <select name="language" class="form-control" id="language_{{ item_name }}">
+          <option>Swedish</option>
+          <option>English</option>
+        </select>
     </div>
-  </div>
+</div>
 {% endmacro %}
 
 
 {% block jumbotron %}
-<h1>Create memorization data!</h1>
-<p>This page is used to Create memorization data and recall settings.</p>
+<h1>Generate memorization data!</h1>
+<p>This page is used to generate memorization data and recall settings.</p>
 <p>1. Pick a discipline below</p>
 <p>2. Enter desired values in the fields</p>
-<p>3. Click the "Create"-button</p>
+<p>3. Click the "Generate"-button</p>
 {% endblock %}
 
 
@@ -42,7 +45,7 @@
     </div>
 </div>
 
-{{ textarea(item_name='Digits', label='Digits', rows=40) }}
+{{ nr_items('Digits', max=10000) }}
 
 {{ common_fields('Digits') }}
 
@@ -54,9 +57,9 @@
 <!-- ________________________ WORDS ________________________ -->
 {% block words %}
 
-{{ language('Words') }}
+{{ languages('Dates')}}
 
-{{ textarea(item_name='Words', label='Words', rows=40) }}
+{{ nr_items('Words', max=500) }}
 
 {{ common_fields('Words') }}
 {% endblock %}
@@ -68,9 +71,9 @@
 
 {% block dates %}
 
-{{ language('Dates') }}
+{{ languages('Dates')}}
 
-{{ textarea(item_name='Dates', label='Historical Dates', rows=40) }}
+{{ nr_items('Dates', max=500) }}
 
 {{ common_fields('Dates') }}
 {% endblock %}

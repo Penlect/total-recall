@@ -45,8 +45,8 @@ class NumberTable(xls.base.RecallTable):
         row = (self.nr_items % NR_ITEMS_PER_PAGE) // NR_ITEMS_ROW + self.page_offset + NR_ROWS_HEADER
 
         self.sheet.write(row, col + 2, str(item), style_number)
-        if col == NR_ITEMS_ROW - 1:
-            self.sheet.write(row, col + 3, f'Row {self.nr_items//NR_ITEMS_ROW + 1}', style_number)
+        if col == 2:
+            self.sheet.write(row, NR_ITEMS_ROW + 2, f'Row {self.nr_items//NR_ITEMS_ROW + 1}', style_number)
 
         self.nr_items += 1
         self._update_page()

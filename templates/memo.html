@@ -1,0 +1,104 @@
+
+{% macro common_fields(item_name) %}
+<div class="form-group">
+    <label for="recallTime_{{ item_name }}" class="col-sm-3 control-label">Recall time (min)</label>
+    <div class="col-sm-9">
+      <input name="recall_time" type="number" min="1" max="1500" required class="form-control" id="recallTime_{{ item_name }}">
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="correction_{{ item_name }}" class="col-sm-3 control-label">Correction</label>
+    <div class="col-sm-9">
+        <select name="correction" class="form-control" id="correction_{{ item_name }}">
+          <option>Harsh</option>
+          <option>Kind</option>
+        </select>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label"></label>
+    <div class="col-sm-9">
+        <button type="submit" type="button" class="btn btn-default btn-block">Generate</button>
+    </div>
+</div>
+{% endmacro %}
+
+{% extends "base.html" %}
+
+{% block body %}
+
+    {% set left_column_width = 8 %}
+    {% set right_column_width = 4 %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="jumbotron">
+                    {% block jumbotron %}{% endblock %}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Numbers</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-{{ left_column_width }}">
+                <div class="well" style="background-color:#5bc0de;">
+                    <form class="form-horizontal" action="{{ url_for('numbers') }}" method="post">
+                        {% block numbers %}{% endblock %}
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-{{ right_column_width }}">
+                {% block numbers_instructions %}{% endblock %}
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Words</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-{{ left_column_width }}">
+                <div class="well" style="background-color:#ffff66;">
+                    <form class="form-horizontal" action="{{ url_for('words') }}" method="post">
+                        {% block words %}{% endblock %}
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-{{ right_column_width }}">
+                {% block words_instructions %}{% endblock %}
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Historical Dates</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-{{ left_column_width }}">
+                <div class="well" style="background-color:#66ff99;">
+                    <form class="form-horizontal" action="{{ url_for('dates') }}" method="post">
+                        {% block dates %}{% endblock %}
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-{{ right_column_width }}">
+                {% block dates_instructions %}{% endblock %}
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
