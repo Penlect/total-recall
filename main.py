@@ -23,7 +23,7 @@ def add_to_database(blob):
     hash_candidate = str(blob)
     while True:
         h = sha(hash_candidate)
-        output_file = f'database/{h[0:2]}/{h[2:6]}.json'
+        output_file = os.path.join(app.root_path, f'database/{h[0:2]}/{h[2:6]}.json')
         if os.path.isfile(output_file):
             hash_candidate = h
         else:
@@ -83,7 +83,7 @@ def numbers():
                                 description=description)
             for n in blob['data']:
                 w.add_item(n)
-            w.save('static/sheets/' + blob['discipline'] + '.xls')
+            w.save(os.path.join(app.root_path, 'static/sheets/' + blob['discipline'] + '.xls'))
             return render_template('memorize.html',
                                    xls_download_link=url_for('static', filename='sheets/' + blob['discipline'] + '.xls'))
             return str(blob)
@@ -121,7 +121,7 @@ def words():
                                 description=description)
             for n in blob['data']:
                 w.add_item(n)
-            w.save('static/sheets/' + blob['discipline'] + '.xls')
+            w.save(os.path.join(app.root_path, 'static/sheets/' + blob['discipline'] + '.xls'))
             return render_template('memorize.html',
                                    xls_download_link=url_for('static', filename='sheets/' + blob['discipline'] + '.xls'))
             return str(blob)
@@ -162,7 +162,7 @@ def dates():
                                 description=description)
             for n in blob['data']:
                 w.add_item(n)
-            w.save('static/sheets/' + blob['discipline'] + '.xls')
+            w.save(os.path.join(app.root_path, 'static/sheets/' + blob['discipline'] + '.xls'))
             return render_template('memorize.html',
                                    xls_download_link=url_for('static', filename='sheets/' + blob['discipline'] + '.xls'))
             return str(blob)
@@ -170,7 +170,7 @@ def dates():
 
 @app.route('/recall/<string:key>')
 def recall(key):
-    blob_file = f'database/{key[0:2]}/{key[2:6]}.json'
+    blob_file = os.path.join(app.root_path, f'database/{key[0:2]}/{key[2:6]}.json')
     if not os.path.isfile(blob_file):
         return f'No such key exsists: {key}'
     with open(blob_file, 'r') as file:
