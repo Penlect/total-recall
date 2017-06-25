@@ -1,7 +1,7 @@
 
 
 import xlwt
-import xls.base
+import recall.xls.base
 
 
 NR_ITEMS_ROW   = 40
@@ -11,13 +11,13 @@ NR_PAGE_ROWS   = 49 # Depends on cell heights!
 NR_PAGE_COLS   = 5
 NR_ROWS_HEADER = 4
 
-WIDTH_INDEX = xls.base.convert_row_width(1.5)
-WIDTH_DATE  = xls.base.convert_row_width(3)
-WIDTH_GAP   = xls.base.convert_row_width(0.4)
-WIDTH_STORY = xls.base.convert_row_width(10)
-WIDTH_KEY   = xls.base.convert_row_width(4)
+WIDTH_INDEX = recall.xls.base.convert_row_width(1.5)
+WIDTH_DATE  = recall.xls.base.convert_row_width(3)
+WIDTH_GAP   = recall.xls.base.convert_row_width(0.4)
+WIDTH_STORY = recall.xls.base.convert_row_width(10)
+WIDTH_KEY   = recall.xls.base.convert_row_width(4)
 
-HEIGHT_ROW  = xls.base.convert_row_height(0.55)
+HEIGHT_ROW  = recall.xls.base.convert_row_height(0.55)
 
 # Syntax: (<element>:(<attribute> <value>,)+;)+
 style_index = xlwt.easyxf(
@@ -36,7 +36,7 @@ style_story = xlwt.easyxf(
     'alignment: horizontal left;'
 )
 
-class DatesTable(xls.base.RecallTable):
+class DatesTable(recall.xls.base.RecallTable):
 
     def __init__(self, *, name, recall_key, title, description):
         super().__init__(name, recall_key, title, description,

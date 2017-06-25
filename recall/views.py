@@ -1,17 +1,16 @@
 
 import os
 import re
-from flask import Flask, render_template, request, jsonify, flash, url_for
+from flask import render_template, request, jsonify, url_for
 
 import random
 from pprint import pprint
 import json
 import hashlib
 
-import xls
+import recall.xls as xls
 
-app = Flask(__name__)
-app.secret_key = 'some_secret'
+from recall import app
 
 def sha(string):
     h = hashlib.sha1(string.encode())
@@ -201,5 +200,3 @@ def arbeiter():
     else:
         print('Wrong method!')
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')

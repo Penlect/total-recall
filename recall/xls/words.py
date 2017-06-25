@@ -1,7 +1,7 @@
 
 
 import xlwt
-import xls.base
+import recall.xls.base
 
 
 NR_ITEMS_ROW   = 20
@@ -11,11 +11,11 @@ NR_PAGE_ROWS   = 28 # Depends on cell heights!
 NR_PAGE_COLS   = 3 * NR_ITEMS_COL
 NR_ROWS_HEADER = 4
 
-WIDTH_INDEX = xls.base.convert_row_width(1)
-WIDTH_GAP   = xls.base.convert_row_width(0.36)
-WIDTH_WORD  = xls.base.convert_row_width(3.7)
+WIDTH_INDEX = recall.xls.base.convert_row_width(1)
+WIDTH_GAP   = recall.xls.base.convert_row_width(0.36)
+WIDTH_WORD  = recall.xls.base.convert_row_width(3.7)
 
-HEIGHT_ROW  = xls.base.convert_row_height(0.65)
+HEIGHT_ROW  = recall.xls.base.convert_row_height(0.65)
 
 # Syntax: (<element>:(<attribute> <value>,)+;)+
 style_index = xlwt.easyxf(
@@ -35,7 +35,7 @@ style_word = xlwt.easyxf(
 )
 
 
-class WordTable(xls.base.RecallTable):
+class WordTable(recall.xls.base.RecallTable):
 
     def __init__(self, *, name, recall_key, title, description):
         super().__init__(name, recall_key, title, description,
