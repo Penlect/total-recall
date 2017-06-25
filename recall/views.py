@@ -8,9 +8,15 @@ from pprint import pprint
 import json
 import hashlib
 
-import recall.xls as xls
-
 from recall import app
+
+# Todo: fix imports
+import recall
+import recall.xls
+import recall.xls.numbers_
+import recall.xls.binary
+import recall.xls.words
+import recall.xls.dates
 
 def sha(string):
     h = hashlib.sha1(string.encode())
@@ -77,7 +83,7 @@ def numbers():
                 f"{len(blob['data'])} digits. "
                 f"Recall time: {blob['recall_time']} Min"
             )
-            w = xls.NumberTable(name='Numbers', recall_key=h.upper(),
+            w = recall.xls.numbers_.NumberTable(name='Numbers', recall_key=h.upper(),
                                 title='Svenska Minnesförbundet',
                                 description=description)
             for n in blob['data']:
@@ -115,7 +121,7 @@ def words():
                 f"{blob['language'].title()}. "
                 f"Recall time: {blob['recall_time']} Min"
             )
-            w = xls.WordTable(name='Words', recall_key=h.upper(),
+            w = recall.xls.words.WordTable(name='Words', recall_key=h.upper(),
                                 title='Svenska Minnesförbundet',
                                 description=description)
             for n in blob['data']:
@@ -156,7 +162,7 @@ def dates():
                 f"{blob['language'].title()}. "
                 f"Recall time: {blob['recall_time']} Min"
             )
-            w = xls.DatesTable(name='Dates', recall_key=h.upper(),
+            w = recall.xls.dates.DatesTable(name='Dates', recall_key=h.upper(),
                                 title='Svenska Minnesförbundet',
                                 description=description)
             for n in blob['data']:
@@ -168,7 +174,7 @@ def dates():
 
 
 @app.route('/recall/<string:key>')
-def recall(key):
+def recall_(key):
     blob_file = os.path.join(app.root_path, f'database/{key[0:2]}/{key[2:6]}.json')
     if not os.path.isfile(blob_file):
         return f'No such key exsists: {key}'
