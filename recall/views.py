@@ -71,6 +71,8 @@ class Blob:
             raise ValueError(f'Invalid correction: "{correction}". '
                              'Choose from ' + str(self.VALID_CORRECTIONS))
 
+        self.language = language
+
         if data is None:
             # If data was not provided, we must generate it ourselves.
             # In order to do so we need to know how many items to
@@ -79,7 +81,6 @@ class Blob:
             self.nr_items = int(nr_items)
             if self.discipline in {'words', 'dates'}:
                 assert language is not None, 'Language not provided to blob!'
-                self.language = language
 
             if self.discipline == 'binary':
                 self.data = tuple(random.randint(0, 1) for _ in range(self.nr_items))
