@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="jumbotron">
+                <h1>Words Database</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Modify Database for Words</h3>
+            <p> Todo: Adding/deleting content to the word database will be controlled from here.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Database content</h3>
+            <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th>Nr</th>
+                <th>Word</th>
+                <th>Language</th>
+                <th>Word class</th>
+                <th>Added by</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for word in words %}
+              <tr>
+                <td>{{loop.index}}</td>
+                <td>{{word}}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
