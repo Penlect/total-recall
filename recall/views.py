@@ -11,8 +11,6 @@ import hashlib
 from recall import app
 
 # Todo: fix imports
-import recall
-import recall.xls
 import recall.xls.numbers_
 import recall.xls.binary
 import recall.xls.words
