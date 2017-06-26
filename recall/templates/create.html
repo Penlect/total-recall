@@ -11,15 +11,6 @@
 </div>
 {% endmacro %}
 
-{% macro textarea(item_name, label, rows) %}
-  <div class="form-group">
-    <label for="data_{{ item_name }}" class="col-sm-3 control-label">{{ label }}</label>
-    <div class="col-sm-9">
-        <textarea class="form-control" name="data" rows="{{ rows }}" id="data_{{ item_name }}"></textarea>
-    </div>
-  </div>
-{% endmacro %}
-
 
 {% block jumbotron %}
 <h1>Create memorization data!</h1>
@@ -42,7 +33,12 @@
     </div>
 </div>
 
-{{ textarea(item_name='Digits', label='Digits', rows=40) }}
+  <div class="form-group">
+    <label for="data_Digits" class="col-sm-3 control-label">Digits</label>
+    <div class="col-sm-9">
+        <textarea class="form-control" name="data" rows="40" id="data_Digits" placeholder="0123456789..."></textarea>
+    </div>
+  </div>
 
 {{ common_fields('Digits') }}
 
@@ -56,7 +52,12 @@
 
 {{ language('Words') }}
 
-{{ textarea(item_name='Words', label='Words', rows=40) }}
+  <div class="form-group">
+    <label for="data_Words" class="col-sm-3 control-label">Words</label>
+    <div class="col-sm-9">
+        <textarea class="form-control" name="data" rows="40" id="data_Words" placeholder="kaffe"></textarea>
+    </div>
+  </div>
 
 {{ common_fields('Words') }}
 {% endblock %}
@@ -70,7 +71,12 @@
 
 {{ language('Dates') }}
 
-{{ textarea(item_name='Dates', label='Historical Dates', rows=40) }}
+  <div class="form-group">
+    <label for="data_Dates" class="col-sm-3 control-label">Historical Dates</label>
+    <div class="col-sm-9">
+        <textarea class="form-control" name="data" rows="40" id="data_Dates" placeholder="2009 Första tävlingen i minne i Sverige"></textarea>
+    </div>
+  </div>
 
 {{ common_fields('Dates') }}
 {% endblock %}
