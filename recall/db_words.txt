@@ -4,7 +4,7 @@ amöba;swedish;;Idriz Zogaj;
 anakonda;swedish;;Idriz Zogaj;
 andas;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 ande;swedish;;Idriz Zogaj;
-anka;swedish;;Idriz Zogaj;
+anka;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 annons;swedish;;Idriz Zogaj;
 ansikte;swedish;;Idriz Zogaj;
 ansöka;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
@@ -54,7 +54,7 @@ bokhylla;swedish;;Idriz Zogaj;
 bord;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 borra;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 borsta;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
-borste;swedish;;Idriz Zogaj;
+borste;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 botemedel;swedish;;Idriz Zogaj;
 brev;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 bromsa;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
@@ -69,6 +69,7 @@ bumerang;swedish;;Idriz Zogaj;
 bungalow;swedish;;Idriz Zogaj;
 burk;swedish;;Idriz Zogaj;
 buske;swedish;;Idriz Zogaj;
+buss;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 butik;swedish;;Idriz Zogaj;
 bygga;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 byggställning;swedish;;Idriz Zogaj;
@@ -98,7 +99,7 @@ datum;swedish;;Idriz Zogaj;
 deklarera;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 demokrati;swedish;;Idriz Zogaj;
 demonstrera;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
-diamant;swedish;;Idriz Zogaj;
+diamant;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 dimma;swedish;;Idriz Zogaj;
 diska;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 diskutera;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
@@ -112,7 +113,7 @@ duka;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 dyka;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 däck;swedish;;Idriz Zogaj;
 dölja;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
-dörr;swedish;;Idriz Zogaj;
+dörr;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 eld;swedish;;Idriz Zogaj;
 elda;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 elefant;swedish;;Idriz Zogaj;
@@ -138,6 +139,7 @@ fira;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 fisk;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 fiska;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 fixa;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
+fjäril;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 flaska;swedish;;Idriz Zogaj;
 flodmynning;swedish;;Idriz Zogaj;
 flottan;swedish;;Idriz Zogaj;
@@ -169,15 +171,18 @@ galge;swedish;;Idriz Zogaj;
 gallion;swedish;;Idriz Zogaj;
 gapa;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 garage;swedish;;Idriz Zogaj;
+garderob;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 garn;swedish;;Idriz Zogaj;
 gas;swedish;;Idriz Zogaj;
 gatlykta;swedish;;Idriz Zogaj;
 geni;swedish;;Idriz Zogaj;
+geting;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 gevär;swedish;;Idriz Zogaj;
 gilla;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 gitarr;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 glas;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 glasburk;swedish;;Idriz Zogaj;
+glass;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 glasögon;swedish;;Idriz Zogaj;
 glöd;swedish;;Idriz Zogaj;
 glömma;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
@@ -188,7 +193,7 @@ gosedjur;swedish;;Idriz Zogaj;
 grad;swedish;;Idriz Zogaj;
 gran;swedish;;Idriz Zogaj;
 gren;swedish;;Idriz Zogaj;
-grill;swedish;;Idriz Zogaj;
+grill;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 grilla;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 grind;swedish;;Idriz Zogaj;
 groda;swedish;;Idriz Zogaj;
@@ -196,6 +201,7 @@ grotta;swedish;;Idriz Zogaj;
 gräla;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 gräsklippare;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 gråta;swedish;;Idriz Zogaj;
+guldfisk;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 gummi;swedish;;Idriz Zogaj;
 gunga;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 gurka;swedish;;Idriz Zogaj;
@@ -207,8 +213,10 @@ gömma;swedish;;Idriz Zogaj;
 hake;swedish;;Idriz Zogaj;
 halka;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 halsband;swedish;;Idriz Zogaj;
+hamburgare;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 hammare;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 hamra;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
+handduk;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 handla;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 handling;swedish;;Idriz Zogaj;
 handske;swedish;;Idriz Zogaj;
@@ -229,7 +237,7 @@ horn;swedish;;Idriz Zogaj;
 hosta;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 hud;swedish;;Idriz Zogaj;
 hund;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
-hus;swedish;;Idriz Zogaj;
+hus;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 hydda;swedish;;Idriz Zogaj;
 hypnos;swedish;;Idriz Zogaj;
 hyra;swedish;;Idriz Zogaj;
@@ -237,6 +245,7 @@ häl;swedish;;Idriz Zogaj;
 hämta;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 hänga;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 hänglås;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
+häst;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 håla;swedish;;Idriz Zogaj;
 hår;swedish;;Idriz Zogaj;
 hö;swedish;;Idriz Zogaj;
@@ -251,11 +260,13 @@ iphone;swedish;;Idriz Zogaj;
 irritera;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 is;swedish;;Idriz Zogaj;
 iskub;swedish;;Idriz Zogaj;
+istapp;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 jacka;swedish;;Idriz Zogaj;
 jaguar;swedish;;Idriz Zogaj;
 jak;swedish;;Idriz Zogaj;
 jobba;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 jogga;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
+julgran;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 järn;swedish;;Idriz Zogaj;
 kaffekopp;swedish;;Idriz Zogaj;
 kaj;swedish;;Idriz Zogaj;
@@ -265,10 +276,12 @@ kaktus;swedish;;Idriz Zogaj;
 kalas;swedish;;Idriz Zogaj;
 kalv;swedish;;Idriz Zogaj;
 kam;swedish;;Idriz Zogaj;
+kamera;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 kamma;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 kandelaber;swedish;;Idriz Zogaj;
 kanin;swedish;;Idriz Zogaj;
 kannibal;swedish;;Idriz Zogaj;
+kapsyl;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 karaff;swedish;;Idriz Zogaj;
 karp;swedish;;Idriz Zogaj;
 karta;swedish;;Idriz Zogaj;
@@ -277,9 +290,10 @@ kasino;swedish;;Idriz Zogaj;
 kassaskåp;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 kassett;swedish;;Idriz Zogaj;
 kasta;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
-kastanj;swedish;;Idriz Zogaj;
+kastanj;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 kastrull;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 katt;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
+kattunge;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 kedja;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 keps;swedish;;Idriz Zogaj;
 kex;swedish;;Idriz Zogaj;
@@ -307,11 +321,15 @@ kortlek;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 korv;swedish;;Idriz Zogaj;
 krama;swedish;;Idriz Zogaj;
 kran;swedish;;Idriz Zogaj;
+kristallkrona;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 krocka;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 krockkudde;swedish;;Idriz Zogaj;
 krok;swedish;;Idriz Zogaj;
 krokodil;swedish;;Idriz Zogaj;
 kropp;swedish;;Idriz Zogaj;
+kruka;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
+kråka;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
+kundvagn;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 kvartz;swedish;;Idriz Zogaj;
 kvinna;swedish;;Idriz Zogaj;
 kvitto;swedish;;Idriz Zogaj;
@@ -322,10 +340,11 @@ köksredskap;swedish;;Idriz Zogaj;
 köpa;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 laga;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 lamm;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
+lampa;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 landa;swedish;;Idriz Zogaj;
 larv;swedish;;Idriz Zogaj;
 lastbil;swedish;;Idriz Zogaj;
-lax;swedish;;Idriz Zogaj;
+lax;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 leguan;swedish;;Idriz Zogaj;
 leka;swedish;;Idriz Zogaj;
 leta;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
@@ -349,8 +368,9 @@ mango;swedish;;Idriz Zogaj;
 manick;swedish;;Idriz Zogaj;
 marknad;swedish;;Idriz Zogaj;
 marknadsstånd;swedish;;Idriz Zogaj;
+maskros;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 maträtt;swedish;;Idriz Zogaj;
-matta;swedish;;Idriz Zogaj;
+matta;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 meddelande;swedish;;Idriz Zogaj;
 melon;swedish;;Idriz Zogaj;
 meter;swedish;;Idriz Zogaj;
@@ -361,12 +381,14 @@ monokel;swedish;;Idriz Zogaj;
 morgon;swedish;;Idriz Zogaj;
 mugg;swedish;;Idriz Zogaj;
 mullvad;swedish;;Idriz Zogaj;
+mun;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 murgröna;swedish;;Idriz Zogaj;
 murslev;swedish;;Idriz Zogaj;
 museum;swedish;;Idriz Zogaj;
 mussla;swedish;;Idriz Zogaj;
 mynt;swedish;;Idriz Zogaj;
 mynta;swedish;;Idriz Zogaj;
+myra;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 myrstack;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 mäta;swedish;;Idriz Zogaj;
 nacke;swedish;;Idriz Zogaj;
@@ -377,7 +399,7 @@ not;swedish;;Idriz Zogaj;
 nunnekloster;swedish;;Idriz Zogaj;
 nyckel;swedish;;Idriz Zogaj;
 näktergal;swedish;;Idriz Zogaj;
-näsa;swedish;;Idriz Zogaj;
+näsa;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 nät;swedish;;Idriz Zogaj;
 näthinna;swedish;;Idriz Zogaj;
 nål;swedish;;Idriz Zogaj;
@@ -410,6 +432,7 @@ passage;swedish;;Idriz Zogaj;
 pelikan;swedish;;Idriz Zogaj;
 penna;swedish;;Idriz Zogaj;
 pensel;swedish;;Idriz Zogaj;
+peruk;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 piano;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 pil;swedish;;Idriz Zogaj;
 piller;swedish;;Idriz Zogaj;
@@ -442,7 +465,7 @@ rapphöna;swedish;;Idriz Zogaj;
 recept;swedish;;Idriz Zogaj;
 ren;swedish;;Idriz Zogaj;
 rengöra;swedish;;Idriz Zogaj;
-rep;swedish;;Idriz Zogaj;
+rep;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 resa;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 respekt;swedish;;Idriz Zogaj;
 revolution;swedish;;Idriz Zogaj;
@@ -477,6 +500,7 @@ sesamfrön;swedish;;Idriz Zogaj;
 sexhörning;swedish;;Idriz Zogaj;
 sfär;swedish;;Idriz Zogaj;
 signatur;swedish;;Idriz Zogaj;
+sill;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 simma;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 sitta;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 sjuksyster;swedish;;Idriz Zogaj;
@@ -486,15 +510,17 @@ sjöjungfru;swedish;;Idriz Zogaj;
 skandal;swedish;;Idriz Zogaj;
 skateboard;swedish;;Idriz Zogaj;
 sked;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
+skida;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 skinn;swedish;;Idriz Zogaj;
 skiva;swedish;;Idriz Zogaj;
 skjorta;swedish;;Idriz Zogaj;
+sko;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 skohorn;swedish;;Idriz Zogaj;
 skorsten;swedish;;Idriz Zogaj;
 skratta;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 skrika;swedish;;Idriz Zogaj;
 skriva;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
-skrivbord;swedish;;Idriz Zogaj;
+skrivbord;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 skruv;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 skräp;swedish;;Idriz Zogaj;
 skugga;swedish;;Idriz Zogaj;
@@ -503,6 +529,7 @@ skylt;swedish;;Idriz Zogaj;
 skärp;swedish;;Idriz Zogaj;
 skål;swedish;;Idriz Zogaj;
 sköldpadda;swedish;;Idriz Zogaj;
+sladd;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 slut;swedish;;Idriz Zogaj;
 släckare;swedish;;Idriz Zogaj;
 släde;swedish;;Idriz Zogaj;
@@ -512,8 +539,10 @@ smaka;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 smådjävul;swedish;;Idriz Zogaj;
 snigel;swedish;;Idriz Zogaj;
 snöre;swedish;;Idriz Zogaj;
+soffa;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 soja;swedish;;Idriz Zogaj;
 sol;swedish;;Idriz Zogaj;
+solglasögon;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 solkraft;swedish;;Idriz Zogaj;
 solstol;swedish;;Idriz Zogaj;
 somna;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
@@ -522,7 +551,7 @@ spade;swedish;;Idriz Zogaj;
 spaniel;swedish;;Idriz Zogaj;
 spara;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 sparka;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
-spegel;swedish;;Idriz Zogaj;
+spegel;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 spela;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 spik;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 spindel;swedish;;Idriz Zogaj;
@@ -565,7 +594,9 @@ säck;swedish;;Idriz Zogaj;
 säkring;swedish;;Idriz Zogaj;
 sälja;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 sällskapsspel;swedish;;Idriz Zogaj;
+säng;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 såg;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
+taggtråd;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 takpanna;swedish;;Idriz Zogaj;
 tala;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 tallrik;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
@@ -589,9 +620,11 @@ tjata;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 tjattra;swedish;;Idriz Zogaj;
 tjur;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 tjuv;swedish;;Idriz Zogaj;
+tomat;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 tomhet;swedish;;Idriz Zogaj;
 torka;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
-trappa;swedish;;Idriz Zogaj;
+traktor;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
+trappa;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 tro;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 troll;swedish;;Idriz Zogaj;
 trotsa;swedish;;Idriz Zogaj;
@@ -602,17 +635,20 @@ tråd;swedish;;Idriz Zogaj;
 trålare;swedish;;Idriz Zogaj;
 tröja;swedish;;Idriz Zogaj;
 tuba;swedish;;Idriz Zogaj;
-tuggummi;swedish;;Idriz Zogaj;
+tuggummi;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 tulpan;swedish;;Idriz Zogaj;
 tunna;swedish;;Idriz Zogaj;
 tupp;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
 tusensköna;swedish;;Idriz Zogaj;
 tvätta;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
+tvål;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 tyrann;swedish;;Idriz Zogaj;
-tält;swedish;;Idriz Zogaj;
+tält;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 tända;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 tänka;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
+tåg;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 tång;swedish;;Idriz Zogaj;
+uggla;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 ugn;swedish;;Idriz Zogaj;
 underkläder;swedish;;Idriz Zogaj;
 urna;swedish;;Idriz Zogaj;
@@ -651,6 +687,7 @@ wigwam;swedish;;Idriz Zogaj;
 zigenare;swedish;;Idriz Zogaj;
 ädelsten;swedish;;Idriz Zogaj;
 äpple;swedish;Concrete Noun;Daniel Andersson;2017-06-26 10:04:48
+ärta;swedish;Concrete Noun;Daniel Andersson;2017-06-26 12:19:28
 äta;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 åka;swedish;Infinitive Verb;Daniel Andersson;2017-06-26 12:06:21
 ö;swedish;;Idriz Zogaj;
