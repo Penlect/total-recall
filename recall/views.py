@@ -4,9 +4,11 @@ import re
 from flask import render_template, request, jsonify, url_for
 
 import random
+import time
 from pprint import pprint
 import json
 import hashlib
+from collections import namedtuple
 
 from recall import app
 
@@ -22,23 +24,71 @@ def sha(string):
     h.update(str(random.random()).encode())
     return h.hexdigest()[0:6]
 
+WordData = namedtuple('WordData', 'word language word_class name date')
+StoryData = namedtuple('StoryData', 'story language name date')
 
 def load_words():
-    with open(os.path.join(app.root_path, 'db_words.txt')) as db_file:
-        words = list(sorted(w.strip().lower() for w in db_file.readlines()
-                            if w.strip()))
-        return words
+    with open(os.path.join(app.root_path, 'db_words.txt'), 'r', encoding='utf-8') as db_file:
+        words = set()
+        for line in db_file:
+            if line.strip():
+                row_data = [x.strip() for x in line.split(';')]
+                words.add(WordData(*row_data))
+        return list(sorted(words))
 
 def load_dates():
-    with open(os.path.join(app.root_path, 'db_dates.txt')) as db_file:
+    with open(os.path.join(app.root_path, 'db_dates.txt'), 'r', encoding='utf-8') as db_file:
         dates = list(sorted(w.strip() for w in db_file.readlines()
                             if w.strip()))
         return dates
 
 
-@app.route('/database/words')
+@app.route('/database/words', methods=['GET', 'POST'])
 def db_words():
-    return render_template('db_words.html', words=load_words())
+    if request.method == 'GET':
+        return render_template('db_words.html', words=load_words())
+    if request.method == 'POST':
+        form = request.form
+
+        if form['test'].lower().strip() != 'admin':
+            return 'Wrong answer on Human Test question!'
+
+        if not form['added_by'].strip():
+            return 'Your name is mandatory!'
+
+        if not form['data'].strip():
+            return 'No words were added since Words input was empty!'
+
+        language = form['language'].lower()
+
+        db_words = set(load_words())
+        db_words_lookup = {f'{w.word};{w.language}':w for w in db_words}
+
+        status = dict()
+
+        data = set(word.strip() for word in form['data'].lower().split('\n') if word.strip())
+        for word in data:
+            w = word.replace('delete:', '')
+            lookup = f'{w};{language}'
+            w = WordData(w, language, form['word_class'],
+                         form['added_by'], time.strftime('%Y-%m-%d %H:%M:%S'))
+            if word.startswith('delete:'):
+                if lookup in db_words_lookup:
+                    status[db_words_lookup[lookup]] = 'deleted'
+                    del db_words_lookup[lookup]
+                else:
+                    status[w] = 'failed_delete'
+            elif lookup in db_words_lookup:
+                db_words_lookup[lookup] = w
+                status[w] = 'updated'
+            else:
+                status[w] = 'added'
+
+        new_words = list(sorted(set(db_words_lookup.values())))
+
+        return render_template('db_words.html', words=new_words, status=status)
+
+
 
 
 @app.route('/generate')
@@ -87,7 +137,7 @@ class Blob:
             elif self.discipline == 'decimal':
                 self.data = tuple(random.randint(0, 9) for _ in range(self.nr_items))
             elif self.discipline == 'words':
-                words = load_words()  # Language not yet supported
+                words = [x.word for x in load_words()]  # Language not yet supported
                 random.shuffle(words)
                 self.data = tuple(words[0:self.nr_items])
             elif self.discipline == 'dates':
