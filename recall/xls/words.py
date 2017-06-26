@@ -58,8 +58,8 @@ class WordTable(recall.xls.base.RecallTable):
         self.sheet.write(row, col + 1, '', style_gap)
         self.sheet.write(row, col + 2, item, style_word)
 
-        self.nr_items += 1
         self._update_page()
+        self.nr_items += 1
 
 
 if __name__ == '__main__':

@@ -50,8 +50,8 @@ class NumberTable(recall.xls.base.RecallTable):
         if col == LEFT_OFFSET:
             self.sheet.write(row, NR_ITEMS_ROW + LEFT_OFFSET, f'Row {self.nr_items//NR_ITEMS_ROW + 1}', style_number)
 
-        self.nr_items += 1
         self._update_page()
+        self.nr_items += 1
 
 
 if __name__ == '__main__':

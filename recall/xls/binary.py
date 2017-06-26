@@ -46,8 +46,8 @@ class BinaryTable(recall.xls.base.RecallTable):
         if col == NR_ITEMS_ROW - 1:
             self.sheet.write(row, col + 3, f'Row {self.nr_items//NR_ITEMS_ROW + 1}', style_number)
 
-        self.nr_items += 1
         self._update_page()
+        self.nr_items += 1
 
 
 if __name__ == '__main__':

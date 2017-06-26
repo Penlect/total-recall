@@ -60,8 +60,8 @@ class DatesTable(recall.xls.base.RecallTable):
         self.sheet.write(row, 1, str(date), style_date)
         self.sheet.write(row, 3, story, style_story)
 
-        self.nr_items += 1
         self._update_page()
+        self.nr_items += 1
 
 
 if __name__ == '__main__':
