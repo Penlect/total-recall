@@ -6,29 +6,26 @@
     <div class="row">
         <div class="col-md-12">
             <div class="jumbotron">
-                <h1>Words Database</h1>
+                <h1>Database: Words</h1>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
-            <h3>Modify Database for Words</h3>
-            <p> Todo: Adding/deleting content to the word database will be controlled from here.</p>
-
+        <div class="col-md-5">
                 <div class="well" style="background-color:#ffff66;">
 
-                    <form class="form-horizontal" action="{{ url_for('db_words') }}" method="post">
+                    <form class="form-horizontal" action="{{ url_for('database_words_modify') }}" method="post">
 
                         <div class="form-group">
-                            <label for="added_by" class="col-sm-1 control-label">Your Name</label>
-                            <div class="col-sm-11">
-                                <input name="added_by" type="string" required class="form-control" id="added_by">
+                            <label for="added_by" class="col-sm-2 control-label">You</label>
+                            <div class="col-sm-10">
+                                <input name="added_by" type="string" required class="form-control" id="added_by" placeholder="Firstname Lastname" autocomplete="off">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="language" class="col-sm-1 control-label">Language</label>
-                            <div class="col-sm-11">
+                            <label for="language" class="col-sm-2 control-label">Language</label>
+                            <div class="col-sm-10">
                                 <select class="form-control" name="language" id="language">
                                   <option>Swedish</option>
                                   <option>English</option>
@@ -37,8 +34,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="word_class" class="col-sm-1 control-label">Class</label>
-                            <div class="col-sm-11">
+                            <label for="word_class" class="col-sm-2 control-label">Class</label>
+                            <div class="col-sm-10">
                                 <select class="form-control" name="word_class" id="word_class">
                                   <option>Concrete Noun</option>
                                   <option>Abstract Noun</option>
@@ -48,110 +45,85 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="word_input" class="col-sm-1 control-label">Words</label>
-                            <div class="col-sm-11">
-                                <textarea class="form-control" required name="data" rows="10" id="word_input"></textarea>
+                            <label for="word_input" class="col-sm-2 control-label">Words</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" required name="data" rows="20" id="word_input"></textarea>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="test" class="col-sm-1 control-label">Human Test</label>
-                            <div class="col-sm-11">
-                                <input name="test" type="string" required class="form-control" id="test" placeholder="Password">
+                            <label for="pwd" class="col-sm-2 control-label">Password</label>
+                            <div class="col-sm-10">
+                                <input name="pwd" type="string" required class="form-control" id="pwd" autocomplete="off">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-sm-1 control-label"></label>
-                            <div class="col-sm-11">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-10">
                                 <button type="submit" type="button" class="btn btn-default btn-block">Submit</button>
                             </div>
                         </div>
                     </form>
                 </div>
         </div>
-    </div>
-
-
-    <div class="row">
-        <div class="col-md-12">
-            {% if status is defined %}
-                <h3>Your previous modifications</h3>
-                <table class="table table-condensed">
-                <thead>
-                  <tr>
-                    <th>Status</th>
-                    <th>Nr</th>
-                    <th>Word</th>
-                    <th>Language</th>
-                    <th>Class</th>
-                    <th>Added by</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody style="font-weight: bold">
-                {% for entry, stat in status.items()|sort %}
-                  {% if stat == 'added' %}
-                  <tr class="text-success">
-                    <td>Added</td>
-                  {% elif stat == 'updated' %}
-                  <tr class="text-warning">
-                    <td>Updated</td>
-                  {% elif stat == 'deleted' %}
-                  <tr class="text-danger">
-                    <td>Deleted</td>
-                  {% elif stat == 'failed_delete' %}
-                  <tr class="text-danger">
-                    <td>Failed to delete (not found)</td>
-                  {% else %}
-                  <tr>
-                    <td>{{ stat }}</td>
-                  {% endif %}
-                    <td>{{ loop.index }}</td>
-                    <td>{{ entry.word }}</td>
-                    <td>{{ entry.language }}</td>
-                    <td>{{ entry.word_class }}</td>
-                    <td>{{ entry.name }}</td>
-                    <td>{{ entry.date }}</td>
-                  </tr>
-                {% endfor %}
-                </tbody>
-                </table>
-            {% endif %}
+        <div class="col-md-7">
+            <h2>Modify the Database for Words</h2>
+            <p>Please enter values in the form to the left in order to add/modify/delete words in the database.</p>
+            <p>You must provide a name, password and write at least one word in the text area to be able submit the form.</p>
+            <p>After a successful submit the database table at the bottom of this page will immediately update to reflect your changes.
+                An extra table with a summary of your modifications will also be printed below
+                (and will disappear when you refresh the page). There is no undo-button. If you make a mistake, simply delete the word or re-add it manually.</p>
+            <p><strong>Syntax:</strong> Type one word per line. Empty lines will be ignored. Everything will be converted to lower case. Example, adding three words:
+                <div class="well" ><em>pizza</em><br>
+                <em>sjöhäst</em><br>
+                <em>kortlek</em><br>
+            </div>
+            To delete a word prepend "delete:" to the word. Example, adding one word, deleting two:<br>
+                <div class="well" ><em>pizza</em><br>
+                <em>delete:sjöhäst</em><br>
+                <em>delete:kortlek</em><br>
+            </div>
+            </p>
+            <p><strong>Conflicts:</strong> If you try to delete a word that does not exist in the database - nothing will happen.
+            If you add a word that already exists - nothing will happen - unless the word class is different. If the
+            word class is different the word will be updated to have the new word class.</p>
         </div>
     </div>
 
 
     <div class="row">
-        <div class="col-md-12">
-            <h3>Database content</h3>
-            <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>Nr</th>
-                <th>Word</th>
-                <th>Language</th>
-                <th>Class</th>
-                <th>Added by</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-            {% for entry in words %}
-              <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ entry.word }}</td>
-                <td>{{ entry.language }}</td>
-                <td>{{ entry.word_class }}</td>
-                <td>{{ entry.name }}</td>
-                <td>{{ entry.date }}</td>
-              </tr>
-            {% endfor %}
-            </tbody>
-            </table>
-
+        <div class="col-md-12" id="db_words_modifications">
         </div>
     </div>
+
+
+    <div class="row">
+        <div class="col-md-12" id="db_words_content">
+        </div>
+    </div>
+
 </div>
 
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+$(document).ready(function(){
+
+    $('#db_words_content').load("{{ url_for('database_words_content') }}")
+
+   $('form').submit(function(event){
+	  event.preventDefault();
+      $.post($(this).attr('action'), $(this).serialize(), function(data){
+        $('#db_words_modifications').prepend(data)
+        $('#db_words_content').load("{{ url_for('database_words_content') }}")
+      });
+
+      return false;
+   });
+});
+
+</script>
 {% endblock %}
