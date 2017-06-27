@@ -8,6 +8,13 @@
 </div>
 
 <div class="form-group">
+    <label for="memoTime_{{ item_name }}" class="col-sm-3 control-label">Memo. time</label>
+    <div class="col-sm-9">
+      <input name="memo_time" type="number" min="1" max="1500" required class="form-control" id="memoTime_{{ item_name }}" placeholder="minutes">
+    </div>
+</div>
+
+<div class="form-group">
     <label for="recallTime_{{ item_name }}" class="col-sm-3 control-label">Recall time</label>
     <div class="col-sm-9">
       <input name="recall_time" type="number" min="1" max="1500" required class="form-control" id="recallTime_{{ item_name }}" placeholder="minutes">
@@ -18,7 +25,7 @@
     <label for="correction_{{ item_name }}" class="col-sm-3 control-label">Correction</label>
     <div class="col-sm-9">
         <select name="correction" class="form-control" id="correction_{{ item_name }}">
-          <option>Harsh</option>
+          <option>Standard</option>
           <option>Kind</option>
         </select>
     </div>

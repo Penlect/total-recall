@@ -65,10 +65,10 @@ class Table:
 
         # Determine and create the style cycle for numbers
         styles = list()
-        if pattern is None:
+        if pattern is None or not pattern.strip():
             styles.append(self.style_item_normal)
         else:
-            for p in (int(p.strip()) for p in pattern.split(',')):
+            for p in (int(p) for p in pattern.split(',')):
                 if p < 1:
                     raise ValueError(f'Pattern invalid: {self.pattern}')
                 elif p == 1:

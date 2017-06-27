@@ -133,9 +133,9 @@ def create():
 class Blob:
 
     VALID_DISCIPLINES = {'binary', 'decimal', 'words', 'dates'}
-    VALID_CORRECTIONS = {'kind', 'harsh'}
+    VALID_CORRECTIONS = {'kind', 'standard'}
 
-    def __init__(self, *, discipline, recall_time, correction, data: str,
+    def __init__(self, *, discipline, memo_time, recall_time, correction, data: str,
                  language=None, nr_items=None, pattern=''):
         # Assign values and check for errors in input
         self.discipline = discipline.lower()
@@ -150,8 +150,12 @@ class Blob:
             raise ValueError(f'Invalid correction: "{correction}". '
                              'Choose from ' + str(self.VALID_CORRECTIONS))
 
+        self.memo_time = memo_time
         self.language = language.lower() if language is not None else None
-        self.pattern = tuple(int(p.strip()) for p in pattern.split(','))
+        try:
+            self.pattern = tuple(int(p) for p in pattern.split(','))
+        except ValueError:
+            self.pattern = None
 
         if data is None:
             # If data was not provided, we must generate it ourselves.
@@ -200,7 +204,7 @@ class Blob:
 
     def add_to_database(self):
 
-        blob = {
+        blob = { # Todo: add language
             'discipline': self.discipline,
             'recall_time': self.recall_time,
             'correction': self.correction,
@@ -230,6 +234,7 @@ def numbers():
         form = request.form
         blob = Blob(
             discipline=form['base'],
+            memo_time=form['memo_time'],
             recall_time=form['recall_time'],
             correction=form['correction'],
             data=form.get('data'),
@@ -247,19 +252,28 @@ def numbers():
         else:
             raise ValueError('Invalid discipline for Numbers: "{blob.discipline}"')
 
+        xls_filename = '{dis}_{nr}st_{mem_t}min_{rec_t}min_{pat}_{cor}.xls'.format(
+            dis=blob.discipline.title(),
+            nr=len(blob.data),
+            mem_t=blob.memo_time,
+            rec_t=blob.recall_time,
+            pat=','.join([p.strip() for p in form['pattern'].split(',')]),
+            cor=blob.correction.title()
+        )
         t = table(
             title='Svenska Minnesförbundet',
             discipline=f'{blob.discipline.title()} Numbers, {len(blob.data)} st.',
             recall_key=h.upper(),
-            memo_time='5',
+            memo_time=form['memo_time'],
             recall_time=blob.recall_time,
             pattern=form['pattern']
         )
         for n in blob.data:
             t.add_item(n)
-        t.save(os.path.join(app.root_path, 'static/sheets/' + blob.discipline + '.xls'))
+        t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
         return render_template('memorize.html',
-                               xls_download_link=url_for('static', filename='sheets/' + blob.discipline + '.xls'))
+                               xls_download_link=url_for('static', filename='sheets/' + xls_filename),
+                               xls_filename=xls_filename)
 
 
 @app.route('/words', methods=['POST'])
@@ -269,6 +283,7 @@ def words():
         form = request.form
         blob = Blob(
             discipline='words',
+            memo_time=form['memo_time'],
             recall_time=form['recall_time'],
             correction=form['correction'],
             data=form.get('data'),
@@ -280,19 +295,29 @@ def words():
         app.logger.info(f'Created blob for words: {h}')
 
         # CREATE XLS DOCUMENT
+        xls_filename = '{dis}_{lang}_{nr}st_{mem_t}min_{rec_t}min_{pat}_{cor}.xls'.format(
+            dis=blob.discipline.title(),
+            lang=form['language'],
+            nr=len(blob.data),
+            mem_t=blob.memo_time,
+            rec_t=blob.recall_time,
+            pat=','.join([p.strip() for p in form['pattern'].split(',')]),
+            cor=blob.correction.title()
+        )
         t = recall.xls.get_words_table(
             title='Svenska Minnesförbundet',
             discipline=f'Words, {blob.language.title()}, {len(blob.data)} st.',
             recall_key=h.upper(),
-            memo_time='5',
+            memo_time=form['memo_time'],
             recall_time=blob.recall_time,
             pattern=form['pattern']
         )
         for n in blob.data:
             t.add_item(n)
-        t.save(os.path.join(app.root_path, 'static/sheets/' + blob.discipline + '.xls'))
+        t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
         return render_template('memorize.html',
-                               xls_download_link=url_for('static', filename='sheets/' + blob.discipline + '.xls'))
+                               xls_download_link=url_for('static', filename='sheets/' + xls_filename),
+                               xls_filename=xls_filename)
 
 
 @app.route('/dates', methods=['POST'])
@@ -302,6 +327,7 @@ def dates():
         form = request.form
         blob = Blob(
             discipline='dates',
+            memo_time=form['memo_time'],
             recall_time=form['recall_time'],
             correction=form['correction'],
             data=form.get('data'),
@@ -313,19 +339,29 @@ def dates():
         app.logger.info(f'Created blob for dates: {h}')
 
         # CREATE XLS DOCUMENT
+        xls_filename = '{dis}_{lang}_{nr}st_{mem_t}min_{rec_t}min_{pat}_{cor}.xls'.format(
+            dis=blob.discipline.title(),
+            lang=form['language'],
+            nr=len(blob.data),
+            mem_t=blob.memo_time,
+            rec_t=blob.recall_time,
+            pat=','.join([p.strip() for p in form['pattern'].split(',')]),
+            cor=blob.correction.title()
+        )
         t = recall.xls.get_dates_table(
             title='Svenska Minnesförbundet',
             discipline=f'Historical Dates, {blob.language.title()}, {len(blob.data)} st.',
             recall_key=h.upper(),
-            memo_time='5',
+            memo_time=form['memo_time'],
             recall_time=blob.recall_time,
             pattern=form['pattern']
         )
         for n in blob.data:
             t.add_item(n)
-        t.save(os.path.join(app.root_path, 'static/sheets/' + blob.discipline + '.xls'))
+        t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
         return render_template('memorize.html',
-                               xls_download_link=url_for('static', filename='sheets/' + blob.discipline + '.xls'))
+                               xls_download_link=url_for('static', filename='sheets/' + xls_filename),
+                               xls_filename=xls_filename)
 
 
 
