@@ -1,6 +1,13 @@
 
 {% macro common_fields(item_name) %}
 <div class="form-group">
+    <label for="pattern_{{ item_name }}" class="col-sm-3 control-label">Pattern</label>
+    <div class="col-sm-9">
+      <input name="pattern" type="string" class="form-control" id="pattern_{{ item_name }}" placeholder="comma-separated list of numbers or leave empty">
+    </div>
+</div>
+
+<div class="form-group">
     <label for="recallTime_{{ item_name }}" class="col-sm-3 control-label">Recall time</label>
     <div class="col-sm-9">
       <input name="recall_time" type="number" min="1" max="1500" required class="form-control" id="recallTime_{{ item_name }}" placeholder="minutes">

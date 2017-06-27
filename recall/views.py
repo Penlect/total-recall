@@ -12,7 +12,6 @@ from collections import namedtuple
 
 from recall import app
 
-
 # Todo: fix imports
 import recall.xls
 
@@ -137,7 +136,7 @@ class Blob:
     VALID_CORRECTIONS = {'kind', 'harsh'}
 
     def __init__(self, *, discipline, recall_time, correction, data: str,
-                 language=None, nr_items=None):
+                 language=None, nr_items=None, pattern=''):
         # Assign values and check for errors in input
         self.discipline = discipline.lower()
         if self.discipline not in self.VALID_DISCIPLINES:
@@ -151,7 +150,8 @@ class Blob:
             raise ValueError(f'Invalid correction: "{correction}". '
                              'Choose from ' + str(self.VALID_CORRECTIONS))
 
-        self.language = language
+        self.language = language.lower() if language is not None else None
+        self.pattern = tuple(int(p.strip()) for p in pattern.split(','))
 
         if data is None:
             # If data was not provided, we must generate it ourselves.
@@ -204,6 +204,7 @@ class Blob:
             'discipline': self.discipline,
             'recall_time': self.recall_time,
             'correction': self.correction,
+            'pattern': self.pattern,
             'data': self.data
         }
 
@@ -222,7 +223,6 @@ class Blob:
         return h
 
 
-
 @app.route('/numbers', methods=['POST'])
 def numbers():
     if request.method == 'POST':
@@ -233,7 +233,8 @@ def numbers():
             recall_time=form['recall_time'],
             correction=form['correction'],
             data=form.get('data'),
-            nr_items=form.get('nr_items')
+            nr_items=form.get('nr_items'),
+            pattern=form['pattern']
         )
         h = blob.add_to_database()
         app.logger.info(f'Created blob for numbers: {h}')
@@ -252,7 +253,7 @@ def numbers():
             recall_key=h.upper(),
             memo_time='5',
             recall_time=blob.recall_time,
-            pattern=None
+            pattern=form['pattern']
         )
         for n in blob.data:
             t.add_item(n)
@@ -272,7 +273,8 @@ def words():
             correction=form['correction'],
             data=form.get('data'),
             nr_items=form.get('nr_items'),
-            language=form.get('language')
+            language=form.get('language'),
+            pattern=form['pattern']
         )
         h = blob.add_to_database()
         app.logger.info(f'Created blob for words: {h}')
@@ -284,7 +286,7 @@ def words():
             recall_key=h.upper(),
             memo_time='5',
             recall_time=blob.recall_time,
-            pattern=None
+            pattern=form['pattern']
         )
         for n in blob.data:
             t.add_item(n)
@@ -304,7 +306,8 @@ def dates():
             correction=form['correction'],
             data=form.get('data'),
             nr_items=form.get('nr_items'),
-            language=form.get('language')
+            language=form.get('language'),
+            pattern=form['pattern']
         )
         h = blob.add_to_database()
         app.logger.info(f'Created blob for dates: {h}')
@@ -316,7 +319,7 @@ def dates():
             recall_key=h.upper(),
             memo_time='5',
             recall_time=blob.recall_time,
-            pattern=None
+            pattern=form['pattern']
         )
         for n in blob.data:
             t.add_item(n)

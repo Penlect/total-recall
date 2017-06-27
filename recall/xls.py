@@ -68,7 +68,7 @@ class Table:
         if pattern is None:
             styles.append(self.style_item_normal)
         else:
-            for p in pattern:
+            for p in (int(p.strip()) for p in pattern.split(',')):
                 if p < 1:
                     raise ValueError(f'Pattern invalid: {self.pattern}')
                 elif p == 1:
