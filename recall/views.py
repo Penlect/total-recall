@@ -14,10 +14,7 @@ from recall import app
 
 
 # Todo: fix imports
-import recall.xls.numbers_
-import recall.xls.binary
-import recall.xls.words
-import recall.xls.dates
+import recall.xls
 
 def sha(string):
     h = hashlib.sha1(string.encode())
@@ -242,28 +239,26 @@ def numbers():
         app.logger.info(f'Created blob for numbers: {h}')
 
         # CREATE XLS DOCUMENT
-        description = (
-            f"Memorization: {blob.discipline.title()} Numbers, "
-            f"{len(blob.data)} digits. "
-            f"Recall time: {blob.recall_time} Min"
-        )
-
         if blob.discipline == 'binary':
-            table = recall.xls.binary.BinaryTable
+            table = recall.xls.get_binary_table
         elif blob.discipline == 'decimal':
-            table = recall.xls.numbers_.NumberTable
+            table = recall.xls.get_decimal_table
         else:
             raise ValueError('Invalid discipline for Numbers: "{blob.discipline}"')
 
-        w = table(name='Numbers', recall_key=h.upper(),
-                  title='Svenska Minnesförbundet',
-                  description=description)
+        t = table(
+            title='Svenska Minnesförbundet',
+            discipline=f'{blob.discipline.title()} Numbers, {len(blob.data)} st.',
+            recall_key=h.upper(),
+            memo_time='5',
+            recall_time=blob.recall_time,
+            pattern=None
+        )
         for n in blob.data:
-            w.add_item(n)
-        w.save(os.path.join(app.root_path, 'static/sheets/' + blob.discipline + '.xls'))
+            t.add_item(n)
+        t.save(os.path.join(app.root_path, 'static/sheets/' + blob.discipline + '.xls'))
         return render_template('memorize.html',
                                xls_download_link=url_for('static', filename='sheets/' + blob.discipline + '.xls'))
-        return str(blob)
 
 
 @app.route('/words', methods=['POST'])
@@ -283,21 +278,19 @@ def words():
         app.logger.info(f'Created blob for words: {h}')
 
         # CREATE XLS DOCUMENT
-        description = (
-            f"Memorization: {blob.language.title()} Words, "
-            f"{len(blob.data)} st. "
-            f"Recall time: {blob.recall_time} Min"
+        t = recall.xls.get_words_table(
+            title='Svenska Minnesförbundet',
+            discipline=f'Words, {blob.language.title()}, {len(blob.data)} st.',
+            recall_key=h.upper(),
+            memo_time='5',
+            recall_time=blob.recall_time,
+            pattern=None
         )
-
-        w = recall.xls.words.WordTable(name='Numbers', recall_key=h.upper(),
-                                       title='Svenska Minnesförbundet',
-                                       description=description)
         for n in blob.data:
-            w.add_item(n)
-        w.save(os.path.join(app.root_path, 'static/sheets/' + blob.discipline + '.xls'))
+            t.add_item(n)
+        t.save(os.path.join(app.root_path, 'static/sheets/' + blob.discipline + '.xls'))
         return render_template('memorize.html',
                                xls_download_link=url_for('static', filename='sheets/' + blob.discipline + '.xls'))
-        return str(blob)
 
 
 @app.route('/dates', methods=['POST'])
@@ -317,21 +310,19 @@ def dates():
         app.logger.info(f'Created blob for dates: {h}')
 
         # CREATE XLS DOCUMENT
-        description = (
-            f"Memorization: {blob.language.title()} Historical Dates, "
-            f"{len(blob.data)} st. "
-            f"Recall time: {blob.recall_time} Min"
+        t = recall.xls.get_dates_table(
+            title='Svenska Minnesförbundet',
+            discipline=f'Historical Dates, {blob.language.title()}, {len(blob.data)} st.',
+            recall_key=h.upper(),
+            memo_time='5',
+            recall_time=blob.recall_time,
+            pattern=None
         )
-
-        w = recall.xls.dates.DatesTable(name='Numbers', recall_key=h.upper(),
-                                        title='Svenska Minnesförbundet',
-                                        description=description)
         for n in blob.data:
-            w.add_item(n)
-        w.save(os.path.join(app.root_path, 'static/sheets/' + blob.discipline + '.xls'))
+            t.add_item(n)
+        t.save(os.path.join(app.root_path, 'static/sheets/' + blob.discipline + '.xls'))
         return render_template('memorize.html',
                                xls_download_link=url_for('static', filename='sheets/' + blob.discipline + '.xls'))
-        return str(blob)
 
 
 
