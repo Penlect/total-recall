@@ -268,27 +268,27 @@ class WordTable(Table):
         'alignment: horizontal left, vertical center;'
     )
     style_item_normal = (
-        xlwt.easyxf(normal),
+        xlwt.easyxf(normal.replace('left', 'right')),
         xlwt.easyxf(normal),
         xlwt.easyxf(normal)
     )
     style_item_single = (
-        xlwt.easyxf(normal + 'borders: left hair, top hair, bottom hair;'),
+        xlwt.easyxf(normal.replace('left', 'right') + 'borders: left hair, top hair, bottom hair;'),
         xlwt.easyxf(normal + 'borders: top hair, bottom hair;'),
         xlwt.easyxf(normal + 'borders: right hair, top hair, bottom hair;'),
     )
     style_item_start = (
-        xlwt.easyxf(normal + 'borders: left hair, top hair;'),
+        xlwt.easyxf(normal.replace('left', 'right') + 'borders: left hair, top hair;'),
         xlwt.easyxf(normal + 'borders: top hair;'),
         xlwt.easyxf(normal + 'borders: right hair, top hair;'),
     )
     style_item_middle = (
-        xlwt.easyxf(normal + 'borders: left hair;'),
+        xlwt.easyxf(normal.replace('left', 'right') + 'borders: left hair;'),
         xlwt.easyxf(normal),
         xlwt.easyxf(normal + 'borders: right hair;'),
     )
     style_item_stop = (
-        xlwt.easyxf(normal + 'borders: left hair, bottom hair;'),
+        xlwt.easyxf(normal.replace('left', 'right') + 'borders: left hair, bottom hair;'),
         xlwt.easyxf(normal + 'borders: bottom hair;'),
         xlwt.easyxf(normal + 'borders: right hair, bottom hair;'),
     )
