@@ -35,7 +35,8 @@ class Table:
             item_width,
             item_height,
 
-            pattern
+            pattern,
+            **kwargs
     ):
         assert nr_page_rows >= nr_item_rows + nr_header_rows
         self.nr_header_rows = nr_header_rows
@@ -65,12 +66,12 @@ class Table:
 
         # Determine and create the style cycle for numbers
         styles = list()
-        if pattern is None or not pattern.strip():
+        if not pattern:
             styles.append(self.style_item_normal)
         else:
-            for p in (int(p) for p in pattern.split(',')):
+            for p in pattern:
                 if p < 1:
-                    raise ValueError(f'Pattern invalid: {self.pattern}')
+                    raise ValueError(f'Pattern invalid: {pattern}')
                 elif p == 1:
                     styles.append(self.style_item_single)
                 elif p == 2:

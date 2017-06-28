@@ -12,14 +12,13 @@ from collections import namedtuple
 
 from recall import app
 
-# Todo: fix imports
 import recall.xls
+
 
 def sha(string):
     h = hashlib.sha1(string.encode())
     h.update(str(random.random()).encode())
     return h.hexdigest()[0:6]
-
 
 DATABASE_WORDS = os.path.join(app.root_path, 'db_words.txt')
 DATABASE_STORIES = os.path.join(app.root_path, 'db_stories.txt')
@@ -28,6 +27,7 @@ StoryEntry = namedtuple('StoryEntry', 'language value name date')
 
 
 def load_database(db_file, entry):
+    """Load database entries"""
     with open(db_file, 'r', encoding='utf-8') as db_file:
         entries = set()
         for line in db_file:
@@ -38,25 +38,169 @@ def load_database(db_file, entry):
 
 
 def save_database(db_file, entries):
+    """Save database entries"""
     with open(db_file, 'w', encoding='utf-8') as db_file:
         lines = (';'.join(entry) for entry in sorted(entries))
         db_file.write('\n'.join(lines))
 
 
-def unqiue_lines_in_textarea(data, lower=False):
+def unique_lines_in_textarea(data: str, lower=False):
+    """Get unique nonempty lines in textarea"""
     if lower:
         data = data.lower()
     return {line.strip() for line in data.split('\n') if line.strip()}
 
 
+class Blob:
+
+    VALID_DISCIPLINES = {'binary', 'decimal', 'words', 'dates'}
+    VALID_CORRECTIONS = {'kind', 'standard'}
+
+    def __init__(self, *,
+                 discipline: str,
+                 memo_time: int, recall_time: int,
+                 correction,
+                 data: str,  # Mandatory for 'create' but not 'generate'
+
+                 language=None,  # Mandatory for 'dates' and 'wrods'
+                 nr_items=None,  # Mandatory for 'generate' but not 'create'
+                 pattern=''
+                 ):
+        self.recall_key = None  # Final hash for this blob
+
+        # Assign values and check for errors in input
+        self.discipline = discipline.strip().lower()
+        if self.discipline not in self.VALID_DISCIPLINES:
+            raise ValueError(f'Invalid discipline: "{discipline}". '
+                             'Choose from ' + str(self.VALID_DISCIPLINES))
+
+        self.memo_time = int(memo_time)
+        if self.memo_time < 0:
+            raise ValueError('Memo. time cannot be negative: '
+                             f'{self.memo_time}')
+
+        self.recall_time = int(recall_time)
+        if self.recall_time < 0:
+            raise ValueError('Recall time cannot be negative: '
+                             f'{self.recall_time}')
+
+        self.correction = correction.strip().lower()
+        if self.correction not in self.VALID_CORRECTIONS:
+            raise ValueError(f'Invalid correction: "{correction}". '
+                             'Choose from ' + str(self.VALID_CORRECTIONS))
+
+        if language is None and self.discipline in {'words', 'dates'}:
+            raise ValueError('Language must be provided when discipline = ' +
+                             self.discipline)
+        elif language:
+            self.language = language.lower()
+        else:
+            self.language = ''
+
+        try:
+            self.pattern = tuple(int(p) for p in pattern.split(',')
+                                 if p.strip())
+        except ValueError:
+            self.pattern = ()  # Empty tuple
+
+        if data is None:
+            # If data was not provided, we must generate it ourselves.
+            # In order to do so we need to know how many items to
+            # generate, + language if words or dates.
+            assert nr_items is not None, 'Nr_items not provided to blob!'
+            self.nr_items = int(nr_items)
+            if self.discipline in {'words', 'dates'}:
+                assert language is not None, 'Language not provided to blob!'
+
+            if self.discipline == 'binary':
+                self.data = tuple(random.randint(0, 1)
+                                  for _ in range(self.nr_items))
+            elif self.discipline == 'decimal':
+                self.data = tuple(random.randint(0, 9)
+                                  for _ in range(self.nr_items))
+            elif self.discipline == 'words':
+                words = [word.value for word in
+                         load_database(DATABASE_WORDS, WordEntry)
+                         if word.language == self.language]
+                random.shuffle(words)
+                self.data = tuple(words[0:self.nr_items])
+            elif self.discipline == 'dates':
+                stories = [story.value for story in
+                           load_database(DATABASE_STORIES, StoryEntry)
+                           if story.language == self.language]
+                random.shuffle(stories)
+                stories = stories[0:self.nr_items]
+                dates = [random.randint(1000,2099) for _ in stories]
+                self.data = tuple(zip(dates, stories))
+            else:
+                raise Exception('Data generation for discipline '
+                                f'"{self.discipline}" not implemented.')
+        else:
+            # If data is provided, it's just a matter of parsing the data
+            # from the string
+            if self.discipline == 'binary':
+                self.data = tuple(int(digit) for digit in
+                                  re.findall('[01]', data))
+            elif self.discipline == 'decimal':
+                self.data = tuple(int(digit) for digit in
+                                  re.findall('\d', data))
+            elif self.discipline == 'words':
+                self.data = tuple(unique_lines_in_textarea(data, lower=True))
+            elif self.discipline == 'dates':
+                lines = unique_lines_in_textarea(data, lower=False)
+                historical_dates = []
+                for line in lines:
+                    date, story = line.split(maxsplit=1)
+                    assert 1000 <= int(date) <= 2099
+                    historical_dates.append((date.strip(), story.strip()))
+                self.data = tuple(historical_dates)
+            else:
+                raise Exception('Data creation for discipline '
+                                f'"{self.discipline}" not implemented.')
+
+    def __iter__(self):
+        yield from (
+            ('discipline', self.discipline),
+            ('memo_time', self.memo_time),
+            ('recall_time', self.recall_time),
+            ('correction', self.correction),
+            ('data', self.data),
+            ('language', self.language),
+            ('pattern', self.pattern),
+            ('recall_key', self.recall_key),
+            ('date_created', time.time())
+        )
+
+    def add_to_database(self):
+        """Write blob as json file to database"""
+        blob = dict(self)
+
+        hash_candidate = str(blob)
+        while True:
+            h = sha(hash_candidate)
+            output_file = os.path.join(app.root_path,
+                                       f'database/{h[0:2]}/{h[2:6]}.json')
+            if os.path.isfile(output_file):
+                hash_candidate = h
+            else:
+                break
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        with open(output_file, 'w', encoding='utf-8') as file:
+            json.dump(blob, file)
+        self.recall_key = h
+        return h
+
+
 @app.route('/database/words', methods=['GET', 'POST'])
 def manage_words_database():
+    """Words database dashboard"""
     if request.method == 'GET':
         return render_template('db_words.html')
 
 
 @app.route('/database/words/content', methods=['GET'])
 def database_words_content():
+    """View whole word database in one big table"""
     db_words = load_database(DATABASE_WORDS, WordEntry)
     return render_template('db_words_content.html', words=db_words)
 
@@ -85,7 +229,7 @@ def database_words_modify():
         db_lang_word = {f'{w.language};{w.value}':w for w in db_words}
 
         status = dict()
-        data = unqiue_lines_in_textarea(form['data'], lower=True)
+        data = unique_lines_in_textarea(form['data'], lower=True)
         for word in data:
             delete_me = word.startswith('delete:')
             w = WordEntry(
@@ -130,119 +274,28 @@ def create():
     return render_template('create.html')
 
 
-class Blob:
-
-    VALID_DISCIPLINES = {'binary', 'decimal', 'words', 'dates'}
-    VALID_CORRECTIONS = {'kind', 'standard'}
-
-    def __init__(self, *, discipline, memo_time, recall_time, correction, data: str,
-                 language=None, nr_items=None, pattern=''):
-        # Assign values and check for errors in input
-        self.discipline = discipline.lower()
-        if self.discipline not in self.VALID_DISCIPLINES:
-            raise ValueError(f'Invalid discipline: "{discipline}". '
-                             'Choose from ' + str(self.VALID_DISCIPLINES))
-        self.recall_time = int(recall_time)
-        if self.recall_time < 0:
-            raise ValueError(f'Recall time cannot be negative: {self.recall_time}')
-        self.correction = correction.lower()
-        if self.correction not in self.VALID_CORRECTIONS:
-            raise ValueError(f'Invalid correction: "{correction}". '
-                             'Choose from ' + str(self.VALID_CORRECTIONS))
-
-        self.memo_time = memo_time
-        self.language = language.lower() if language is not None else None
-        try:
-            self.pattern = tuple(int(p) for p in pattern.split(','))
-        except ValueError:
-            self.pattern = None
-
-        if data is None:
-            # If data was not provided, we must generate it ourselves.
-            # In order to do so we need to know how many items to
-            # generate, + language if words or dates.
-            assert nr_items is not None, 'Nr_items not provided to blob!'
-            self.nr_items = int(nr_items)
-            if self.discipline in {'words', 'dates'}:
-                assert language is not None, 'Language not provided to blob!'
-
-            if self.discipline == 'binary':
-                self.data = tuple(random.randint(0, 1) for _ in range(self.nr_items))
-            elif self.discipline == 'decimal':
-                self.data = tuple(random.randint(0, 9) for _ in range(self.nr_items))
-            elif self.discipline == 'words':
-                words = [word.value for word in load_database(DATABASE_WORDS, WordEntry)]  # Language not yet supported
-                random.shuffle(words)
-                self.data = tuple(words[0:self.nr_items])
-            elif self.discipline == 'dates':
-                stories = [story.value for story in load_database(DATABASE_STORIES, StoryEntry)]  # Language not yet supported
-                random.shuffle(stories)
-                stories = stories[0:self.nr_items]
-                dates = [random.randint(1000,2099) for _ in stories]
-                self.data = tuple(zip(dates, stories))
-            else:
-                raise Exception(f'Data generation for discipline "{self.discipline}" not implemented.')
-
-        else:
-            # If data is provided, it's just a matter of parsing the data
-            # from the string
-            if self.discipline == 'binary':
-                self.data = tuple(int(digit) for digit in re.findall('[01]', data))
-            elif self.discipline == 'decimal':
-                self.data = tuple(int(digit) for digit in re.findall('\d', data))
-            elif self.discipline == 'words':
-                self.data = tuple(word.strip() for word in data.lower().split('\n') if word.strip())
-            elif self.discipline == 'dates':
-                historical_dates = list()
-                for line in data.split('\n'):
-                    if line.strip():
-                        date, story = line.split(maxsplit=1)
-                        historical_dates.append((date.strip(), story.strip()))
-                self.data = tuple(historical_dates)
-            else:
-                raise Exception(f'Data creation for discipline "{self.discipline}" not implemented.')
-
-    def add_to_database(self):
-
-        blob = { # Todo: add language
-            'discipline': self.discipline,
-            'recall_time': self.recall_time,
-            'correction': self.correction,
-            'pattern': self.pattern,
-            'data': self.data
-        }
-
-        hash_candidate = str(blob)
-        while True:
-            h = sha(hash_candidate)
-            output_file = os.path.join(app.root_path,
-                                       f'database/{h[0:2]}/{h[2:6]}.json')
-            if os.path.isfile(output_file):
-                hash_candidate = h
-            else:
-                break
-        os.makedirs(os.path.dirname(output_file), exist_ok=True)
-        with open(output_file, 'w') as file:
-            json.dump(blob, file)
-        return h
-
-
-@app.route('/numbers', methods=['POST'])
-def numbers():
-    if request.method == 'POST':
+def form_to_blob(form, discipline:str):
         # The request form is a ImmutableMultiDict
-        form = request.form
         blob = Blob(
-            discipline=form['base'],
+            discipline=discipline,
             memo_time=form['memo_time'],
             recall_time=form['recall_time'],
             correction=form['correction'],
             data=form.get('data'),
             nr_items=form.get('nr_items'),
+            language=form.get('language'),
             pattern=form['pattern']
         )
         h = blob.add_to_database()
-        app.logger.info(f'Created blob for numbers: {h}')
+        app.logger.info(f'Created blob for {discipline}: {h}')
+        return blob
+
+XLS_FILENAME_FMT = '{discipline}_{language}_{nr}st_{memo_time}min_{recall_time}min_{pattern_str}_{correction}.xls'
+
+@app.route('/numbers', methods=['POST'])
+def numbers():
+    if request.method == 'POST':
+        blob = form_to_blob(request.form, discipline=request.form['base'])
 
         # CREATE XLS DOCUMENT
         if blob.discipline == 'binary':
@@ -250,23 +303,22 @@ def numbers():
         elif blob.discipline == 'decimal':
             table = recall.xls.get_decimal_table
         else:
-            raise ValueError('Invalid discipline for Numbers: "{blob.discipline}"')
+            raise ValueError(
+                'Invalid discipline for Numbers: "{blob.discipline}"'
+            )
 
-        xls_filename = '{dis}_{nr}st_{mem_t}min_{rec_t}min_{pat}_{cor}.xls'.format(
-            dis=blob.discipline.title(),
+        b = dict(blob)
+        xls_filename = XLS_FILENAME_FMT.format(
             nr=len(blob.data),
-            mem_t=blob.memo_time,
-            rec_t=blob.recall_time,
-            pat=','.join([p.strip() for p in form['pattern'].split(',')]),
-            cor=blob.correction.title()
-        )
+            pattern_str=','.join(str(p) for p in blob.pattern),
+            **b
+        ).title()
+
+        b.pop('discipline')
         t = table(
             title='Svenska Minnesförbundet',
             discipline=f'{blob.discipline.title()} Numbers, {len(blob.data)} st.',
-            recall_key=h.upper(),
-            memo_time=form['memo_time'],
-            recall_time=blob.recall_time,
-            pattern=form['pattern']
+            **b
         )
         for n in blob.data:
             t.add_item(n)
@@ -279,39 +331,23 @@ def numbers():
 @app.route('/words', methods=['POST'])
 def words():
     if request.method == 'POST':
-        # The request form is a ImmutableMultiDict
-        form = request.form
-        blob = Blob(
-            discipline='words',
-            memo_time=form['memo_time'],
-            recall_time=form['recall_time'],
-            correction=form['correction'],
-            data=form.get('data'),
-            nr_items=form.get('nr_items'),
-            language=form.get('language'),
-            pattern=form['pattern']
-        )
-        h = blob.add_to_database()
-        app.logger.info(f'Created blob for words: {h}')
+        blob = form_to_blob(request.form, discipline='words')
 
         # CREATE XLS DOCUMENT
-        xls_filename = '{dis}_{lang}_{nr}st_{mem_t}min_{rec_t}min_{pat}_{cor}.xls'.format(
-            dis=blob.discipline.title(),
-            lang=form['language'],
+        b = dict(blob)
+        xls_filename = XLS_FILENAME_FMT.format(
             nr=len(blob.data),
-            mem_t=blob.memo_time,
-            rec_t=blob.recall_time,
-            pat=','.join([p.strip() for p in form['pattern'].split(',')]),
-            cor=blob.correction.title()
-        )
+            pattern_str=','.join(str(p) for p in blob.pattern),
+            **b
+        ).title()
+
+        b.pop('discipline')
         t = recall.xls.get_words_table(
             title='Svenska Minnesförbundet',
             discipline=f'Words, {blob.language.title()}, {len(blob.data)} st.',
-            recall_key=h.upper(),
-            memo_time=form['memo_time'],
-            recall_time=blob.recall_time,
-            pattern=form['pattern']
+            **b
         )
+
         for n in blob.data:
             t.add_item(n)
         t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
@@ -323,39 +359,23 @@ def words():
 @app.route('/dates', methods=['POST'])
 def dates():
     if request.method == 'POST':
-        # The request form is a ImmutableMultiDict
-        form = request.form
-        blob = Blob(
-            discipline='dates',
-            memo_time=form['memo_time'],
-            recall_time=form['recall_time'],
-            correction=form['correction'],
-            data=form.get('data'),
-            nr_items=form.get('nr_items'),
-            language=form.get('language'),
-            pattern=form['pattern']
-        )
-        h = blob.add_to_database()
-        app.logger.info(f'Created blob for dates: {h}')
+        blob = form_to_blob(request.form, discipline='dates')
 
         # CREATE XLS DOCUMENT
-        xls_filename = '{dis}_{lang}_{nr}st_{mem_t}min_{rec_t}min_{pat}_{cor}.xls'.format(
-            dis=blob.discipline.title(),
-            lang=form['language'],
+        b = dict(blob)
+        xls_filename = XLS_FILENAME_FMT.format(
             nr=len(blob.data),
-            mem_t=blob.memo_time,
-            rec_t=blob.recall_time,
-            pat=','.join([p.strip() for p in form['pattern'].split(',')]),
-            cor=blob.correction.title()
-        )
-        t = recall.xls.get_dates_table(
+            pattern_str=','.join(str(p) for p in blob.pattern),
+            **b
+        ).title()
+
+        b.pop('discipline')
+        t = recall.xls.get_words_table(
             title='Svenska Minnesförbundet',
             discipline=f'Historical Dates, {blob.language.title()}, {len(blob.data)} st.',
-            recall_key=h.upper(),
-            memo_time=form['memo_time'],
-            recall_time=blob.recall_time,
-            pattern=form['pattern']
+            **b
         )
+
         for n in blob.data:
             t.add_item(n)
         t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
@@ -369,7 +389,7 @@ def dates():
 def recall_(key):
     blob_file = os.path.join(app.root_path, f'database/{key[0:2]}/{key[2:6]}.json')
     if not os.path.isfile(blob_file):
-        return f'No such key exsists: {key}'
+        return f'No such key exsists: {key}, {blob_file}'
     with open(blob_file, 'r') as file:
         blob = json.load(file)
     return render_template('numbers.html', key=key, blob=blob)
