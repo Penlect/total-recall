@@ -5,6 +5,7 @@ from flask import render_template, request, jsonify, url_for
 
 import random
 import time
+import math
 from pprint import pprint
 import json
 import hashlib
@@ -290,7 +291,7 @@ def form_to_blob(form, discipline:str):
         app.logger.info(f'Created blob for {discipline}: {h}')
         return blob
 
-XLS_FILENAME_FMT = '{discipline}_{language}_{nr}st_{memo_time}min_{recall_time}min_{pattern_str}_{correction}.xls'
+XLS_FILENAME_FMT = '{discipline}_{language}_{nr}st_{memo_time}min_{recall_time}min_{pattern_str}_{correction}'
 
 @app.route('/numbers', methods=['POST'])
 def numbers():
@@ -312,7 +313,7 @@ def numbers():
             nr=len(blob.data),
             pattern_str=','.join(str(p) for p in blob.pattern),
             **b
-        ).title()
+        ).title() + '.xls'
 
         b.pop('discipline')
         t = table(
@@ -339,7 +340,7 @@ def words():
             nr=len(blob.data),
             pattern_str=','.join(str(p) for p in blob.pattern),
             **b
-        ).title()
+        ).title() + '.xls'
 
         b.pop('discipline')
         t = recall.xls.get_words_table(
@@ -367,7 +368,7 @@ def dates():
             nr=len(blob.data),
             pattern_str=','.join(str(p) for p in blob.pattern),
             **b
-        ).title()
+        ).title() + '.xls'
 
         b.pop('discipline')
         t = recall.xls.get_words_table(
@@ -390,9 +391,10 @@ def recall_(key):
     blob_file = os.path.join(app.root_path, f'database/{key[0:2]}/{key[2:6]}.json')
     if not os.path.isfile(blob_file):
         return f'No such key exsists: {key}, {blob_file}'
-    with open(blob_file, 'r') as file:
+    with open(blob_file, 'r', encoding='utf-8') as file:
         blob = json.load(file)
-    return render_template('numbers.html', key=key, blob=blob)
+    return render_template('numbers.html', key=key, blob=blob,
+                           nr_cols=40, nr_rows=math.ceil(len(blob['data'])/40))
 
 
 def _arbeiter(key, dictionary):
