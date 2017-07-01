@@ -23,6 +23,7 @@ tr, td {
 	padding:0px;
 	margin:0px;
 	white-space: nowrap;
+	border: 1px solid;
 }
 body{
     color: black;
@@ -95,13 +96,16 @@ $(document).ready(function(){
                 $('#' + recall_cell_id).css('background-color', '#eaeaea');
             }
             else if(result.cells[recall_cell_id] == 'off_limits'){
-                $('#' + recall_cell_id).css('background-color', '#eaeaea');
+                $('#' + recall_cell_id).css('background-color', 'lightgray');
             }
             else{
                 console.log('Got unexpected data: ' + result.cells[recall_cell_id]);
             }
         }
-        $("#result").text('details here');
+        $("#result").text('Nr correct digits: ' + result.nr_correct +
+                          ' Nr wrong digits: ' + result.nr_wrong +
+                          ' Nr forgotten digits: ' + result.nr_gap +
+                          ' Nr digits not reached: ' + result.nr_not_reached);
     }
 
    console.log("Recall time")

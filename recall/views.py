@@ -420,12 +420,14 @@ class ClientRecallData:
         for i in range(self.nr_recall_cells):
             assert f'recall_cell_{i}' in self._data
 
-        self.empty_from_this_and_after = self.nr_recall_cells
-        for i in reversed(range(self.nr_recall_cells)):
+    def start_of_emptiness_before(self, index):
+        index_of_empty_cell = index
+        for i in reversed(range(index)):
             if self[i].strip():
                 break
             else:
-                self.empty_from_this_and_after = i
+                index_of_empty_cell = i
+        return index_of_empty_cell
 
     def __getitem__(self, item):
         try:
@@ -466,7 +468,11 @@ class Arbeiter:
 
     def _correct_binary(self):
         result = {
-            'cells': dict()
+            'cells': dict(),
+            'nr_correct': 0,
+            'nr_wrong': 0,
+            'nr_gap': 0,
+            'nr_not_reached': 0
         }
         for i, cell_value in enumerate(self.client_data, start=0):
             try:
@@ -476,15 +482,19 @@ class Arbeiter:
             else:
                 if not cell_value.strip():
                     # Empty cell
-                    if i < self.client_data.empty_from_this_and_after:
+                    if i < self.client_data.start_of_emptiness_before(len(self.blob['data'])):
                         result['cells'][f'recall_cell_{i}'] = 'gap'
+                        result['nr_gap'] += 1
                     else:
                         result['cells'][f'recall_cell_{i}'] = 'not_reached'
+                        result['nr_not_reached'] += 1
                 else:
                     if int(cell_value) == correct_value:
                         result['cells'][f'recall_cell_{i}'] = 'correct'
+                        result['nr_correct'] += 1
                     else:
                         result['cells'][f'recall_cell_{i}'] = 'wrong'
+                        result['nr_wrong'] += 1
         return result
 
     def _correct_decimals(self):
