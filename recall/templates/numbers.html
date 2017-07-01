@@ -3,7 +3,7 @@
 {% block css %}
 
 <style>
-input[type=number] {
+input[type=text] {
     text-align: center;
 	padding:0px;
 	margin:0px;
@@ -11,18 +11,8 @@ input[type=number] {
 	font-size:18px;
 	border: 0px;
 }
-input[type=number]:focus {
+input[type=text]:focus {
     background-color: lightblue;
-}
-/*
-Needed when input type=number, hides spin-button.
-https://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-input-s-spin-box
-*/
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 table {
 	border-collapse: collapse;
@@ -32,11 +22,17 @@ table {
 tr, td {
 	padding:0px;
 	margin:0px;
+	white-space: nowrap;
 }
 body{
-color: black;
-margin-left: 20px;
-margin-bottom: 20px;
+    color: black;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+.row_enumeration {
+    padding-left:20px;
+    padding-right:10px;
+    border-left: 1px solid;
 }
 </style>
 
@@ -49,16 +45,19 @@ margin-bottom: 20px;
     </div>
     <h3>{{ blob.discipline|title }} numbers, {{ blob.recall_time }} min Recall</h3>
 	
-	<p><span class="label label-primary">Seconds remaining: <span id="seconds_remaining">15</span></span></p>
+	<p><span class="label label-primary">Seconds remaining: <span id="seconds_remaining">20</span></span></p>
 	
     <form action="{{ url_for('arbeiter') }}" method="post">
         <fieldset>
+        <input name="recall_key" type="hidden" value="{{ key }}">
+
         <table border="1px" id="recall_table">
         {% for row_i in range(nr_rows) %}
             <tr class="recall_row">
                 {% for col_i in range(nr_cols) %}
-                    <td><input class="recall_cell" id="recall_cell_{{ row_i*nr_cols + col_i }}" name="recall_cell_{{ row_i*nr_cols + col_i }}" type="number" maxlength="1" size="1" autocomplete="off"></input></td>
+                    <td><input class="recall_cell" id="recall_cell_{{ row_i*nr_cols + col_i }}" name="recall_cell_{{ row_i*nr_cols + col_i }}" type="text" maxlength="1" size="1" autocomplete="off"></input></td>
                 {% endfor %}
+                <td class="row_enumeration">Row {{ row_i + 1 }}</td>
             </tr>
         {% endfor %}
         </table>
@@ -75,63 +74,38 @@ margin-bottom: 20px;
 
 <script>
 
-var SECOND = 1000 // milliseconds
-
-function getRecallTimer(recallTimeSec){
-	var secondsRemaining = recallTimeSec;
-	var interval = SECOND; // ms
-	var expected = Date.now() + interval;
-	function step() {
-		secondsRemaining--;
-		$('#seconds_remaining').text(secondsRemaining);
-		if(secondsRemaining <= 0){
-			console.log('Recall timeout -> Submit');
-			$('#recall_complete').submit();
-		}
-		else{
-			var dt = Date.now() - expected; // the drift (positive for overshooting)
-			if (dt > interval) {
-				console.log('Warning: dt = ' + dt);
-			}
-			expected += interval;
-			recallTimer = setTimeout(step, Math.max(0, interval - dt)); // take into account drift
-		}
-	}
-	return step;
-}
-
-
-function recallSubmit(data, status, xhr){
-	console.log(data);
-	console.log(status);
-	
-	var recall_correct = 0;
-	var recall_wrong = 0;
-	var recall_none = 0;
-	
-	for (var recall_cell_id in data){
-		if(data[recall_cell_id] == true){
-			$('#' + recall_cell_id).css('background-color', 'lime');
-			recall_correct++;
-		}
-		else if(data[recall_cell_id] == false){
-			$('#' + recall_cell_id).css('background-color', '#ff0022');
-			recall_wrong++;
-		}
-		else if(data[recall_cell_id] == null){
-			recall_none++;
-		}
-		else{
-			console.log('Got unexpected data: ' + data[recall_cell_id]);
-		}
-	}
-	$("#result").text(recall_correct + ', ' + recall_wrong + ', ' + recall_none);
-}
-
 $(document).ready(function(){
 
-	// Start count down clock for recall
-	recallTimer = setTimeout(getRecallTimer(15), SECOND);
+
+    function recallSubmit(result, status, xhr){
+        console.log(result);
+        console.log(status);
+
+        for (var recall_cell_id in result.cells){
+            if(result.cells[recall_cell_id] == 'correct'){
+                $('#' + recall_cell_id).css('background-color', 'lime');
+            }
+            else if(result.cells[recall_cell_id] == 'wrong'){
+                $('#' + recall_cell_id).css('background-color', '#ff0022');
+            }
+            else if(result.cells[recall_cell_id] == 'gap'){
+                $('#' + recall_cell_id).css('background-color', '#ff0022');
+            }
+            else if(result.cells[recall_cell_id] == 'not_reached'){
+                $('#' + recall_cell_id).css('background-color', '#eaeaea');
+            }
+            else if(result.cells[recall_cell_id] == 'off_limits'){
+                $('#' + recall_cell_id).css('background-color', '#eaeaea');
+            }
+            else{
+                console.log('Got unexpected data: ' + result.cells[recall_cell_id]);
+            }
+        }
+        $("#result").text('details here');
+    }
+
+   console.log("Recall time")
+   recallTimer = setTimeout(getRecallTimer($('#seconds_remaining'), $('#recall_complete')), SECOND);
 
    // User clicks on a cell
    var nrRows = $('#recall_table .recall_row').length;
@@ -147,8 +121,14 @@ $(document).ready(function(){
 
    $('form').submit(function(event){
 	  event.preventDefault();
+	  // Post all the recall input data to the server
       $.post($(this).attr('action'), $(this).serialize(), recallSubmit, 'json');
+
+      /* Disable the recall form because we don't want anyone
+       to modify it after the time has run out */
       $('fieldset').prop('disabled', true);
+
+      // Stop the clock from ticking
 	  clearTimeout(recallTimer);
       return false;
    });

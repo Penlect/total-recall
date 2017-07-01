@@ -192,6 +192,13 @@ class Blob:
         return h
 
 
+def load_blob(recall_key):
+    blob_file = os.path.join(
+        app.root_path, f'database/{recall_key[0:2]}/{recall_key[2:6]}.json')
+    with open(blob_file, 'r', encoding='utf-8') as file:
+        return json.load(file)
+
+
 @app.route('/database/words', methods=['GET', 'POST'])
 def manage_words_database():
     """Words database dashboard"""
@@ -401,22 +408,103 @@ def _arbeiter(key, dictionary):
     pass
 
 
+class ClientRecallData:
+    def __init__(self, request_form):
+        self.recall_key = request_form['recall_key']
+        self._data = dict()
+        for key in request_form:
+            if key.startswith('recall_cell_'):
+                self._data[key] = request_form[key]
+        self.nr_recall_cells = len(self._data)
+
+        for i in range(self.nr_recall_cells):
+            assert f'recall_cell_{i}' in self._data
+
+        self.empty_from_this_and_after = self.nr_recall_cells
+        for i in reversed(range(self.nr_recall_cells)):
+            if self[i].strip():
+                break
+            else:
+                self.empty_from_this_and_after = i
+
+    def __getitem__(self, item):
+        try:
+            return self._data[str(item)]
+        except KeyError:
+            return self._data['recall_cell_' + str(item)]
+
+    def __setitem__(self, key, value):
+        if key in self._data:
+            self._data[key] = value
+        elif 'recall_cell_' + str(value) in self._data:
+            self._data['recall_cell_' + str(value)] = value
+        else:
+            raise ValueError(f'Can\'t set item: {key}')
+
+    def __iter__(self):
+        for i in range(self.nr_recall_cells):
+            yield self[i]
+
+
+class Arbeiter:
+    def __init__(self, client_data, blob: dict):
+        self.client_data = client_data
+        self.blob = blob
+
+    def correct(self):
+        d = self.blob['discipline']
+        if d == 'binary':
+            return self._correct_binary()
+        elif d == 'decimal':
+            return self._correct_decimals()
+        elif d == 'words':
+            return self._correct_words()
+        elif d == 'dates':
+            return self._correct_dates()
+        else:
+            raise Exception(f'Blob contain invalid discipline: {d}')
+
+    def _correct_binary(self):
+        result = {
+            'cells': dict()
+        }
+        for i, cell_value in enumerate(self.client_data, start=0):
+            try:
+                correct_value = self.blob['data'][i]
+            except IndexError:
+                result['cells'][f'recall_cell_{i}'] = 'off_limits'
+            else:
+                if not cell_value.strip():
+                    # Empty cell
+                    if i < self.client_data.empty_from_this_and_after:
+                        result['cells'][f'recall_cell_{i}'] = 'gap'
+                    else:
+                        result['cells'][f'recall_cell_{i}'] = 'not_reached'
+                else:
+                    if int(cell_value) == correct_value:
+                        result['cells'][f'recall_cell_{i}'] = 'correct'
+                    else:
+                        result['cells'][f'recall_cell_{i}'] = 'wrong'
+        return result
+
+    def _correct_decimals(self):
+        return self._correct_binary()
+
+    def _correct_words(self):
+        pass
+
+    def _correct_dates(self):
+        pass
+
+
 @app.route('/arbeiter', methods=['POST'])
 def arbeiter():
     if request.method == 'POST':
-        d = dict(request.form)
-        resp = dict()
-        key = 'abc123'
-        with open(f'database/{key}.txt', 'r') as file:
-            data = file.read().split(';')
-            for key in d:
-                id_ = int(key.split('_')[-1].strip())
-                if d[key][0].strip():
-                    resp[key] = data[id_] == d[key][0]
-                else:
-                    resp[key] = None
-        app.logger.info(resp)
-        return jsonify(resp)
+        client = ClientRecallData(request.form)
+        # Todo: save client data to disk for backup
+        blob = load_blob(client.recall_key)
+        result = Arbeiter(client, blob).correct()
+        return jsonify(result)
     else:
         print('Wrong method!')
 

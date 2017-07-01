@@ -1,3 +1,6 @@
+
+/* ---------- KEYBOARD ---------- */
+
 function RecallGrid(rows, columns, cell) {
 	this.rows = rows;
 	this.columns = columns;
@@ -116,3 +119,33 @@ function keydownHandler(event, grid){
 			console.log("INVALID KEY: " + event.which);
 	}
 }
+
+/* ---------- TIMING ---------- */
+
+var SECOND = 1000 // milliseconds
+
+function getRecallTimer(sec_remaining_element, submit_element){
+	var secondsRemaining = Number(sec_remaining_element.text());
+	var interval = SECOND; // ms
+	var expected = Date.now() + interval;
+	function step() {
+		secondsRemaining--;
+		sec_remaining_element.text(secondsRemaining);
+		if(secondsRemaining <= 0){
+			console.log('Recall timeout -> Submit');
+			submit_element.submit();
+		}
+		else{
+			var dt = Date.now() - expected; // the drift (positive for overshooting)
+			if (dt > interval) {
+				console.log('Warning: dt = ' + dt);
+			}
+			expected += interval;
+			recallTimer = setTimeout(step, Math.max(0, interval - dt)); // take into account drift
+		}
+	}
+	return step;
+}
+
+/* ---------- CORRECTION ---------- */
+
