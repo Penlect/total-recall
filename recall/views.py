@@ -378,7 +378,7 @@ def dates():
         ).title() + '.xls'
 
         b.pop('discipline')
-        t = recall.xls.get_words_table(
+        t = recall.xls.get_dates_table(
             title='Svenska Minnesförbundet',
             discipline=f'Historical Dates, {blob.language.title()}, {len(blob.data)} st.',
             **b
