@@ -52,6 +52,13 @@ def unique_lines_in_textarea(data: str, lower=False):
     return {line.strip() for line in data.split('\n') if line.strip()}
 
 
+def load_blob(recall_key):
+    blob_file = os.path.join(
+        app.root_path, f'database/{recall_key[0:2]}/{recall_key[2:6]}.json')
+    with open(blob_file, 'r', encoding='utf-8') as file:
+        return json.load(file)
+
+
 class Blob:
 
     VALID_DISCIPLINES = {'binary', 'decimal', 'words', 'dates'}
@@ -63,7 +70,7 @@ class Blob:
                  correction,
                  data: str,  # Mandatory for 'create' but not 'generate'
 
-                 language=None,  # Mandatory for 'dates' and 'wrods'
+                 language=None,  # Mandatory for 'dates' and 'words'
                  nr_items=None,  # Mandatory for 'generate' but not 'create'
                  pattern=''
                  ):
@@ -98,11 +105,16 @@ class Blob:
         else:
             self.language = ''
 
+        if pattern.strip():
+            if not re.fullmatch('(\d+)(,\s*\d+\s*)*', pattern):
+                raise ValueError('The pattern provided doesn\'t match a '
+                                 'comma separated list of numbers.')
         try:
             self.pattern = tuple(int(p) for p in pattern.split(',')
                                  if p.strip())
-        except ValueError:
-            self.pattern = ()  # Empty tuple
+        except Exception as e:
+            raise ValueError('The pattern could not be converted to a tuple '
+                             'of integers.' + str(e))
 
         if data is None:
             # If data was not provided, we must generate it ourselves.
@@ -110,8 +122,6 @@ class Blob:
             # generate, + language if words or dates.
             assert nr_items is not None, 'Nr_items not provided to blob!'
             self.nr_items = int(nr_items)
-            if self.discipline in {'words', 'dates'}:
-                assert language is not None, 'Language not provided to blob!'
 
             if self.discipline == 'binary':
                 self.data = tuple(random.randint(0, 1)
@@ -131,7 +141,7 @@ class Blob:
                            if story.language == self.language]
                 random.shuffle(stories)
                 stories = stories[0:self.nr_items]
-                dates = [random.randint(1000,2099) for _ in stories]
+                dates = [random.randint(1000, 2099) for _ in stories]
                 self.data = tuple(zip(dates, stories))
             else:
                 raise Exception('Data generation for discipline '
@@ -152,7 +162,8 @@ class Blob:
                 historical_dates = []
                 for line in lines:
                     date, story = line.split(maxsplit=1)
-                    assert 1000 <= int(date) <= 2099
+                    if not (1000 <= int(date) <= 2099):
+                        raise ValueError(f'Date out of range: 1000 <= {date} <= 2099')
                     historical_dates.append((date.strip(), story.strip()))
                 self.data = tuple(historical_dates)
             else:
@@ -192,11 +203,8 @@ class Blob:
         return h
 
 
-def load_blob(recall_key):
-    blob_file = os.path.join(
-        app.root_path, f'database/{recall_key[0:2]}/{recall_key[2:6]}.json')
-    with open(blob_file, 'r', encoding='utf-8') as file:
-        return json.load(file)
+def alert(message):
+    return f'<div class="alert alert-danger">{message}</div>'
 
 
 @app.route('/database/words', methods=['GET', 'POST'])
@@ -283,20 +291,20 @@ def create():
 
 
 def form_to_blob(form, discipline:str):
-        # The request form is a ImmutableMultiDict
-        blob = Blob(
-            discipline=discipline,
-            memo_time=form['memo_time'],
-            recall_time=form['recall_time'],
-            correction=form['correction'],
-            data=form.get('data'),
-            nr_items=form.get('nr_items'),
-            language=form.get('language'),
-            pattern=form['pattern']
-        )
-        h = blob.add_to_database()
-        app.logger.info(f'Created blob for {discipline}: {h}')
-        return blob
+    # The request form is a ImmutableMultiDict
+    blob = Blob(
+        discipline=discipline,
+        memo_time=form['memo_time'],
+        recall_time=form['recall_time'],
+        correction=form['correction'],
+        data=form.get('data'),
+        nr_items=form.get('nr_items'),
+        language=form.get('language'),
+        pattern=form['pattern']
+    )
+    h = blob.add_to_database()
+    app.logger.info(f'Created blob for {discipline}: {h}')
+    return blob
 
 def blob_to_xls_filename(blob):
     XLS_FILENAME_FMT = '{discipline}_{nr}st_{language}_{memo_time}-{recall_time}min_p{pattern_str}_{correction}_{recall_key}'
@@ -340,19 +348,24 @@ def blob_to_table(blob):
 @app.route('/make', methods=['POST'])
 def make_blob_and_sheets():
     if request.method == 'POST':
-        blob = form_to_blob(request.form, discipline=request.form['base'])
+        try:
+            blob = form_to_blob(request.form, discipline=request.form['base'])
+        except Exception as e:
+            return alert(f'Failed to create blob of form data: {e}')
         xls_filename = blob_to_xls_filename(blob)
-        t = blob_to_table(blob)
-        t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
-        sheet_url = url_for('static', filename='sheets/' + xls_filename)
-        recall_url = url_for('recall_', key=blob.recall_key)
+        try:
+            t = blob_to_table(blob)
+        except Exception as e:
+            return alert(f'Failed to create table object of blob: {e}')
+        try:
+            t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
+        except Exception as e:
+            return alert(f'Failed to save xls file on server: {e}')
         return render_template(
             'links_memo_and_recall.html',
             xls_filename=xls_filename,
             recall_key=blob.recall_key
         )
-        #return f'<ul class="nav nav-pills"><li><a href="{sheet_url}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> {xls_filename}</a></li><li><a href="{recall_url}" target="_blank"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span> Link to recall</a></li></ul>'
-
 
 @app.route('/recall/<string:key>')
 def recall_(key):
