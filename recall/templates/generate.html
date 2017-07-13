@@ -57,7 +57,9 @@
 <!-- ________________________ WORDS ________________________ -->
 {% block words %}
 
-{{ languages('Dates')}}
+<input name="base" type="hidden" value="words">
+
+{{ languages('Words')}}
 
 {{ nr_items('Words', max=500) }}
 
@@ -70,6 +72,8 @@
 <!-- ________________________ HISTORICAL DATES ________________________ -->
 
 {% block dates %}
+
+<input name="base" type="hidden" value="dates">
 
 {{ languages('Dates')}}
 

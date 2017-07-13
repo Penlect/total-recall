@@ -298,110 +298,62 @@ def form_to_blob(form, discipline:str):
         app.logger.info(f'Created blob for {discipline}: {h}')
         return blob
 
-XLS_FILENAME_FMT = '{discipline}_{language}_{nr}st_{memo_time}min_{recall_time}min_{pattern_str}_{correction}'
+def blob_to_xls_filename(blob):
+    XLS_FILENAME_FMT = '{discipline}_{nr}st_{language}_{memo_time}-{recall_time}min_p{pattern_str}_{correction}_{recall_key}'
+    b = dict(blob)
+    xls_filename = XLS_FILENAME_FMT.format(
+        nr=len(blob.data),
+        pattern_str=','.join(str(p) for p in blob.pattern),
+        **b
+    ) + '.xls'
+    return xls_filename
 
-@app.route('/numbers', methods=['POST'])
-def numbers():
+def blob_to_table(blob):
+
+    if blob.discipline == 'binary':
+        table = recall.xls.get_binary_table
+        description=f'{blob.discipline.title()} Numbers, {len(blob.data)} st.'
+    elif blob.discipline == 'decimal':
+        table = recall.xls.get_decimal_table
+        description=f'{blob.discipline.title()} Numbers, {len(blob.data)} st.'
+    elif blob.discipline == 'words':
+        table = recall.xls.get_words_table
+        description=f'Words, {blob.language.title()}, {len(blob.data)} st.'
+    elif blob.discipline == 'dates':
+        table = recall.xls.get_dates_table
+        description=f'Historical Dates, {blob.language.title()}, {len(blob.data)} st.'
+    else:
+        raise ValueError(
+            'Invalid discipline in blob: "{blob.discipline}"'
+        )
+    b = dict(blob)
+    t = table(
+        title='Svenska Minnesförbundet',
+        description=description,
+        **b
+    )
+    for n in blob.data:
+        t.add_item(n)
+    return t
+
+
+@app.route('/make', methods=['POST'])
+def make_blob_and_sheets():
     if request.method == 'POST':
         blob = form_to_blob(request.form, discipline=request.form['base'])
-
-        # CREATE XLS DOCUMENT
-        if blob.discipline == 'binary':
-            table = recall.xls.get_binary_table
-        elif blob.discipline == 'decimal':
-            table = recall.xls.get_decimal_table
-        else:
-            raise ValueError(
-                'Invalid discipline for Numbers: "{blob.discipline}"'
-            )
-
-        b = dict(blob)
-        xls_filename = XLS_FILENAME_FMT.format(
-            nr=len(blob.data),
-            pattern_str=','.join(str(p) for p in blob.pattern),
-            **b
-        ).title() + '.xls'
-
-        b.pop('discipline')
-        t = table(
-            title='Svenska Minnesförbundet',
-            discipline=f'{blob.discipline.title()} Numbers, {len(blob.data)} st.',
-            **b
-        )
-        for n in blob.data:
-            t.add_item(n)
+        xls_filename = blob_to_xls_filename(blob)
+        t = blob_to_table(blob)
         t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
-        return render_template('memorize.html',
-                               xls_download_link=url_for('static', filename='sheets/' + xls_filename),
-                               xls_filename=xls_filename)
-
-
-@app.route('/words', methods=['POST'])
-def words():
-    if request.method == 'POST':
-        blob = form_to_blob(request.form, discipline='words')
-
-        # CREATE XLS DOCUMENT
-        b = dict(blob)
-        xls_filename = XLS_FILENAME_FMT.format(
-            nr=len(blob.data),
-            pattern_str=','.join(str(p) for p in blob.pattern),
-            **b
-        ).title() + '.xls'
-
-        b.pop('discipline')
-        t = recall.xls.get_words_table(
-            title='Svenska Minnesförbundet',
-            discipline=f'Words, {blob.language.title()}, {len(blob.data)} st.',
-            **b
-        )
-
-        for n in blob.data:
-            t.add_item(n)
-        t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
-        return render_template('memorize.html',
-                               xls_download_link=url_for('static', filename='sheets/' + xls_filename),
-                               xls_filename=xls_filename)
-
-
-@app.route('/dates', methods=['POST'])
-def dates():
-    if request.method == 'POST':
-        blob = form_to_blob(request.form, discipline='dates')
-
-        # CREATE XLS DOCUMENT
-        b = dict(blob)
-        xls_filename = XLS_FILENAME_FMT.format(
-            nr=len(blob.data),
-            pattern_str=','.join(str(p) for p in blob.pattern),
-            **b
-        ).title() + '.xls'
-
-        b.pop('discipline')
-        t = recall.xls.get_dates_table(
-            title='Svenska Minnesförbundet',
-            discipline=f'Historical Dates, {blob.language.title()}, {len(blob.data)} st.',
-            **b
-        )
-
-        for n in blob.data:
-            t.add_item(n)
-        t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
-        return render_template('memorize.html',
-                               xls_download_link=url_for('static', filename='sheets/' + xls_filename),
-                               xls_filename=xls_filename)
-
+        url = url_for('static', filename='sheets/' + xls_filename)
+        return f'<a href="{url}">{xls_filename}.xls</a>'
 
 
 @app.route('/recall/<string:key>')
 def recall_(key):
-    blob_file = os.path.join(app.root_path, f'database/{key[0:2]}/{key[2:6]}.json')
-    if not os.path.isfile(blob_file):
-        return f'No such key exsists: {key}, {blob_file}'
-    with open(blob_file, 'r', encoding='utf-8') as file:
-        blob = json.load(file)
-
-
+    try:
+        blob = load_blob(key)
+    except FileNotFoundError:
+        return f'No blob for key "{key}" exists'
 
     if blob['discipline'] == 'binary':
         nr_rows = math.ceil(len(blob['data'])/30)
@@ -525,7 +477,8 @@ class Arbeiter:
             'nr_correct': 0,
             'nr_wrong': 0,
             'nr_gap': 0,
-            'nr_not_reached': 0
+            'nr_not_reached': 0,
+            'almost_correct': 0
         }
         for i, cell_value in enumerate(self.client_data, start=0):
             try:
@@ -545,6 +498,9 @@ class Arbeiter:
                     if cell_value.strip().lower() == correct_value.strip().lower():
                         result['cells'][f'recall_cell_{i}'] = 'correct'
                         result['nr_correct'] += 1
+                    elif self._word_almost_correct(cell_value, correct_value):
+                        result['cells'][f'recall_cell_{i}'] = 'almost_correct'
+                        result['almost_correct'] += 1
                     else:
                         result['cells'][f'recall_cell_{i}'] = 'wrong'
                         result['nr_wrong'] += 1
@@ -552,6 +508,9 @@ class Arbeiter:
 
     def _correct_dates(self):
         pass
+
+    def _word_almost_correct(self, cell_value, correct_value):
+        return False
 
 
 @app.route('/arbeiter', methods=['POST'])

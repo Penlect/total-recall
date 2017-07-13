@@ -133,7 +133,7 @@ class Table:
 
     def write_header(self, sheets,
                      left_column, right_column,
-                     title, discipline, recall_key,
+                     title, description, recall_key,
                      memo_time, recall_time):
             for sheet in sheets:
                 sheet.write_merge(
@@ -146,7 +146,7 @@ class Table:
                 sheet.write(
                     self.y_header + 1,
                     left_column,
-                    *discipline
+                    *description
                 )
                 sheet.write(
                     self.y_header + 1,
@@ -189,11 +189,11 @@ class NumberTable(Table):
         normal + 'borders: right hair, top hair, bottom hair;'
     )
 
-    def __init__(self, title, discipline, recall_key, memo_time, recall_time,
+    def __init__(self, title, description, recall_key, memo_time, recall_time,
                  **kwargs):
 
         self.title = title
-        self.discipline = discipline
+        self.description = description
         self.recall_key = recall_key
         self.memo_time = memo_time
         self.recall_time = recall_time
@@ -246,7 +246,7 @@ class NumberTable(Table):
                 left_column=self.x_header,
                 right_column=self.x_header + self.nr_page_cols - 5,
                 title=(self.title, style_title),
-                discipline=(f'Discip. {self.discipline}', style_normal),
+                description=(f'{self.description}', style_normal),
                 recall_key=(f'Recall key: {self.recall_key}', style_normal),
                 memo_time=(f'Memo. time: {self.memo_time} Min', style_normal),
                 recall_time=(f'Recall time: {self.recall_time} Min', style_normal)
@@ -294,11 +294,11 @@ class WordTable(Table):
         xlwt.easyxf(normal + 'borders: right hair, bottom hair;'),
     )
 
-    def __init__(self, title, discipline, recall_key, memo_time, recall_time,
+    def __init__(self, title, description, recall_key, memo_time, recall_time,
                  **kwargs):
 
         self.title = title
-        self.discipline = discipline
+        self.description = description
         self.recall_key = recall_key
         self.memo_time = memo_time
         self.recall_time = recall_time
@@ -348,7 +348,7 @@ class WordTable(Table):
                 left_column=self.x_header,
                 right_column=self.x_header + self.nr_page_cols - 1,
                 title=(self.title, style_title),
-                discipline=(f'Discip. {self.discipline}', style_normal),
+                description=(f'{self.description}', style_normal),
                 recall_key=(f'Recall key: {self.recall_key}', style_normal),
                 memo_time=(f'Memo. time: {self.memo_time} Min', style_normal),
                 recall_time=(f'Recall time: {self.recall_time} Min', style_normal)
@@ -380,11 +380,11 @@ class DatesTable(Table):
     style_item_middle = style_item_normal
     style_item_stop = style_item_normal + 'borders: bottom hair;'
 
-    def __init__(self, title, discipline, recall_key, memo_time, recall_time,
+    def __init__(self, title, description, recall_key, memo_time, recall_time,
                  **kwargs):
 
         self.title = title
-        self.discipline = discipline
+        self.description = description
         self.recall_key = recall_key
         self.memo_time = memo_time
         self.recall_time = recall_time
@@ -433,7 +433,7 @@ class DatesTable(Table):
                 left_column=self.x_header,
                 right_column=self.x_header + self.nr_page_cols - 1,
                 title=(self.title, style_title),
-                discipline=(f'Discip. {self.discipline}', style_normal),
+                description=(f'{self.description}', style_normal),
                 recall_key=(f'Recall key: {self.recall_key}', style_normal),
                 memo_time=(f'Memo. time: {self.memo_time} Min', style_normal),
                 recall_time=(f'Recall time: {self.recall_time} Min', style_normal)
@@ -519,28 +519,28 @@ if __name__ == '__main__':
     import random
 
     d = get_decimal_table(title='Svenska Minnesförbundet',
-                    discipline='Decimal Numbers, 1234 st',
+                    description='Decimal Numbers, 1234 st',
                     recall_key='A4B2C9',
                     memo_time='5',
                     recall_time='15',
                     pattern=[5])
 
     b = get_binary_table(title='Svenska Minnesförbundet',
-                    discipline='Binary Numbers, 1234 st',
+                    description='Binary Numbers, 1234 st',
                     recall_key='ABC123',
                     memo_time='5',
                     recall_time='15',
                     pattern=[4])
 
     w = get_words_table(title='Svenska Minnesförbundet',
-                    discipline='Words, 1234 st',
+                    description='Words, 1234 st',
                     recall_key='ABC123',
                     memo_time='5',
                     recall_time='15',
                     pattern=[2])
 
     h = get_dates_table(title='Svenska Minnesförbundet',
-                    discipline='Historical Dates, 1234 st',
+                    description='Historical Dates, 1234 st',
                     recall_key='ABC123',
                     memo_time='5',
                     recall_time='15',
