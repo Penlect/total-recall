@@ -344,8 +344,14 @@ def make_blob_and_sheets():
         xls_filename = blob_to_xls_filename(blob)
         t = blob_to_table(blob)
         t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
-        url = url_for('static', filename='sheets/' + xls_filename)
-        return f'<a href="{url}">{xls_filename}.xls</a>'
+        sheet_url = url_for('static', filename='sheets/' + xls_filename)
+        recall_url = url_for('recall_', key=blob.recall_key)
+        return render_template(
+            'links_memo_and_recall.html',
+            xls_filename=xls_filename,
+            recall_key=blob.recall_key
+        )
+        #return f'<ul class="nav nav-pills"><li><a href="{sheet_url}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> {xls_filename}</a></li><li><a href="{recall_url}" target="_blank"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span> Link to recall</a></li></ul>'
 
 
 @app.route('/recall/<string:key>')

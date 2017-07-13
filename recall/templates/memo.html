@@ -64,10 +64,11 @@
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#5bc0de;">
-                    <form class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post" target="_blank">
+                    <form id="form_numbers" class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
                         {% block numbers %}{% endblock %}
                     </form>
                 </div>
+                <p id="links_numbers"><p>
             </div>
             <div class="col-md-{{ right_column_width }}">
                 {% block numbers_instructions %}{% endblock %}
@@ -83,10 +84,11 @@
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#ffff66;">
-                    <form class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
+                    <form id="form_words" class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
                         {% block words %}{% endblock %}
                     </form>
                 </div>
+                <p id="links_words"><p>
             </div>
             <div class="col-md-{{ right_column_width }}">
                 {% block words_instructions %}{% endblock %}
@@ -102,10 +104,11 @@
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#66ff99;">
-                    <form class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
+                    <form id="form_dates" class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
                         {% block dates %}{% endblock %}
                     </form>
                 </div>
+                <p id="links_dates"><p>
             </div>
             <div class="col-md-{{ right_column_width }}">
                 {% block dates_instructions %}{% endblock %}
@@ -114,5 +117,35 @@
 
     </div>
 
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+$(document).ready(function(){
+
+   $('#form_numbers').submit(function(event){
+	  event.preventDefault();
+      $.post($(this).attr('action'), $(this).serialize(), function(data){
+        $('#links_numbers').prepend(data)
+      });
+   });
+
+   $('#form_words').submit(function(event){
+	  event.preventDefault();
+      $.post($(this).attr('action'), $(this).serialize(), function(data){
+        $('#links_words').prepend(data)
+      });
+   });
+
+   $('#form_dates').submit(function(event){
+	  event.preventDefault();
+      $.post($(this).attr('action'), $(this).serialize(), function(data){
+        $('#links_dates').prepend(data)
+      });
+   });
+});
+
+</script>
 {% endblock %}
 
