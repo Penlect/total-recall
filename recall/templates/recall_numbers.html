@@ -1,42 +1,7 @@
 {% extends "base.html" %}
 
 {% block css %}
-
-<style>
-input[type=text] {
-    text-align: center;
-	padding:0px;
-	margin:0px;
-	width: 18px;
-	font-size:18px;
-	border: 0px;
-}
-input[type=text]:focus {
-    background-color: lightblue;
-}
-table {
-	border-collapse: collapse;
-	margin-top: 10px;
-	margin-bottom: 20px;
-}
-tr, td {
-	padding:0px;
-	margin:0px;
-	white-space: nowrap;
-	border: 1px solid;
-}
-body{
-    color: black;
-    margin-left: 20px;
-    margin-bottom: 20px;
-}
-.row_enumeration {
-    padding-left:20px;
-    padding-right:10px;
-    border-left: 1px solid;
-}
-</style>
-
+<link href="{{ url_for('static', filename='css/recall_numbers.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -46,22 +11,27 @@ body{
     </div>
     <h3>{{ blob.discipline|title }} numbers, {{ blob.recall_time }} min Recall</h3>
 	
-	<p><span class="label label-primary">Seconds remaining: <span id="seconds_remaining">20</span></span></p>
+	<p><span class="label label-primary">Seconds remaining: <span id="seconds_remaining">30</span></span></p>
 	
     <form action="{{ url_for('arbeiter') }}" method="post">
         <fieldset>
         <input name="recall_key" type="hidden" value="{{ key }}">
 
-        <table border="1px" id="recall_table">
+        <table border="1px" class="recall_table">
         {% for row_i in range(nr_rows) %}
             <tr class="recall_row">
                 {% for col_i in range(nr_cols) %}
-                    <td><input class="recall_cell" id="recall_cell_{{ row_i*nr_cols + col_i }}" name="recall_cell_{{ row_i*nr_cols + col_i }}" type="text" maxlength="1" size="1" autocomplete="off"></input></td>
+                    <td><input class="recall_cell" id="recall_cell_{{ row_i*nr_cols + col_i }}" name="recall_cell_{{ row_i*nr_cols + col_i }}" type="text" maxlength="1" size="1" autocomplete="off"></td>
                 {% endfor %}
                 <td class="row_enumeration">Row {{ row_i + 1 }}</td>
             </tr>
+        {% if (row_i + 1)%25 == 0%}
+            </table>
+        <table border="1px" class="recall_table">
+        {% endif %}
         {% endfor %}
         </table>
+
         <button id="recall_complete" type="submit" class="btn btn-primary">Submit</button>
         </fieldset>
     </form>
@@ -77,30 +47,12 @@ body{
 
 $(document).ready(function(){
 
-
     function recallSubmit(result, status, xhr){
         console.log(result);
         console.log(status);
 
         for (var recall_cell_id in result.cells){
-            if(result.cells[recall_cell_id] == 'correct'){
-                $('#' + recall_cell_id).css('background-color', 'lime');
-            }
-            else if(result.cells[recall_cell_id] == 'wrong'){
-                $('#' + recall_cell_id).css('background-color', '#ff0022');
-            }
-            else if(result.cells[recall_cell_id] == 'gap'){
-                $('#' + recall_cell_id).css('background-color', '#ff0022');
-            }
-            else if(result.cells[recall_cell_id] == 'not_reached'){
-                $('#' + recall_cell_id).css('background-color', '#eaeaea');
-            }
-            else if(result.cells[recall_cell_id] == 'off_limits'){
-                $('#' + recall_cell_id).css('background-color', 'lightgray');
-            }
-            else{
-                console.log('Got unexpected data: ' + result.cells[recall_cell_id]);
-            }
+            recallResultColor(recall_cell_id, result.cells[recall_cell_id]);
         }
         $("#result").text('Nr correct digits: ' + result.nr_correct +
                           ' Nr wrong digits: ' + result.nr_wrong +
@@ -108,12 +60,10 @@ $(document).ready(function(){
                           ' Nr digits not reached: ' + result.nr_not_reached);
     }
 
-   console.log("Recall time")
    recallTimer = setTimeout(getRecallTimer($('#seconds_remaining'), $('#recall_complete')), SECOND);
 
-   // User clicks on a cell
-   var nrRows = $('#recall_table .recall_row').length;
-   var nrCells = $('#recall_table .recall_cell').length;
+   var nrRows = $('.recall_table .recall_row').length;
+   var nrCells = $('.recall_table .recall_cell').length;
    console.log("Rows = " + nrRows);
    console.log("Cells = " + nrCells);
 

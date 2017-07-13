@@ -400,8 +400,27 @@ def recall_(key):
         return f'No such key exsists: {key}, {blob_file}'
     with open(blob_file, 'r', encoding='utf-8') as file:
         blob = json.load(file)
-    return render_template('numbers.html', key=key, blob=blob,
-                           nr_cols=40, nr_rows=math.ceil(len(blob['data'])/40))
+
+
+
+    if blob['discipline'] == 'binary':
+        nr_rows = math.ceil(len(blob['data'])/30)
+        return render_template('recall_numbers.html', key=key, blob=blob,
+                               nr_cols=30, nr_rows=nr_rows)
+    elif blob['discipline'] == 'decimal':
+        nr_rows = math.ceil(len(blob['data'])/40)
+        return render_template('recall_numbers.html', key=key, blob=blob,
+                               nr_cols=40, nr_rows=nr_rows)
+    elif blob['discipline'] == 'words':
+        nr_cols = math.ceil(len(blob['data'])/20)
+        if nr_cols%5 == 0:
+            nr_cols_iter = [5]*(nr_cols//5)
+        else:
+            nr_cols_iter = [5]*(nr_cols//5) + [nr_cols%5]
+        return render_template('recall_words.html', key=key, blob=blob,
+                               nr_cols_iter=nr_cols_iter)
+    else:
+        return 'Not implemented yet: ' + blob['discipline']
 
 
 def _arbeiter(key, dictionary):
@@ -501,7 +520,35 @@ class Arbeiter:
         return self._correct_binary()
 
     def _correct_words(self):
-        pass
+        result = {
+            'cells': dict(),
+            'nr_correct': 0,
+            'nr_wrong': 0,
+            'nr_gap': 0,
+            'nr_not_reached': 0
+        }
+        for i, cell_value in enumerate(self.client_data, start=0):
+            try:
+                correct_value = self.blob['data'][i]
+            except IndexError:
+                result['cells'][f'recall_cell_{i}'] = 'off_limits'
+            else:
+                if not cell_value.strip():
+                    # Empty cell
+                    if i < self.client_data.start_of_emptiness_before(len(self.blob['data'])):
+                        result['cells'][f'recall_cell_{i}'] = 'gap'
+                        result['nr_gap'] += 1
+                    else:
+                        result['cells'][f'recall_cell_{i}'] = 'not_reached'
+                        result['nr_not_reached'] += 1
+                else:
+                    if cell_value.strip().lower() == correct_value.strip().lower():
+                        result['cells'][f'recall_cell_{i}'] = 'correct'
+                        result['nr_correct'] += 1
+                    else:
+                        result['cells'][f'recall_cell_{i}'] = 'wrong'
+                        result['nr_wrong'] += 1
+        return result
 
     def _correct_dates(self):
         pass

@@ -34,11 +34,14 @@ function RecallGrid(rows, columns, cell) {
 		this.navigate(this.columns).select();
 	}
 	
-	this.shift_left = function(){
+	this.shift_right_row = function(){
+		/*F: Set the current cell empty and move all aftercomming cells
+		on this row one step to the right */
 	   var current_id = this.cell.attr('id');
 	   var new_value = '';
 	   var prev_value = null;
-	   for(var i = parseInt(current_id.split('_')[2]); i >= 0; i--){
+	   var start = parseInt(current_id.split('_')[2]);
+	   for(var i = start; i < this.columns*Math.ceil(start/this.columns); i++){
 			var cell_id = '#recall_cell_' + i.toString();
 			prev_value = $(cell_id).val();
 			$(cell_id).val(new_value);
@@ -46,11 +49,42 @@ function RecallGrid(rows, columns, cell) {
 	   }
 	}
 	
-	this.shift_right = function(){
+	this.shift_left_row = function(){
+		/*B: Delete the current cell empty and move all aftercomming cells
+		on this row one step to the left */
+	   var current_id = this.cell.attr('id');
+	   var new_value = '';
+	   var prev_value = null;
+	   var start = parseInt(current_id.split('_')[2]);
+	   for(var i = this.columns*Math.ceil(start/this.columns) - 1; i >= start; i--){
+			var cell_id = '#recall_cell_' + i.toString();
+			prev_value = $(cell_id).val();
+			$(cell_id).val(new_value);
+			new_value = prev_value;
+	   }
+	}
+	
+	this.shift_right_after = function(){
+		/*P: Set the current cell empty and move all aftercomming cells one step
+		to the right */
 	   var current_id = this.cell.attr('id');
 	   var new_value = '';
 	   var prev_value = null;
 	   for(var i = parseInt(current_id.split('_')[2]); i < this.size; i++){
+			var cell_id = '#recall_cell_' + i.toString();
+			prev_value = $(cell_id).val();
+			$(cell_id).val(new_value);
+			new_value = prev_value;
+	   }
+	}
+	
+	this.shift_left_after = function(){
+		/*M: Delete the current cell and move all aftercomming cells one step
+		to the left */
+	   var current_id = this.cell.attr('id');
+	   var new_value = '';
+	   var prev_value = null;
+	   for(var i = this.size - 1; i >= parseInt(current_id.split('_')[2]); i--){
 			var cell_id = '#recall_cell_' + i.toString();
 			prev_value = $(cell_id).val();
 			$(cell_id).val(new_value);
@@ -78,16 +112,16 @@ function keydownHandler(event, grid){
 		case 57: // 9
 			console.log("NUMERIC KEY: " + event.which);
 			var digit = event.which - 48;
-		   grid.set(digit);
-		   grid.select_next();
+			grid.set(digit);
+			grid.select_next();
 			break;
 		case 39: // Right Arrow
 			console.log("RIGHT ARROW KEY: " + event.which);
-		   grid.select_next();
+		    grid.select_next();
 			break;
 		case 37: // Left Arrow
 			console.log("LEFT ARROW KEY: " + event.which);
-		   grid.select_previous();
+		    grid.select_previous();
 			break;
 		case 38: // Up Arrow
 			console.log("UP ARROW KEY: " + event.which);
@@ -97,24 +131,81 @@ function keydownHandler(event, grid){
 			console.log("DOWN ARROW KEY: " + event.which);
 			grid.select_down();
 			break;
+		case 70: // F character
+			console.log("RIGHT SHIFT BEFORE KEY: " + event.which);
+			grid.shift_right_row();
+			break;
+		case 66: // B character
+			console.log("LEFT SHIFT BEFORE KEY: " + event.which);
+			grid.shift_left_row();
+			break;
 		case 80: // P character
-			console.log("RIGHT SHIFT KEY: " + event.which);
-			grid.shift_right()
+			console.log("RIGHT SHIFT AFTER KEY: " + event.which);
+			grid.shift_right_after();
 			break;
 		case 77: // M character
-			console.log("LEFT SHIFT KEY: " + event.which);
-			grid.shift_left()
+			console.log("LEFT SHIFT AFTER KEY: " + event.which);
+			grid.shift_left_after();
 			break;
 		case 8: // Backspace
 			console.log("BACKSPACE KEY: " + event.which);
-		   grid.set('');
-		   grid.select_previous();
-		   break;
+		    grid.set('');
+		    grid.select_previous();
+		    break;
 		case 46: // Del key
 			console.log("DELETE KEY: " + event.which);
-		   grid.set('');
-		   grid.select_next();
-		   break;
+		    grid.set('');
+		    grid.select_next();
+		    break;
+		default:
+			console.log("INVALID KEY: " + event.which);
+	}
+}
+
+function keydownHandlerWords(event, grid){
+	switch(event.which) {
+		case 48: // 0
+		case 49: // 1 (B) character
+			console.log("LEFT SHIFT BEFORE KEY: " + event.which);
+			event.preventDefault();
+			grid.shift_left_row();
+			break;
+		case 50: // 2 (F) character
+			console.log("RIGHT SHIFT BEFORE KEY: " + event.which);
+			event.preventDefault();
+			grid.shift_right_row();
+			break;
+		case 56: // 8 (M) character
+			console.log("LEFT SHIFT AFTER KEY: " + event.which);
+			event.preventDefault();
+			grid.shift_left_after();
+			break;
+		case 57: // 9 (P) character
+			console.log("RIGHT SHIFT AFTER KEY: " + event.which);
+			event.preventDefault();
+			grid.shift_right_after();
+			break;
+		case 39: // Right Arrow
+			console.log("RIGHT ARROW KEY: " + event.which);
+			event.preventDefault();
+		    grid.select_down(); // For words
+			break;
+		case 37: // Left Arrow
+			console.log("LEFT ARROW KEY: " + event.which);
+			event.preventDefault();
+		    grid.select_up(); // For words
+			break;
+		case 38: // Up Arrow
+			console.log("UP ARROW KEY: " + event.which);
+			event.preventDefault();
+			grid.select_previous();
+			break;
+		case 13:
+		case 40: // Down Arrow
+			console.log("DOWN ARROW KEY: " + event.which);
+			event.preventDefault();
+			grid.select_next();
+			break;
 		default:
 			console.log("INVALID KEY: " + event.which);
 	}
@@ -148,4 +239,26 @@ function getRecallTimer(sec_remaining_element, submit_element){
 }
 
 /* ---------- CORRECTION ---------- */
-
+function recallResultColor(recall_cell_id, result){
+    if(result == 'correct'){
+        $('#' + recall_cell_id).css('background-color', 'lime');
+    }
+    else if(result == 'wrong'){
+        $('#' + recall_cell_id).css('background-color', '#ff0022');
+    }
+    else if(result == 'gap'){
+        $('#' + recall_cell_id).css('background-color', '#ff0022');
+    }
+    else if(result == 'not_reached'){
+        $('#' + recall_cell_id).css('background-color', '#eaeaea');
+    }
+    else if(result == 'off_limits'){
+        $('#' + recall_cell_id).css('background-color', 'lightgray');
+    }
+    else if(result == 'almost_correct'){
+        $('#' + recall_cell_id).css('background-color', '#ffff66');
+    }
+    else{
+        console.log('Got unexpected result status: ' + result);
+    }
+}
