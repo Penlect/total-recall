@@ -1,4 +1,4 @@
-
+# /var/log/uwsgi.log
 from recall import app
 
 if __name__ == '__main__':
