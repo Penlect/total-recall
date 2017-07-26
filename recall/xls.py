@@ -154,37 +154,52 @@ class Table:
         else:
             raise ValueError(f'Invalid direction: {direction}')
 
-    def write_header(self, sheets,
-                     left_column, right_column,
-                     title, description, recall_key,
-                     memo_time, recall_time):
-            for sheet in sheets:
+    def write_header(self, header):
+            # Write header
+            style_title = xlwt.easyxf(
+                'font: name Arial, height 220;'
+                'alignment: horizontal center;'
+            )
+            style_normal = xlwt.easyxf(
+                'font: name Arial, height 180;'
+                'alignment: horizontal left;'
+            )
+            for sheet in (self.sheet_memo, self.sheet_recall):
+                # Write top Title row
                 sheet.write_merge(
+                    # Y-range
                     self.y_header,
                     self.y_header,
-                    self.x_header,
-                    self.x_header + self.nr_page_cols - 1,
-                    *title
+                    # X-range
+                    header.left_offset,
+                    header.left_offset + self.nr_page_cols - 1,
+                    # Content
+                    header.title,
+                    style_title
+                )
+                # Write second header row
+                sheet.write(
+                    self.y_header + 1, header.left_offset,
+                    f'{header.description}',
+                    style_normal
                 )
                 sheet.write(
                     self.y_header + 1,
-                    left_column,
-                    *description
+                    header.left_offset + self.nr_page_cols + header.right_offset,
+                    f'Recall key: {header.recall_key}',
+                    style_normal
                 )
+                # Write third header row
                 sheet.write(
-                    self.y_header + 1,
-                    right_column,
-                    *recall_key
-                )
-                sheet.write(
-                    self.y_header + 2,
-                    left_column,
-                    *memo_time
+                    self.y_header + 2, header.left_offset,
+                    f'Memo. time: {header.memo_time} Min',
+                    style_normal
                 )
                 sheet.write(
                     self.y_header + 2,
-                    right_column,
-                    *recall_time
+                    header.left_offset + self.nr_page_cols + header.right_offset,
+                    f'Recall time: {header.recall_time} Min',
+                    style_normal
                 )
 
     def save(self, filename):
@@ -212,14 +227,8 @@ class NumberTable(Table):
         normal + 'borders: right hair, top hair, bottom hair;'
     )
 
-    def __init__(self, title, description, recall_key, memo_time, recall_time,
-                 **kwargs):
-
-        self.title = title
-        self.description = description
-        self.recall_key = recall_key
-        self.memo_time = memo_time
-        self.recall_time = recall_time
+    def __init__(self, header, **kwargs):
+        self.header = header
 
         super().__init__(**kwargs)
         self.nr_items = 0
@@ -255,27 +264,7 @@ class NumberTable(Table):
 
         # Check for new page action
         if self.new_page is True:
-            # Write header
-            style_title = xlwt.easyxf(
-                'font: name Arial, height 220;'
-                'alignment: horizontal center;'
-            )
-            style_normal = xlwt.easyxf(
-                'font: name Arial, height 180;'
-                'alignment: horizontal left;'
-            )
-            self.write_header(
-                sheets=(self.sheet_memo, self.sheet_recall),
-                left_column=self.x_header,
-                right_column=self.x_header + self.nr_page_cols - 5,
-                title=(self.title, style_title),
-                description=(f'{self.description}', style_normal),
-                recall_key=(f'Recall key: {self.recall_key}', style_normal),
-                memo_time=(f'Memo. time: {self.memo_time} Min', style_normal),
-                recall_time=(f'Recall time: {self.recall_time} Min', style_normal)
-            )
-
-            # Write footer - Not implemented
+            self.write_header(self.header)
 
         self.nr_items += 1
         style = next(self.item_styles)
@@ -317,14 +306,8 @@ class WordTable(Table):
         xlwt.easyxf(normal + 'borders: right hair, bottom hair;'),
     )
 
-    def __init__(self, title, description, recall_key, memo_time, recall_time,
-                 **kwargs):
-
-        self.title = title
-        self.description = description
-        self.recall_key = recall_key
-        self.memo_time = memo_time
-        self.recall_time = recall_time
+    def __init__(self, header, **kwargs):
+        self.header = header
 
         super().__init__(**kwargs)
         self.nr_items = 0
@@ -342,9 +325,7 @@ class WordTable(Table):
             self.sheet_recall.col(i*self.item_width + 1).width = convert_row_width(0.36)
             self.sheet_recall.col(i*self.item_width + 2).width = convert_row_width(3.9)
 
-
     def add_item(self, item):
-
         item = str(item)
 
         # Check for newline action
@@ -357,27 +338,7 @@ class WordTable(Table):
 
         # Check for new page action
         if self.new_page is True:
-            # Write header
-            style_title = xlwt.easyxf(
-                'font: name Arial, height 220;'
-                'alignment: horizontal center;'
-            )
-            style_normal = xlwt.easyxf(
-                'font: name Arial, height 180;'
-                'alignment: horizontal left;'
-            )
-            self.write_header(
-                sheets=(self.sheet_memo, self.sheet_recall),
-                left_column=self.x_header,
-                right_column=self.x_header + self.nr_page_cols - 1,
-                title=(self.title, style_title),
-                description=(f'{self.description}', style_normal),
-                recall_key=(f'Recall key: {self.recall_key}', style_normal),
-                memo_time=(f'Memo. time: {self.memo_time} Min', style_normal),
-                recall_time=(f'Recall time: {self.recall_time} Min', style_normal)
-            )
-
-            # Write footer - Not implemented
+            self.write_header(self.header)
 
         self.nr_items += 1
         style_A, style_B, style_C = next(self.item_styles)
@@ -403,14 +364,8 @@ class DatesTable(Table):
     style_item_middle = style_item_normal
     style_item_stop = style_item_normal + 'borders: bottom hair;'
 
-    def __init__(self, title, description, recall_key, memo_time, recall_time,
-                 **kwargs):
-
-        self.title = title
-        self.description = description
-        self.recall_key = recall_key
-        self.memo_time = memo_time
-        self.recall_time = recall_time
+    def __init__(self, header, **kwargs):
+        self.header = header
 
         super().__init__(**kwargs)
         self.nr_items = 0
@@ -427,7 +382,6 @@ class DatesTable(Table):
         self.sheet_recall.col(3).width = convert_row_width(10)
         self.sheet_recall.col(4).width = convert_row_width(4)
 
-
     def add_item(self, item):
 
         date, story = item
@@ -442,27 +396,7 @@ class DatesTable(Table):
 
         # Check for new page action
         if self.new_page is True:
-            # Write header
-            style_title = xlwt.easyxf(
-                'font: name Arial, height 220;'
-                'alignment: horizontal center;'
-            )
-            style_normal = xlwt.easyxf(
-                'font: name Arial, height 180;'
-                'alignment: horizontal left;'
-            )
-            self.write_header(
-                sheets=(self.sheet_memo, self.sheet_recall),
-                left_column=self.x_header,
-                right_column=self.x_header + self.nr_page_cols - 1,
-                title=(self.title, style_title),
-                description=(f'{self.description}', style_normal),
-                recall_key=(f'Recall key: {self.recall_key}', style_normal),
-                memo_time=(f'Memo. time: {self.memo_time} Min', style_normal),
-                recall_time=(f'Recall time: {self.recall_time} Min', style_normal)
-            )
-
-            # Write footer - Not implemented
+            self.write_header(self.header)
 
         self.nr_items += 1
         style = next(self.item_styles)
@@ -481,9 +415,11 @@ class DatesTable(Table):
         self.next_pos(direction='vertical')
 
 
-
-def get_decimal_table(**kwargs):
+def get_decimal_table(header, pattern):
+    header.right_offset = -5
     return NumberTable(
+                    header=header,
+                    pattern=pattern,
                     nr_header_rows=7,
                     nr_item_rows=25,
                     nr_page_rows=40,
@@ -491,12 +427,15 @@ def get_decimal_table(**kwargs):
                     nr_page_cols=43 + 2,
                     item_width=1,
                     item_height=1,
-                    left_padding=2,
-                    **kwargs
+                    left_padding=2
                     )
 
-def get_binary_table(**kwargs):
+
+def get_binary_table(header, pattern):
+    header.right_offset = -5
     return NumberTable(
+                    header=header,
+                    pattern=pattern,
                     nr_header_rows=7,
                     nr_item_rows=25,
                     nr_page_rows=40,
@@ -504,12 +443,15 @@ def get_binary_table(**kwargs):
                     nr_page_cols=43 + 2,
                     item_width=1,
                     item_height=1,
-                    left_padding=7,
-                    **kwargs
+                    left_padding=7
                     )
 
-def get_words_table(**kwargs):
+
+def get_words_table(header, pattern):
+    header.right_offset = -1
     return WordTable(
+                    header=header,
+                    pattern=pattern,
                     nr_header_rows=7,
                     nr_item_rows=20,
                     nr_page_rows=31,
@@ -517,12 +459,15 @@ def get_words_table(**kwargs):
                     nr_page_cols=15,
                     item_width=3,
                     item_height=1,
-                    left_padding=0,
-                    **kwargs
+                    left_padding=0
                     )
 
-def get_dates_table(**kwargs):
+
+def get_dates_table(header, pattern):
+    header.right_offset = -1
     return DatesTable(
+                    header=header,
+                    pattern=pattern,
                     nr_header_rows=7,
                     nr_item_rows=40,
                     nr_page_rows=51,
@@ -530,40 +475,40 @@ def get_dates_table(**kwargs):
                     nr_page_cols=5,
                     item_width=4,
                     item_height=1,
-                    left_padding=0,
-                    **kwargs
+                    left_padding=0
                     )
+
+class Header:
+    def __init__(self, title, description, recall_key, memo_time, recall_time):
+        self.title = title
+        self.description = description
+        self.recall_key = recall_key
+        self.memo_time = memo_time
+        self.recall_time = recall_time
+        self.left_offset = 0
+        self.right_offset = -1
+
 
 if __name__ == '__main__':
     import random
 
-    d = get_decimal_table(title='Svenska Minnesförbundet',
-                    description='Decimal Numbers, 1234 st',
-                    recall_key='A4B2C9',
-                    memo_time='5',
-                    recall_time='15',
-                    pattern=[5, 3])
+    header = Header(
+        title='Svenska Minnesförbundet',
+        description='Decimal Numbers, 1234 st',
+        recall_key='A4B2C9',
+        memo_time='5',
+        recall_time='15'
+    )
+    d = get_decimal_table(header, pattern=[5, 3])
 
-    b = get_binary_table(title='Svenska Minnesförbundet',
-                    description='Binary Numbers, 1234 st',
-                    recall_key='ABC123',
-                    memo_time='5',
-                    recall_time='15',
-                    pattern=[4, 3, 3])
+    header.description = 'Binary Numbers, 1234 st'
+    b = get_binary_table(header, pattern=[4, 3, 3])
 
-    w = get_words_table(title='Svenska Minnesförbundet',
-                    description='Words, 1234 st',
-                    recall_key='ABC123',
-                    memo_time='5',
-                    recall_time='15',
-                    pattern=[2])
+    header.description = 'Words, 1234 st'
+    w = get_words_table(header, pattern=[2])
 
-    h = get_dates_table(title='Svenska Minnesförbundet',
-                    description='Historical Dates, 1234 st',
-                    recall_key='ABC123',
-                    memo_time='5',
-                    recall_time='15',
-                    pattern=[10])
+    header.description = 'Dates, 1234 st'
+    h = get_dates_table(header, pattern=[10])
 
     # Cards: Q\u2665 2\u2666 A\u2663
     words = itertools.cycle(['bacon', 'pizza', 'hej', 'vattenfall', 'åäö'])
