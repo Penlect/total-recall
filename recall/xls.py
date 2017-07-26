@@ -202,6 +202,17 @@ class Table:
                     style_normal
                 )
 
+    def set_column_widths(self, widths):
+        for i, width in enumerate(widths):
+            self.sheet_memo.col(i).width = convert_row_width(width)
+            self.sheet_recall.col(i).width = convert_row_width(width)
+
+    def set_row_height(self, height):
+        self.sheet_memo.row(self.y_cell).height_mismatch = True
+        self.sheet_recall.row(self.y_cell).height_mismatch = True
+        self.sheet_memo.row(self.y_cell).height = convert_row_height(height)
+        self.sheet_recall.row(self.y_cell).height = convert_row_height(height)
+
     def save(self, filename):
         self.book.save(filename)
 
@@ -229,31 +240,20 @@ class NumberTable(Table):
 
     def __init__(self, header, **kwargs):
         self.header = header
-
         super().__init__(**kwargs)
         self.nr_items = 0
-
-        for i in range(self.nr_page_cols):
-            self.sheet_memo.col(i).width = convert_row_width(0.361)
-            self.sheet_recall.col(i).width = convert_row_width(0.361)
-
-        # Set width of "Row Nr" column
-        self.sheet_memo.col(self.nr_page_cols - 1).width = convert_row_width(2)
-        self.sheet_recall.col(self.nr_page_cols - 1).width = convert_row_width(2)
+        # The last page_column need to be wider to fit "Row 23"
+        self.set_column_widths([0.361]*(self.nr_page_cols - 1) + [2])
 
 
     def add_item(self, item):
-
         assert 0 <= int(item) <= 9
         item = str(item)
 
         # Check for newline action
         if self.new_row is True:
-            # Set the height for this new row
-            self.sheet_memo.row(self.y_cell).height_mismatch = True
-            self.sheet_recall.row(self.y_cell).height_mismatch = True
-            self.sheet_memo.row(self.y_cell).height = convert_row_height(0.79)
-            self.sheet_recall.row(self.y_cell).height = convert_row_height(0.79)
+            self.set_row_height(height=0.79)
+
             # Write "Row Nr" on the rightmost side
             style_row_enumeration = xlwt.easyxf(
                 'font: name Arial, height 180;'
@@ -308,33 +308,20 @@ class WordTable(Table):
 
     def __init__(self, header, **kwargs):
         self.header = header
-
         super().__init__(**kwargs)
         self.nr_items = 0
+        self.set_column_widths([1, 0.36, 3.9]*self.nr_item_cols)
 
         self.sheet_memo.portrait = False
         self.sheet_recall.portrait = False
 
-        for i in range(self.nr_item_cols):
-
-            self.sheet_memo.col(i*self.item_width + 0).width = convert_row_width(1)
-            self.sheet_memo.col(i*self.item_width + 1).width = convert_row_width(0.36)
-            self.sheet_memo.col(i*self.item_width + 2).width = convert_row_width(3.9)
-
-            self.sheet_recall.col(i*self.item_width + 0).width = convert_row_width(1)
-            self.sheet_recall.col(i*self.item_width + 1).width = convert_row_width(0.36)
-            self.sheet_recall.col(i*self.item_width + 2).width = convert_row_width(3.9)
 
     def add_item(self, item):
         item = str(item)
 
         # Check for newline action
         if self.new_row is True:
-            # Set the height for this new row
-            self.sheet_memo.row(self.y_cell).height_mismatch = True
-            self.sheet_recall.row(self.y_cell).height_mismatch = True
-            self.sheet_memo.row(self.y_cell).height = convert_row_height(0.65)
-            self.sheet_recall.row(self.y_cell).height = convert_row_height(0.65)
+            self.set_row_height(height=0.65)
 
         # Check for new page action
         if self.new_page is True:
@@ -366,33 +353,16 @@ class DatesTable(Table):
 
     def __init__(self, header, **kwargs):
         self.header = header
-
         super().__init__(**kwargs)
         self.nr_items = 0
-
-        self.sheet_memo.col(0).width = convert_row_width(1.5)
-        self.sheet_memo.col(1).width = convert_row_width(3)
-        self.sheet_memo.col(2).width = convert_row_width(0.4)
-        self.sheet_memo.col(3).width = convert_row_width(10)
-        self.sheet_memo.col(4).width = convert_row_width(4)
-
-        self.sheet_recall.col(0).width = convert_row_width(1.5)
-        self.sheet_recall.col(1).width = convert_row_width(3)
-        self.sheet_recall.col(2).width = convert_row_width(0.4)
-        self.sheet_recall.col(3).width = convert_row_width(10)
-        self.sheet_recall.col(4).width = convert_row_width(4)
+        self.set_column_widths([1.5, 3, 0.4, 10, 4])
 
     def add_item(self, item):
-
         date, story = item
 
         # Check for newline action
         if self.new_row is True:
-            # Set the height for this new row
-            self.sheet_memo.row(self.y_cell).height_mismatch = True
-            self.sheet_recall.row(self.y_cell).height_mismatch = True
-            self.sheet_memo.row(self.y_cell).height = convert_row_height(0.55)
-            self.sheet_recall.row(self.y_cell).height = convert_row_height(0.55)
+            self.set_row_height(height=0.55)
 
         # Check for new page action
         if self.new_page is True:
