@@ -1,4 +1,20 @@
+"""Create memorization sheets in .xls format
 
+This module is used to create the .xls files used as memorization
+sheets in memory competitions. These disciplines are supported today:
+
+* Numbers
+* Binary
+* Words
+* Historical Dates
+
+The .xls files are easily opened in OpenOffice Calc, which is a free
+to use software.
+
+This module depends on the xlwt package. Documentation of xlwt is
+best studied here:
+https://github.com/python-excel/tutorial/raw/master/python-excel.pdf
+"""
 
 import itertools
 import xlwt
@@ -13,6 +29,7 @@ def convert_row_height(cm):
 
 
 class Table:
+    """Each discipline specific table should inherit this class"""
 
     style_item_normal = xlwt.easyxf()
     style_item_single = xlwt.easyxf()
@@ -22,8 +39,6 @@ class Table:
 
     def __init__(
             self,
-            name,
-
             nr_header_rows,
             nr_item_rows,
             nr_page_rows,
@@ -48,16 +63,24 @@ class Table:
         self.nr_item_cols = nr_item_cols
         self.nr_page_cols = nr_page_cols
 
+        # Item size in units of cells
         self.item_width = item_width
         self.item_height = item_height
 
-        self.book = xlwt.Workbook(name)
+        # The memo and recall sheets
+        self.book = xlwt.Workbook(encoding='utf-8')
         self.sheet_memo = self.book.add_sheet('Memorization')
         self.sheet_recall = self.book.add_sheet('Recall')
 
+        # Coordinates to current item
         self.x_item = 0
         self.y_item = 0
+
+        # Current page, 0 mean first page
         self.page = 0
+
+        # Boolean indicators that is triggered when new areas
+        # are reached by an item
         self.new_page = True
         self.new_row = True
         self.new_col = True
@@ -461,7 +484,6 @@ class DatesTable(Table):
 
 def get_decimal_table(**kwargs):
     return NumberTable(
-                    name='Decimal',
                     nr_header_rows=7,
                     nr_item_rows=25,
                     nr_page_rows=40,
@@ -475,7 +497,6 @@ def get_decimal_table(**kwargs):
 
 def get_binary_table(**kwargs):
     return NumberTable(
-                    name='Binary',
                     nr_header_rows=7,
                     nr_item_rows=25,
                     nr_page_rows=40,
@@ -489,7 +510,6 @@ def get_binary_table(**kwargs):
 
 def get_words_table(**kwargs):
     return WordTable(
-                    name='Word',
                     nr_header_rows=7,
                     nr_item_rows=20,
                     nr_page_rows=31,
@@ -503,7 +523,6 @@ def get_words_table(**kwargs):
 
 def get_dates_table(**kwargs):
     return DatesTable(
-                    name='Dates',
                     nr_header_rows=7,
                     nr_item_rows=40,
                     nr_page_rows=51,
@@ -523,14 +542,14 @@ if __name__ == '__main__':
                     recall_key='A4B2C9',
                     memo_time='5',
                     recall_time='15',
-                    pattern=[5])
+                    pattern=[5, 3])
 
     b = get_binary_table(title='Svenska Minnesförbundet',
                     description='Binary Numbers, 1234 st',
                     recall_key='ABC123',
                     memo_time='5',
                     recall_time='15',
-                    pattern=[4])
+                    pattern=[4, 3, 3])
 
     w = get_words_table(title='Svenska Minnesförbundet',
                     description='Words, 1234 st',
@@ -546,9 +565,11 @@ if __name__ == '__main__':
                     recall_time='15',
                     pattern=[10])
 
-    words = itertools.cycle(['bacon', 'pizza', 'hej', 'vattenfall'])
+    # Cards: Q\u2665 2\u2666 A\u2663
+    words = itertools.cycle(['bacon', 'pizza', 'hej', 'vattenfall', 'åäö'])
     dates = itertools.cycle([('2017', 'Katter kan flyga'),
-                             ('2008', 'Hunda vill bli katt')])
+                             ('2008', 'Hunda vill bli katt'),
+                             ('2008', 'Åäö tas bort från svenskan')])
     for _ in range(1234):
         d.add_item(random.randint(0, 9))
         b.add_item(random.randint(0, 1))
