@@ -282,12 +282,12 @@ def database_words_modify():
 
 @app.route('/generate')
 def generate():
-    return render_template('generate.html')
+    return render_template('make_generate.html')
 
 
 @app.route('/create')
 def create():
-    return render_template('create.html')
+    return render_template('make_create.html')
 
 
 def form_to_blob(form, discipline:str):
@@ -306,9 +306,11 @@ def form_to_blob(form, discipline:str):
     app.logger.info(f'Created blob for {discipline}: {h}')
     return blob
 
+
 def blob_to_xls_filename(blob):
+    """Create xls filename containing blob data"""
     XLS_FILENAME_FMT = '{discipline}_{nr}st_{language}_{memo_time}-{recall_time}min_p{pattern_str}_{correction}_{recall_key}'
-    b = dict(blob)
+    b = dict(blob)  # So we can unpack below
     xls_filename = XLS_FILENAME_FMT.format(
         nr=len(blob.data),
         pattern_str=','.join(str(p) for p in blob.pattern),
@@ -316,8 +318,15 @@ def blob_to_xls_filename(blob):
     ) + '.xls'
     return xls_filename
 
-def blob_to_table(blob):
 
+def blob_to_table(blob):
+    """Take relevant data of blob and create table
+
+    The table can later be saved to disk as .xls file.
+    """
+
+    # Depending on which discipline we have, we'll need discipline
+    # specific table and description
     if blob.discipline == 'binary':
         table = recall.xls.get_binary_table
         description=f'{blob.discipline.title()} Numbers, {len(blob.data)} st.'
@@ -334,6 +343,7 @@ def blob_to_table(blob):
         raise ValueError(
             f'Invalid discipline in blob: "{blob.discipline}"'
         )
+    # Create header
     header = recall.xls.Header(
         title='Svenska Minnesförbundet',
         description=description,
@@ -341,7 +351,9 @@ def blob_to_table(blob):
         memo_time=blob.memo_time,
         recall_time=blob.recall_time
     )
+    # Create table
     t = table(header=header, pattern=blob.pattern)
+    # Update the table with data
     for n in blob.data:
         t.add_item(n)
     return t
@@ -349,6 +361,7 @@ def blob_to_table(blob):
 
 @app.route('/make', methods=['POST'])
 def make_blob_and_sheets():
+    """Convert request form to blob, create xls file, return links"""
     if request.method == 'POST':
         try:
             blob = form_to_blob(request.form, discipline=request.form['base'])
@@ -364,10 +377,11 @@ def make_blob_and_sheets():
         except Exception as e:
             return alert(f'Failed to save xls file on server: {e}')
         return render_template(
-            'links_memo_and_recall.html',
+            'make_links_memo_and_recall.html',
             xls_filename=xls_filename,
             recall_key=blob.recall_key
         )
+
 
 @app.route('/recall/<string:key>')
 def recall_(key):
