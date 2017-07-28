@@ -164,7 +164,6 @@ function keydownHandler(event, grid){
 
 function keydownHandlerWords(event, grid){
 	switch(event.which) {
-		case 48: // 0
 		case 49: // 1 (B) character
 			console.log("LEFT SHIFT BEFORE KEY: " + event.which);
 			event.preventDefault();
@@ -201,6 +200,27 @@ function keydownHandlerWords(event, grid){
 			grid.select_previous();
 			break;
 		case 13:
+            // NO BREAK
+		case 40: // Down Arrow
+			console.log("DOWN ARROW KEY: " + event.which);
+			event.preventDefault();
+			grid.select_next();
+			break;
+		default:
+			console.log("INVALID KEY: " + event.which);
+	}
+}
+
+function keydownHandlerDates(event, grid){
+	switch(event.which) {
+		case 37: // Left Arrow
+		case 38: // Up Arrow
+			console.log("UP ARROW KEY: " + event.which);
+			event.preventDefault();
+			grid.select_previous();
+			break;
+		case 13:
+		case 39: // Right Arrow
 		case 40: // Down Arrow
 			console.log("DOWN ARROW KEY: " + event.which);
 			event.preventDefault();

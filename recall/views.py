@@ -74,6 +74,8 @@ class Blob:
                  nr_items=None,  # Mandatory for 'generate' but not 'create'
                  pattern=''
                  ):
+
+        self._recall_data = None # Only used for historical dates
         self.recall_key = None  # Final hash for this blob
 
         # Assign values and check for errors in input
@@ -143,6 +145,9 @@ class Blob:
                 stories = stories[0:self.nr_items]
                 dates = [random.randint(1000, 2099) for _ in stories]
                 self.data = tuple(zip(dates, stories))
+                recall_data = list(self.data)
+                random.shuffle(recall_data)
+                self._recall_data = tuple(recall_data)
             else:
                 raise Exception('Data generation for discipline '
                                 f'"{self.discipline}" not implemented.')
@@ -166,6 +171,9 @@ class Blob:
                         raise ValueError(f'Date out of range: 1000 <= {date} <= 2099')
                     historical_dates.append((date.strip(), story.strip()))
                 self.data = tuple(historical_dates)
+                recall_data = list(self.data)
+                random.shuffle(recall_data)
+                self._recall_data = tuple(recall_data)
             else:
                 raise Exception('Data creation for discipline '
                                 f'"{self.discipline}" not implemented.')
@@ -180,7 +188,8 @@ class Blob:
             ('language', self.language),
             ('pattern', self.pattern),
             ('recall_key', self.recall_key),
-            ('date_created', time.time())
+            ('date_created', time.time()),
+            ('_recall_data', self._recall_data)
         )
 
     def add_to_database(self):
@@ -406,6 +415,8 @@ def recall_(key):
             nr_cols_iter = [5]*(nr_cols//5) + [nr_cols%5]
         return render_template('recall_words.html', key=key, blob=blob,
                                nr_cols_iter=nr_cols_iter)
+    elif blob['discipline'] == 'dates':
+        return render_template('recall_dates.html', key=key, blob=blob)
     else:
         return 'Not implemented yet: ' + blob['discipline']
 
@@ -542,7 +553,36 @@ class Arbeiter:
         return result
 
     def _correct_dates(self):
-        pass
+        result = {
+            'cells': dict(),
+            'nr_correct': 0,
+            'nr_wrong': 0,
+            'nr_gap': 0,
+            'nr_not_reached': 0,
+            'almost_correct': 0
+        }
+        for i, cell_value in enumerate(self.client_data, start=0):
+            try:
+                correct_date, story = self.blob['_recall_data'][i]
+            except IndexError:
+                result['cells'][f'recall_cell_{i}'] = 'off_limits'
+            else:
+                if not cell_value.strip():
+                    # Empty cell
+                    if i < self.client_data.start_of_emptiness_before(len(self.blob['data'])):
+                        result['cells'][f'recall_cell_{i}'] = 'gap'
+                        result['nr_gap'] += 1
+                    else:
+                        result['cells'][f'recall_cell_{i}'] = 'not_reached'
+                        result['nr_not_reached'] += 1
+                else:
+                    if cell_value.strip().lower() == str(correct_date):
+                        result['cells'][f'recall_cell_{i}'] = 'correct'
+                        result['nr_correct'] += 1
+                    else:
+                        result['cells'][f'recall_cell_{i}'] = 'wrong'
+                        result['nr_wrong'] += 1
+        return result
 
     def _word_almost_correct(self, cell_value, correct_value):
         return False
