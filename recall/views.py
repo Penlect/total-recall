@@ -332,14 +332,16 @@ def blob_to_table(blob):
         description=f'Historical Dates, {blob.language.title()}, {len(blob.data)} st.'
     else:
         raise ValueError(
-            'Invalid discipline in blob: "{blob.discipline}"'
+            f'Invalid discipline in blob: "{blob.discipline}"'
         )
-    b = dict(blob)
-    t = table(
+    header = recall.xls.Header(
         title='Svenska Minnesförbundet',
         description=description,
-        **b
+        recall_key=blob.recall_key,
+        memo_time=blob.memo_time,
+        recall_time=blob.recall_time
     )
+    t = table(header=header, pattern=blob.pattern)
     for n in blob.data:
         t.add_item(n)
     return t
