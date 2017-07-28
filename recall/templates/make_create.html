@@ -14,10 +14,10 @@
 
 {% block jumbotron %}
 <h1>Create memorization data!</h1>
-<p>This page is used to Create memorization data and recall settings.</p>
+<p>This page is used to create memorization data and recall settings.</p>
 <p>1. Pick a discipline below</p>
 <p>2. Enter desired values in the fields</p>
-<p>3. Click the "Create"-button</p>
+<p>3. Click the Create-button</p>
 {% endblock %}
 
 
@@ -40,7 +40,7 @@
     </div>
   </div>
 
-{{ common_fields('Digits') }}
+{{ common_fields('Digits', 'Create') }}
 
 {% endblock %}
 {% block numbers_instructions %}
@@ -61,7 +61,7 @@
     </div>
   </div>
 
-{{ common_fields('Words') }}
+{{ common_fields('Words', 'Create') }}
 {% endblock %}
 
 {% block words_instructions %}
@@ -82,7 +82,7 @@
     </div>
   </div>
 
-{{ common_fields('Dates') }}
+{{ common_fields('Dates', 'Create') }}
 {% endblock %}
 
 {% block dates_instructions %}

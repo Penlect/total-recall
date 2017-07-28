@@ -1,9 +1,9 @@
 
-{% macro common_fields(item_name) %}
+{% macro common_fields(item_name, button_name) %}
 <div class="form-group">
     <label for="pattern_{{ item_name }}" class="col-sm-3 control-label">Pattern</label>
     <div class="col-sm-9">
-      <input name="pattern" type="string" class="form-control" id="pattern_{{ item_name }}" placeholder="comma-separated list of numbers or leave empty" autocomplete="off">
+      <input name="pattern" type="string" class="form-control" id="pattern_{{ item_name }}" autocomplete="off">
     </div>
 </div>
 
@@ -34,7 +34,7 @@
 <div class="form-group">
     <label class="col-sm-3 control-label"></label>
     <div class="col-sm-9">
-        <button type="submit" type="button" class="btn btn-default btn-block">Generate</button>
+        <button type="submit" type="button" class="btn btn-default btn-block">{{ button_name }}</button>
     </div>
 </div>
 {% endmacro %}

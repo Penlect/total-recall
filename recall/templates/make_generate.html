@@ -29,7 +29,7 @@
 <p>This page is used to generate memorization data and recall settings.</p>
 <p>1. Pick a discipline below</p>
 <p>2. Enter desired values in the fields</p>
-<p>3. Click the "Generate"-button</p>
+<p>3. Click the Generate-button</p>
 {% endblock %}
 
 
@@ -47,7 +47,7 @@
 
 {{ nr_items('Digits', max=10000) }}
 
-{{ common_fields('Digits') }}
+{{ common_fields('Digits', 'Generate') }}
 
 {% endblock %}
 {% block numbers_instructions %}
@@ -63,7 +63,7 @@
 
 {{ nr_items('Words', max=500) }}
 
-{{ common_fields('Words') }}
+{{ common_fields('Words', 'Generate') }}
 {% endblock %}
 
 {% block words_instructions %}
@@ -79,7 +79,7 @@
 
 {{ nr_items('Dates', max=500) }}
 
-{{ common_fields('Dates') }}
+{{ common_fields('Dates', 'Generate') }}
 {% endblock %}
 
 {% block dates_instructions %}
