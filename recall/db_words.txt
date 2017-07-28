@@ -1,92 +1,183 @@
+english;car;Daniel Andersson;2017-07-28 17:45:22;concrete noun
+swedish;advokat;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;affisch;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;affär;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;alarm;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;alkohol;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;alm;Idriz Zogaj;;
+swedish;almanacka;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;altan;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;amma;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;ammoniak;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;amulett;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;amöba;Idriz Zogaj;;
 swedish;anakonda;Idriz Zogaj;;
+swedish;ananas;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;andas;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;ande;Idriz Zogaj;;
-swedish;anka;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
-swedish;annons;Idriz Zogaj;;
+swedish;anka;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;annons;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;ansikte;Idriz Zogaj;;
 swedish;ansöka;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;anteckna;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;antenn;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;antenn;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;antilop;Idriz Zogaj;;
+swedish;apa;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;apelsin;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;apotek;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;apparat;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;aprikos;Idriz Zogaj;;
 swedish;arbeta;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;arkitekt;Idriz Zogaj;;
+swedish;arm;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;armband;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;armbåge;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;arrestera;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;asfalt;Idriz Zogaj;;
+swedish;arsenik;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;artist;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;asfalt;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;astronaut;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;atmosfär;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;atom;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;atombomb;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;autograf;Idriz Zogaj;;
+swedish;automat;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;aviarium;Idriz Zogaj;;
+swedish;avlopp;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;avsnitt;Idriz Zogaj;;
 swedish;avtäcka;Idriz Zogaj;;
 swedish;avundas;Idriz Zogaj;;
-swedish;babian;Idriz Zogaj;;
+swedish;babian;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bacill;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;backa;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;backe;Idriz Zogaj;;
+swedish;bacon;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;bada;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;badkar;Idriz Zogaj;;
+swedish;badkar;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;badrock;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;badstrand;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bajonett;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;baka;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;bakdörr;Idriz Zogaj;;
+swedish;bakterie;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;balans;Idriz Zogaj;;
-swedish;ballong;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
-swedish;banan;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
-swedish;barnvagn;Idriz Zogaj;;
+swedish;balkong;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;ballong;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;balsam;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;banan;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;band;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bandage;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;banderoll;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bandit;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bank;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bankomat;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bark;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;barn;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;barnvagn;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;barr;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bas;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;batong;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bebis;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;bekänna;Idriz Zogaj;;
+swedish;ben;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bensin;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;berg;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bestick;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;betong;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bi;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;bibliotek;Idriz Zogaj;;
 swedish;bifoga;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;bikupa;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;bil;Idriz Zogaj;;
+swedish;bildskärm;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;biljard;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;biljett;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;bita;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;bjuda;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;björk;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;björn;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;björnbärsbuske;Idriz Zogaj;;
+swedish;blad;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;blanda;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;blankett;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;blindtarm;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;blinka;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;blixt;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;blodhund;Idriz Zogaj;;
-swedish;blomma;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;blodprov;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;blomkål;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;blomma;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;blunda;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;bläck;Idriz Zogaj;;
-swedish;bläckfisk;Idriz Zogaj;;
+swedish;bläckfisk;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;bläddra;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;blåbär;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;blåklocka;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;blåsa;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;blöja;Idriz Zogaj;;
+swedish;blöja;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;bok;Idriz Zogaj;;
-swedish;bokhylla;Idriz Zogaj;;
-swedish;bord;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;bokhylla;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;boll;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bomb;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bomull;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bondgård;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bord;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;borr;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;borra;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;borsta;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;borste;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
 swedish;botemedel;Idriz Zogaj;;
+swedish;brandbil;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;brev;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;broms;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;bromsa;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;broschyr;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;brunn;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
 swedish;bryta;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;bräda;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;brädspel;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;bränna;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;brännsår;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;brännässla;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
-swedish;bröd;Idriz Zogaj;;
+swedish;bränsle;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bröd;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bubbla;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;buk;Idriz Zogaj;;
+swedish;bula;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;bullra;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;bumerang;Idriz Zogaj;;
 swedish;bungalow;Idriz Zogaj;;
-swedish;burk;Idriz Zogaj;;
+swedish;burk;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;buske;Idriz Zogaj;;
-swedish;buss;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
+swedish;buss;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;butik;Idriz Zogaj;;
 swedish;bygga;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;byggställning;Idriz Zogaj;;
+swedish;byxa;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;bäck;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;bädda;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;bältdjur;Idriz Zogaj;;
+swedish;bänk;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;båge;Idriz Zogaj;;
 swedish;böja;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;börs;Idriz Zogaj;;
-swedish;cigarett;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;bössa;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;cement;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;centrifug;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;champagne;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;choklad;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;cigarett;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;cirkus;Idriz Zogaj;;
-swedish;citron;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;citron;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;cowboyhatt;Idriz Zogaj;;
 swedish;curry;Idriz Zogaj;;
+swedish;currysås;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;cykel;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
 swedish;cykla;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;cymbal;Idriz Zogaj;;
 swedish;cypress;Idriz Zogaj;;
+swedish;dagbok;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;daggmask;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;dal;Idriz Zogaj;;
 swedish;damm;Idriz Zogaj;;
 swedish;damma;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
@@ -97,132 +188,244 @@ swedish;dataskärm;Idriz Zogaj;;
 swedish;dator;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
 swedish;datum;Idriz Zogaj;;
 swedish;deklarera;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;delfin;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;demokrati;Idriz Zogaj;;
+swedish;demon;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;demonstrera;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;diamant;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
-swedish;dimma;Idriz Zogaj;;
+swedish;deodorant;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;diadem;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;diamant;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;dill;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;dimma;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;dinosaurie;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;diplom;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;diska;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;diskutera;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;djur;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;djävul;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;docka;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;dockskåp;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;doktorand;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;dokument;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;dolk;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;domare;Idriz Zogaj;;
+swedish;domkyrka;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;dosa;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;drag;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;dragkedja;Idriz Zogaj;;
+swedish;drake;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;dreja;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;dricka;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;droppa;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;duk;Idriz Zogaj;;
+swedish;droppe;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;dryck;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;dubbdäck;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;duggregn;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;duk;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;duka;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;dusch;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;duva;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;dvärg;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;dyka;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;däck;Idriz Zogaj;;
+swedish;dynamit;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;däck;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;däggdjur;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;dölja;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;dörr;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
+swedish;dörr;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;ek;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;eka;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;ekorre;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;eksem;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;eld;Idriz Zogaj;;
 swedish;elda;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;elefant;Idriz Zogaj;;
-swedish;element;Idriz Zogaj;;
+swedish;elefant;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;element;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;elev;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;elgitarr;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;elkabel;Idriz Zogaj;;
+swedish;eluttag;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;elvisp;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;energi;Idriz Zogaj;;
+swedish;enkrona;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;epok;Idriz Zogaj;;
-swedish;etikett;Idriz Zogaj;;
+swedish;etikett;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fabrik;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fackla;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;falk;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fallskärm;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;falukorv;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;farkost;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fartyg;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fasta;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;fat;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fatta;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;faxapparat;Idriz Zogaj;;
 swedish;fenix;Idriz Zogaj;;
 swedish;fest;Idriz Zogaj;;
 swedish;ficka;Idriz Zogaj;;
-swedish;ficklampa;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;ficklampa;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fikastund;Idriz Zogaj;;
 swedish;fila;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;film;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;filma;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;filmare;Idriz Zogaj;;
+swedish;filmjölk;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;filmkamera;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fimp;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fimpa;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;fiol;Idriz Zogaj;;
+swedish;fiol;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fira;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;fisk;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;fisk;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fiska;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;fiskebåt;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fixa;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;fjäril;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
+swedish;fjäril;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;flagga;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;flaska;Idriz Zogaj;;
+swedish;flod;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;flodhäst;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;flodmynning;Idriz Zogaj;;
 swedish;flottan;Idriz Zogaj;;
+swedish;flotte;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fluga;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;flugsvamp;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fluor;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;flyga;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;flygplan;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;flygstol;Idriz Zogaj;;
 swedish;flytta;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;flytväst;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fläck;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fläkt;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fläta;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;flöjt;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fnöske;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fodon;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fodral;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fogsvans;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fontän;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fossil;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;foster;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;fot;Idriz Zogaj;;
+swedish;fotboja;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fotboll;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fotografera;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;frack;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;frid;Idriz Zogaj;;
-swedish;frimärke;Idriz Zogaj;;
-swedish;frukost;Idriz Zogaj;;
-swedish;frukt;Idriz Zogaj;;
+swedish;frimärke;Daniel Andersson;2017-07-28 17:03:36;concrete noun
+swedish;frost;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;frukost;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;frukt;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;frys;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fråga;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;fullmåne;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fuska;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;fällkniv;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fält;Idriz Zogaj;;
 swedish;fängelse;Idriz Zogaj;;
 swedish;färja;Idriz Zogaj;;
+swedish;fågelbo;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fågelholk;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;fånga;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;får;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;får;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;fåtölj;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;föda;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;föl;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;förlänga;Idriz Zogaj;;
 swedish;förmåga;Idriz Zogaj;;
 swedish;förstå;Idriz Zogaj;;
 swedish;försäljare;Idriz Zogaj;;
 swedish;förändra;Idriz Zogaj;;
 swedish;gaffel;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;galax;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;galge;Idriz Zogaj;;
 swedish;gallion;Idriz Zogaj;;
 swedish;gapa;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;garage;Idriz Zogaj;;
-swedish;garderob;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
+swedish;garage;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;garderob;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;gardin;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;garn;Idriz Zogaj;;
-swedish;gas;Idriz Zogaj;;
+swedish;gas;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;gasol;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;gatlykta;Idriz Zogaj;;
+swedish;gem;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;geni;Idriz Zogaj;;
+swedish;gepard;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;geting;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
-swedish;gevär;Idriz Zogaj;;
+swedish;gevär;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;gift;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;gilla;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;gitarr;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;gitarr;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;glaciär;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;glas;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
 swedish;glasburk;Idriz Zogaj;;
 swedish;glass;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
-swedish;glasögon;Idriz Zogaj;;
+swedish;glasögon;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;glöd;Idriz Zogaj;;
+swedish;glödlampa;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;glögg;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;glömma;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;gnista;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;gnom;Idriz Zogaj;;
-swedish;godis;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;godis;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;godisklubba;Idriz Zogaj;;
+swedish;golfbana;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;golfklubba;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;golv;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;gondol;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;gorilla;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;gosedjur;Idriz Zogaj;;
 swedish;grad;Idriz Zogaj;;
-swedish;gran;Idriz Zogaj;;
-swedish;gren;Idriz Zogaj;;
-swedish;grill;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
+swedish;gran;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;granat;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;grav;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;gren;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;grill;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;grilla;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;grind;Idriz Zogaj;;
 swedish;groda;Idriz Zogaj;;
+swedish;grop;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;grotta;Idriz Zogaj;;
+swedish;gryta;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;grädde;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;gräla;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;gräsklippare;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;gräsmatta;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;gråta;Idriz Zogaj;;
+swedish;guld;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;guldfisk;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
 swedish;gummi;Idriz Zogaj;;
-swedish;gunga;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;gummisnodd;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;gunga;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;gurka;Idriz Zogaj;;
 swedish;gurkmeja;Idriz Zogaj;;
 swedish;gäspa;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;gå;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;gå in;Idriz Zogaj;;
+swedish;gås;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;gömma;Idriz Zogaj;;
+swedish;hackspett;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;hage;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;haj;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;hake;Idriz Zogaj;;
+swedish;haklapp;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;halka;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;hallon;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;halm;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;halsband;Idriz Zogaj;;
 swedish;hamburgare;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
 swedish;hammare;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
 swedish;hamra;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
-swedish;handduk;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
+swedish;hand;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;handduk;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;handla;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;handling;Idriz Zogaj;;
-swedish;handske;Idriz Zogaj;;
-swedish;harpa;Idriz Zogaj;;
+swedish;handske;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;harpa;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;hasselmus;Idriz Zogaj;;
 swedish;hatt;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
+swedish;hav;Daniel Andersson;2017-07-28 17:29:31;concrete noun
+swedish;havre;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;havsgud;Idriz Zogaj;;
 swedish;hertig;Idriz Zogaj;;
 swedish;hetta;Idriz Zogaj;;
@@ -379,6 +582,7 @@ swedish;mikroskop;Idriz Zogaj;;
 swedish;miniräknare;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
 swedish;monokel;Idriz Zogaj;;
 swedish;morgon;Idriz Zogaj;;
+swedish;motorväg;Daniel Andersson;2017-07-28 17:29:31;concrete noun
 swedish;mugg;Idriz Zogaj;;
 swedish;mullvad;Idriz Zogaj;;
 swedish;mun;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
@@ -648,6 +852,7 @@ swedish;tända;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;tänka;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
 swedish;tåg;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
 swedish;tång;Idriz Zogaj;;
+swedish;ubåt;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;uggla;Daniel Andersson;2017-06-26 12:19:28;Concrete Noun
 swedish;ugn;Idriz Zogaj;;
 swedish;underkläder;Idriz Zogaj;;
@@ -663,6 +868,7 @@ swedish;vattenkokare;Idriz Zogaj;;
 swedish;vattenmelon;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
 swedish;vattenödla;Idriz Zogaj;;
 swedish;vattna;Daniel Andersson;2017-06-26 12:06:21;Infinitive Verb
+swedish;vax;Daniel Andersson;2017-07-28 17:03:36;concrete noun
 swedish;veckotidning;Idriz Zogaj;;
 swedish;ved;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
 swedish;verktyg;Daniel Andersson;2017-06-26 10:04:48;Concrete Noun
