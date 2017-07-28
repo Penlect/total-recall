@@ -462,23 +462,38 @@ class Header:
 if __name__ == '__main__':
     import random
 
-    header = Header(
+    header_decimal = Header(
         title='Svenska Minnesförbundet',
         description='Decimal Numbers, 1234 st',
         recall_key='A4B2C9',
         memo_time='5',
         recall_time='15'
     )
-    d = get_decimal_table(header, pattern=[5, 3])
-
-    header.description = 'Binary Numbers, 1234 st'
-    b = get_binary_table(header, pattern=[4, 3, 3])
-
-    header.description = 'Words, 1234 st'
-    w = get_words_table(header, pattern=[2])
-
-    header.description = 'Dates, 1234 st'
-    h = get_dates_table(header, pattern=[10])
+    header_binary = Header(
+        title='Svenska Minnesförbundet',
+        description='Binary Numbers, 1234 st',
+        recall_key='A4B2C9',
+        memo_time='5',
+        recall_time='15'
+    )
+    header_words = Header(
+        title='Svenska Minnesförbundet',
+        description='Words, 1234 st',
+        recall_key='A4B2C9',
+        memo_time='5',
+        recall_time='15'
+    )
+    header_dates = Header(
+        title='Svenska Minnesförbundet',
+        description='Dates, 1234 st',
+        recall_key='A4B2C9',
+        memo_time='5',
+        recall_time='15'
+    )
+    d = get_decimal_table(header_decimal, pattern=[5, 3])
+    b = get_binary_table(header_binary, pattern=[4, 3, 3])
+    w = get_words_table(header_words, pattern=[2])
+    h = get_dates_table(header_dates, pattern=[10])
 
     # Cards: Q\u2665 2\u2666 A\u2663
     words = itertools.cycle(['bacon', 'pizza', 'hej', 'vattenfall', 'åäö'])
