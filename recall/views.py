@@ -508,126 +508,101 @@ class ClientRecallData:
 
 
 class Arbeiter:
-    def __init__(self, client_data, blob: dict):
-        self.client_data = client_data
-        self.blob = blob
+    """Correct user's recall data
 
-    def correct(self):
-        d = self.blob['discipline']
+    The Arbeiter is used to correct the user's recall.
+    The user's recall is compared to the blob answer.
+    """
+    def __init__(self):
+        pass
+
+    def correct(self, client_data):
+        """Correct client_data (user's recall data)"""
+        self._client_data = client_data
+        self._blob = load_blob(client_data.recall_key)
+
+        cell_by_cell_result = self._correct_cells()
+        count = dict(collections.Counter(cell_by_cell_result))
+        raw_score = self._raw_score(cell_by_cell_result)
+        points = self._points(raw_score)
+
+        return {
+            'cell_by_cell_result': tuple(cell_by_cell_result),
+            'count': count,
+            'raw_score': raw_score,
+            'points': points
+        }
+
+    def _correct_cells(self):
+        d = self._blob['discipline']
         if d == 'binary':
-            return self._correct_binary()
+            correcter = self._correct_binary
         elif d == 'decimal':
-            return self._correct_decimals()
+            correcter = self._correct_decimals
         elif d == 'words':
-            return self._correct_words()
+            correcter = self._correct_words
         elif d == 'dates':
-            return self._correct_dates()
+            correcter = self._correct_dates
         else:
             raise Exception(f'Blob contain invalid discipline: {d}')
 
-    def _correct_binary(self):
-        result = {
-            'cells': dict(),
-            'nr_correct': 0,
-            'nr_wrong': 0,
-            'nr_gap': 0,
-            'nr_not_reached': 0
-        }
-        for i, cell_value in enumerate(self.client_data, start=0):
+        result = [None]*len(self._client_data)
+        for i, user_value in enumerate(self._client_data, start=0):
             try:
-                correct_value = self.blob['data'][i]
+                correct_value = self._blob['data'][i]
             except IndexError:
-                result['cells'][f'recall_cell_{i}'] = 'off_limits'
+                result[i] = 'off_limits'
             else:
-                if not cell_value.strip():
+                if not user_value.strip():
                     # Empty cell
-                    if i < self.client_data.start_of_emptiness_before(len(self.blob['data'])):
-                        result['cells'][f'recall_cell_{i}'] = 'gap'
-                        result['nr_gap'] += 1
+                    if i < self._client_data.start_of_emptiness_before(
+                            len(self._blob['data'])):
+                        result[i] = 'gap'
                     else:
-                        result['cells'][f'recall_cell_{i}'] = 'not_reached'
-                        result['nr_not_reached'] += 1
+                        result[i] = 'not_reached'
                 else:
-                    if int(cell_value) == correct_value:
-                        result['cells'][f'recall_cell_{i}'] = 'correct'
-                        result['nr_correct'] += 1
-                    else:
-                        result['cells'][f'recall_cell_{i}'] = 'wrong'
-                        result['nr_wrong'] += 1
+                    result[i] = correcter(user_value, correct_value)
         return result
 
-    def _correct_decimals(self):
-        return self._correct_binary()
+    @staticmethod
+    def _correct_binary(user_value: str, correct_value: int):
+        if user_value == str(correct_value):
+            return 'correct'
+        else:
+            return 'wrong'
 
-    def _correct_words(self):
-        result = {
-            'cells': dict(),
-            'nr_correct': 0,
-            'nr_wrong': 0,
-            'nr_gap': 0,
-            'nr_not_reached': 0,
-            'almost_correct': 0
-        }
-        for i, cell_value in enumerate(self.client_data, start=0):
-            try:
-                correct_value = self.blob['data'][i]
-            except IndexError:
-                result['cells'][f'recall_cell_{i}'] = 'off_limits'
-            else:
-                if not cell_value.strip():
-                    # Empty cell
-                    if i < self.client_data.start_of_emptiness_before(len(self.blob['data'])):
-                        result['cells'][f'recall_cell_{i}'] = 'gap'
-                        result['nr_gap'] += 1
-                    else:
-                        result['cells'][f'recall_cell_{i}'] = 'not_reached'
-                        result['nr_not_reached'] += 1
-                else:
-                    if cell_value.strip().lower() == correct_value.strip().lower():
-                        result['cells'][f'recall_cell_{i}'] = 'correct'
-                        result['nr_correct'] += 1
-                    elif self._word_almost_correct(cell_value, correct_value):
-                        result['cells'][f'recall_cell_{i}'] = 'almost_correct'
-                        result['almost_correct'] += 1
-                    else:
-                        result['cells'][f'recall_cell_{i}'] = 'wrong'
-                        result['nr_wrong'] += 1
-        return result
+    @staticmethod
+    def _correct_decimals(user_value: str, correct_value: int):
+        if user_value == str(correct_value):
+            return 'correct'
+        else:
+            return 'wrong'
 
-    def _correct_dates(self):
-        result = {
-            'cells': dict(),
-            'nr_correct': 0,
-            'nr_wrong': 0,
-            'nr_gap': 0,
-            'nr_not_reached': 0,
-            'almost_correct': 0
-        }
-        for i, cell_value in enumerate(self.client_data, start=0):
-            try:
-                correct_date, story = self.blob['_recall_data'][i]
-            except IndexError:
-                result['cells'][f'recall_cell_{i}'] = 'off_limits'
-            else:
-                if not cell_value.strip():
-                    # Empty cell
-                    if i < self.client_data.start_of_emptiness_before(len(self.blob['data'])):
-                        result['cells'][f'recall_cell_{i}'] = 'gap'
-                        result['nr_gap'] += 1
-                    else:
-                        result['cells'][f'recall_cell_{i}'] = 'not_reached'
-                        result['nr_not_reached'] += 1
-                else:
-                    if cell_value.strip().lower() == str(correct_date):
-                        result['cells'][f'recall_cell_{i}'] = 'correct'
-                        result['nr_correct'] += 1
-                    else:
-                        result['cells'][f'recall_cell_{i}'] = 'wrong'
-                        result['nr_wrong'] += 1
-        return result
+    def _correct_words(self, user_value: str, correct_value: str):
+        if user_value.strip().lower() == correct_value.strip().lower():
+            return 'correct'
+        elif self._word_almost_correct(user_value, correct_value):
+            return 'almost_correct'
+        else:
+            return 'wrong'
 
-    def _word_almost_correct(self, cell_value, correct_value):
+    @staticmethod
+    def _correct_dates(user_value: str, correct_value: int):
+        if user_value == str(correct_value):
+            return 'correct'
+        else:
+            return 'wrong'
+
+    @staticmethod
+    def _word_almost_correct(user_value, correct_value):
         return False
+
+    def _raw_score(self, cell_by_cell_result):
+        # Will depend on correction method
+        return 123
+
+    def _points(self, raw_score):
+        return 3.14
 
 
 @app.route('/arbeiter', methods=['POST'])
