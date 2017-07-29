@@ -608,11 +608,22 @@ class Arbeiter:
 @app.route('/arbeiter', methods=['POST'])
 def arbeiter():
     if request.method == 'POST':
-        client = ClientRecallData(request.form)
-        # Todo: save client data to disk for backup
-        blob = load_blob(client.recall_key)
-        result = Arbeiter(client, blob).correct()
-        return jsonify(result)
+        try:
+            client_data = ClientRecallData(request.form)
+            recall_correction = Arbeiter().correct(client_data)
+        except Exception as e:
+            app.logger.error(str(e))
+            filename = os.path.join(
+                app.root_path, f'recalldata/error_{time.time()}.json')
+            with open(filename, 'w', encoding='utf-8') as file:
+                json.dump(dict(request.form), file)
+            return jsonify({'error': str(e)})
+        else:
+            filename = os.path.join(
+                app.root_path, f'recalldata/{time.time()}_{client_data.username}.pickle')
+            with open(filename, 'wb') as file:
+                pickle.dump((client_data, recall_correction), file)
+        return jsonify(recall_correction)
     else:
         print('Wrong method!')
 
