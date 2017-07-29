@@ -10,6 +10,9 @@ from pprint import pprint
 import json
 import hashlib
 from collections import namedtuple
+import pickle
+import functools
+import collections
 
 from recall import app
 
@@ -52,6 +55,7 @@ def unique_lines_in_textarea(data: str, lower=False):
     return {line.strip() for line in data.split('\n') if line.strip()}
 
 
+@functools.lru_cache(maxsize=8)
 def load_blob(recall_key):
     blob_file = os.path.join(
         app.root_path, f'database/{recall_key[0:2]}/{recall_key[2:6]}.json')
@@ -426,16 +430,63 @@ def _arbeiter(key, dictionary):
 
 
 class ClientRecallData:
+    """Collect and hold submitted recall data
+
+    The user will after recall press the submit button
+    or wait until the time runs out and the submit is
+    triggered automatically.
+
+    The server will receive a form from the client
+    that this class will take care of.
+
+    The important fields in the form that must exist
+    are:
+        * username
+        * recall_key
+        * recall_cell_X values
+
+    The username is used to identify the user, the
+    recall_key is used to identify the blob, the
+    cells are the data that will be corrected.
+
+    Remember that all values will be strings, even
+    numbers in cells from number disciplines.
+    """
+    # Todo: add seconds_remaining, ip address(?)
     def __init__(self, request_form):
+
+        # Clean and set username
+        _username = request_form['username']
+        if not _username.strip():
+            _username = 'Unknown'
+        # Replace whitespace with '_'
+        _username = re.sub(r'\s', '_', _username)
+        # Remove non-word characters
+        _username = re.sub(r'[^\w-]', '', _username)
+        self.username = _username
+
         self.recall_key = request_form['recall_key']
+
         self._data = dict()
         for key in request_form:
             if key.startswith('recall_cell_'):
                 self._data[key] = request_form[key]
-        self.nr_recall_cells = len(self._data)
+        self._nr_recall_cells = len(self._data)
 
-        for i in range(self.nr_recall_cells):
-            assert f'recall_cell_{i}' in self._data
+        # Make sure the cells make a consecutive set
+        # of cells.
+        _temp_data = [None]*self._nr_recall_cells
+        for i in range(self._nr_recall_cells):
+            try:
+                user_value = self._data[f'recall_cell_{i}']
+            except KeyError:
+                raise Exception('Failed to get consecutive set of cells')
+            else:
+                _temp_data[i] = user_value
+        self._data = _temp_data
+
+    def __repr__(self):
+        return f'<ClientRecallData {self.recall_key}:{self.username}>'
 
     def start_of_emptiness_before(self, index):
         index_of_empty_cell = index
@@ -447,22 +498,13 @@ class ClientRecallData:
         return index_of_empty_cell
 
     def __getitem__(self, item):
-        try:
-            return self._data[str(item)]
-        except KeyError:
-            return self._data['recall_cell_' + str(item)]
-
-    def __setitem__(self, key, value):
-        if key in self._data:
-            self._data[key] = value
-        elif 'recall_cell_' + str(value) in self._data:
-            self._data['recall_cell_' + str(value)] = value
-        else:
-            raise ValueError(f'Can\'t set item: {key}')
+            return self._data[item]
 
     def __iter__(self):
-        for i in range(self.nr_recall_cells):
-            yield self[i]
+        yield from self._data
+
+    def __len__(self):
+        return self._nr_recall_cells
 
 
 class Arbeiter:
