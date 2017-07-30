@@ -23,3 +23,10 @@
 	padding-right:10px;
 	border: 1px solid;
 }
+
+form button {
+    height: 35px;
+}
+#username {
+    height: 35px;
+}

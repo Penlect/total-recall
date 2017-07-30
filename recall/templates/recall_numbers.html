@@ -1,92 +1,36 @@
-{% extends "base.html" %}
+{% extends "recall.html" %}
 
-{% block css %}
+{% block css_discipline_specific %}
 <link href="{{ url_for('static', filename='css/recall_numbers.css') }}" rel="stylesheet">
 {% endblock %}
 
-{% block body %}
+{% block subheader %}
+<h3>{{ blob.discipline|title }} numbers, {{ blob.data|length }} st, {{ blob.recall_time }} min Recall</h3>
+{% endblock %}
 
-    <div class="page-header">
-        <h1>Recall <small>(key={{ key }})</small></h1>
-    </div>
-    <h3>{{ blob.discipline|title }} numbers, {{ blob.recall_time }} min Recall</h3>
-	
-	<p><span class="label label-primary">Seconds remaining: <span id="seconds_remaining">30</span></span></p>
-	
-    <form action="{{ url_for('arbeiter') }}" method="post">
-        <fieldset>
-        <input name="recall_key" type="hidden" value="{{ key }}">
+{% block seconds_remaining %}30{% endblock %}
 
-        <table border="1px" class="recall_table">
-        {% for row_i in range(nr_rows) %}
-            <tr class="recall_row">
-                {% for col_i in range(nr_cols) %}
-                    <td><input class="recall_cell" id="recall_cell_{{ row_i*nr_cols + col_i }}" name="recall_cell_{{ row_i*nr_cols + col_i }}" type="text" maxlength="1" size="1" autocomplete="off"></td>
-                {% endfor %}
-                <td class="row_enumeration">Row {{ row_i + 1 }}</td>
-            </tr>
-        {% if (row_i + 1)%25 == 0%}
-            </table>
-        <table border="1px" class="recall_table">
-        {% endif %}
+<!-- This part defines the recall table layout -->
+{% block table_logic %}
+<table border="1px" class="recall_table" id="first_table">
+{% for row_i in range(nr_rows) %}
+    <tr class="recall_row">
+        {% for col_i in range(nr_cols) %}
+            <td><input class="recall_cell" id="recall_cell_{{ row_i*nr_cols + col_i }}" name="recall_cell_{{ row_i*nr_cols + col_i }}" type="text" maxlength="1" size="1" autocomplete="off"></td>
         {% endfor %}
-        </table>
+        <td class="row_enumeration">Row {{ row_i + 1 }}</td>
+    </tr>
+{% if (row_i + 1)%25 == 0%}
+    </table>
+<table border="1px" class="recall_table">
+{% endif %}
+{% endfor %}
+</table>
+{% endblock table_logic %}
 
-        <button id="recall_complete" type="submit" class="btn btn-primary">Submit</button>
-        </fieldset>
-    </form>
-	
-	<p id="result"></p>
-
-{% endblock %}
-
-{% block javascript%}
-<script src="{{ url_for('static', filename='js/recall.js') }}"></script>
-
-<script>
-
-$(document).ready(function(){
-
-    function recallSubmit(result, status, xhr){
-        console.log(result);
-        console.log(status);
-
-        for (var recall_cell_id in result.cells){
-            recallResultColor(recall_cell_id, result.cells[recall_cell_id]);
-        }
-        $("#result").text('Nr correct digits: ' + result.nr_correct +
-                          ' Nr wrong digits: ' + result.nr_wrong +
-                          ' Nr forgotten digits: ' + result.nr_gap +
-                          ' Nr digits not reached: ' + result.nr_not_reached);
-    }
-
-   recallTimer = setTimeout(getRecallTimer($('#seconds_remaining'), $('#recall_complete')), SECOND);
-
-   var nrRows = $('.recall_table .recall_row').length;
-   var nrCells = $('.recall_table .recall_cell').length;
-   console.log("Rows = " + nrRows);
-   console.log("Cells = " + nrCells);
-
-   $('.recall_cell').keydown(function(event) {
-	   event.preventDefault();
-	   var grid = new RecallGrid(nrRows, nrCells/nrRows, $(this));
-	   keydownHandler(event, grid);
-   });
-
-   $('form').submit(function(event){
-	  event.preventDefault();
-	  // Post all the recall input data to the server
-      $.post($(this).attr('action'), $(this).serialize(), recallSubmit, 'json');
-
-      /* Disable the recall form because we don't want anyone
-       to modify it after the time has run out */
-      $('fieldset').prop('disabled', true);
-
-      // Stop the clock from ticking
-	  clearTimeout(recallTimer);
-      return false;
-   });
-});
-</script>
-{% endblock %}
-
+<!-- This part handles what will happen when a key is pressed -->
+{% block keydown%}
+   event.preventDefault();
+   var grid = new RecallGrid(nrRows, nrCells/nrRows, $(this));
+   keydownHandler(event, grid);
+{% endblock keydown%}

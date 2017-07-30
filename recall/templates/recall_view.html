@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link href="{{ url_for('static', filename='css/recall.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/recall_numbers.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+
+    <div class="page-header">
+        <h1>Recall <small>(key={{ blob.recall_key }})</small></h1>
+    </div>
+    <h3>{{ blob.discipline|title }} numbers, {{ blob.recall_time }} min Recall</h3>
+    <p>
+        Seconds remaining: {{ client_data.seconds_remaining }}
+    </p>
+
+    <form>
+        <fieldset>
+        <div id="recallsheet">
+
+        <table border="1px" class="recall_table">
+        {% for row_i in range(nr_rows) %}
+            <tr class="recall_row">
+                {% for col_i in range(nr_cols) %}
+                    <td><input class="recall_cell recall_{{ result.cell_by_cell_result[row_i*nr_cols + col_i] }}" id="recall_cell_{{ row_i*nr_cols + col_i }}" type="text" maxlength="1" size="1" autocomplete="off" value="{{ client_data[row_i*nr_cols + col_i] }}"></td>
+                {% endfor %}
+                <td class="row_enumeration">Row {{ row_i + 1 }}</td>
+            </tr>
+        {% if (row_i + 1)%25 == 0%}
+            </table>
+        <table border="1px" class="recall_table">
+        {% endif %}
+        {% endfor %}
+        </table>
+
+        </div>
+        </fieldset>
+    </form>
+
+	<p id="result"></p>
+
+{% endblock %}
+
+{% block javascript%}
+<script src="{{ url_for('static', filename='js/recall.js') }}"></script>
+
+<script>
+$(document).ready(function(){
+   $('fieldset').prop('disabled', true);
+});
+</script>
+{% endblock %}
+
