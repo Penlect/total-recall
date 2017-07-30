@@ -631,3 +631,31 @@ def arbeiter():
     else:
         print('Wrong method!')
 
+
+@app.route('/results/view', methods=['GET'])
+def view_recall():
+    file = request.args.get('data')
+    filename = os.path.join(
+        app.root_path, f'recalldata/{file}')
+    with open(filename, 'rb') as file:
+        client, result = pickle.load(file)
+        blob = load_blob(client.recall_key)
+    nr_rows = math.ceil(len(blob['data'])/40)
+    return render_template('recall_view.html', blob=blob,
+                           client_data=client, result=result,
+                               nr_cols=40, nr_rows=nr_rows)
+
+@app.route('/results')
+def list_results():
+    root = os.path.join(app.root_path, f'recalldata')
+    files = os.listdir(root)
+    pickle_files = list()
+    for file in files:
+        if file.lower().endswith('.pickle'):
+            timestamp, username = file.split('_', 1)
+            local_time = time.localtime(float(timestamp))
+            time_str = time.strftime('%Y-%m-%d %H:%M:%S', local_time)
+            username = os.path.splitext(username)[0]
+            pickle_files.append((file, time_str, username))
+    pickle_files.sort(reverse=True)
+    return render_template('results.html', results=pickle_files)
