@@ -30,3 +30,9 @@ form button {
 #username {
     height: 35px;
 }
+
+body{
+    color: black;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}

@@ -1,4 +1,4 @@
-input[type=text] {
+#recallsheet input[type=text] {
     text-align: center;
 	padding:0px;
 	margin:0px;
@@ -6,31 +6,26 @@ input[type=text] {
 	font-size:18px;
 	border: 0px;
 }
-input[type=text]:focus {
+#recallsheet input[type=text]:focus {
     background-color: lightblue;
 }
-table {
+#recallsheet table {
 	border-collapse: collapse;
 	margin-top: 10px;
 	margin-bottom: 40px;
 }
-tr, td {
+#recallsheet tr, td {
 	padding:0px;
 	margin:0px;
 	white-space: nowrap;
 	border: 1px solid;
 }
-body{
-    color: black;
-    margin-left: 20px;
-    margin-bottom: 20px;
-}
-.row_enumeration {
+#recallsheet .row_enumeration {
     padding-left:20px;
     padding-right:10px;
     border-left: 1px solid;
 }
-.story {
+#recallsheet .story {
 	padding-left:10px;
 	padding-right:10px;
 }
