@@ -1,0 +1,19 @@
+
+.recall_correct {
+    background-color:lime;
+}
+.recall_wrong {
+    background-color:#ff0022;
+}
+.recall_gap {
+    background-color:#42d7f4;
+}
+.recall_not_reached {
+    background-color:#eaeaea;
+}
+.recall_off_limits {
+    background-color:lightgray;
+}
+.recall_almost_correct {
+    background-color:#ffff66;
+}
