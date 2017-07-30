@@ -640,7 +640,7 @@ def view_recall():
     with open(filename, 'rb') as file:
         client, result = pickle.load(file)
         blob = load_blob(client.recall_key)
-    d = blob.discipline
+    d = blob['discipline']
     if d == 'binary':
         nr_rows = math.ceil(len(blob['data'])/30)
         return render_template('view_recall_numbers.html', blob=blob,
