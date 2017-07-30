@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Results</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <tr>
+                    <th>Time</th>
+                    <th>Username</th>
+                    <th>Discipline</th>
+                    <th>Raw score</th>
+                </tr>
+            {% for file, time, username in results %}
+                <tr>
+                <td><a href="{{ url_for('view_recall', data=file) }}">{{ time }}</a></td>
+                <td>{{ username }}</td>
+                <td></td>
+                <td></td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+$(document).ready(function(){
+
+});
+
+</script>
+{% endblock %}
