@@ -10,7 +10,7 @@
 {% block body %}
 
     <div class="page-header">
-        <h1>Recall <small>(key={{ key }})</small></h1>
+        <h1>Recall <small>(key={{ blob.recall_key }})</small></h1>
     </div>
     {% block subheader %}
     <h3>{{ blob.discipline|title }} numbers, {{ blob.data|length }} st, {{ blob.recall_time }} min Recall</h3>
@@ -100,8 +100,8 @@ $(document).ready(function(){
 
     // The timer is started when the Start-Recall button is clicked
    $('#start_recall').on('click', function(event){
-        $(this).prop('disabled', true)
-        $('#recallsheet').css("display", "block")
+        $(this).prop('disabled', true);
+        $('#recallsheet').css("display", "block");
         recallTimer = setTimeout(getRecallTimer($('#seconds_remaining'), $('#recall_submit_button'), $('#progressbar')), SECOND);
    })
 

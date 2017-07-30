@@ -199,7 +199,6 @@ class Blob:
     def add_to_database(self):
         """Write blob as json file to database"""
         blob = dict(self)
-
         hash_candidate = str(blob)
         while True:
             h = sha(hash_candidate)
@@ -209,10 +208,11 @@ class Blob:
                 hash_candidate = h
             else:
                 break
+        self.recall_key = h
+        blob = dict(self)  # recall_key now available
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         with open(output_file, 'w', encoding='utf-8') as file:
             json.dump(blob, file)
-        self.recall_key = h
         return h
 
 
@@ -640,10 +640,31 @@ def view_recall():
     with open(filename, 'rb') as file:
         client, result = pickle.load(file)
         blob = load_blob(client.recall_key)
-    nr_rows = math.ceil(len(blob['data'])/40)
-    return render_template('recall_view.html', blob=blob,
-                           client_data=client, result=result,
-                               nr_cols=40, nr_rows=nr_rows)
+    d = blob.discipline
+    if d == 'binary':
+        nr_rows = math.ceil(len(blob['data'])/30)
+        return render_template('view_recall_numbers.html', blob=blob,
+                               client_data=client, result=result,
+                                   nr_cols=30, nr_rows=nr_rows)
+    elif d == 'decimal':
+        nr_rows = math.ceil(len(blob['data'])/40)
+        return render_template('view_recall_numbers.html', blob=blob,
+                               client_data=client, result=result,
+                                   nr_cols=40, nr_rows=nr_rows)
+    elif d == 'words':
+        nr_cols = math.ceil(len(blob['data'])/20)
+        if nr_cols%5 == 0:
+            nr_cols_iter = [5]*(nr_cols//5)
+        else:
+            nr_cols_iter = [5]*(nr_cols//5) + [nr_cols%5]
+        return render_template('view_recall_words.html', blob=blob,
+                               client_data=client, result=result,
+                               nr_cols_iter=nr_cols_iter)
+    elif d == 'dates':
+        return render_template('view_recall_dates.html', blob=blob,
+                               client_data=client, result=result)
+    else:
+        raise Exception(f'Blob contain invalid discipline: {d}')
 
 @app.route('/results')
 def list_results():

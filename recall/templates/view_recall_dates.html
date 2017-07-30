@@ -1,0 +1,33 @@
+{% extends "recall.html" %}
+
+{% block css_discipline_specific %}
+<link href="{{ url_for('static', filename='css/recall_dates.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block subheader %}
+<h3>Historical {{ blob.discipline|title }}, {{ blob.data|length }} st, {{ blob.language|title }}, {{ blob.recall_time }} min Recall</h3>
+{% endblock %}
+
+{% block seconds_remaining %}30{% endblock %}
+
+<!-- This part defines the recall table layout -->
+{% block table_logic %}
+<table border="1px" class="recall_table">
+{% for date, story in blob._recall_data %}
+    <tr class="recall_row">
+        <td><input class="recall_cell" id="recall_cell_{{ loop.index0 }}" name="recall_cell_{{ loop.index0 }}" type="text" maxlength="4" size="4" autocomplete="off"></td>
+        <td class="story">{{ story }}</td>
+    </tr>
+{% if (loop.index0 + 1)%40 == 0%}
+    </table>
+    <table border="1px" class="recall_table">
+{% endif %}
+{% endfor %}
+</table>
+{% endblock table_logic %}
+
+<!-- This part handles what will happen when a key is pressed -->
+{% block keydown%}
+    var grid = new RecallGrid(nrRows, nrCells/nrRows, $(this));
+    keydownHandlerDates(event, grid);
+{% endblock keydown%}
