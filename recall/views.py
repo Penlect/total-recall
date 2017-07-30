@@ -611,10 +611,12 @@ class Arbeiter:
 
 @app.route('/arbeiter', methods=['POST'])
 def arbeiter():
+    app.logger.info(f'Arbeiter got data from {request.remote_addr}')
     if request.method == 'POST':
         try:
             client_data = ClientRecallData(request.form)
             recall_correction = Arbeiter().correct(client_data)
+            app.logger.info(f'Arbeiter has corrected {request.remote_addr}')
         except Exception as e:
             app.logger.error(str(e))
             filename = os.path.join(
@@ -627,6 +629,7 @@ def arbeiter():
                 app.root_path, f'recalldata/{time.time()}_{client_data.username}.pickle')
             with open(filename, 'wb') as file:
                 pickle.dump((client_data, recall_correction), file)
+            app.logger.info(f'Arbeiter saved pickle file')
         return jsonify(recall_correction)
     else:
         print('Wrong method!')

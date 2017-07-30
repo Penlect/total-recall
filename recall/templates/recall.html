@@ -119,13 +119,16 @@ $(document).ready(function(){
    });
 
    $('form').submit(function(event){
+      console.log('Recall submit initiated');
 	  event.preventDefault();
 
       // Copy seconds remaining to hidden input field
 	  $('#seconds_remaining_field').val($('#seconds_remaining').text());
 
 	  // Post all the recall input data to the server
+      console.log('Posting data to server ...');
       $.post($(this).attr('action'), $(this).serialize(), recallSubmit, 'json');
+      console.log('Done posting data to server ...');
 
       /* Disable the recall form because we don't want anyone
        to modify it after the time has run out */
