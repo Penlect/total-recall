@@ -17,3 +17,9 @@
 .recall_almost_correct {
     background-color:#ffff66;
 }
+
+#score_table tr, #score_table td {
+	padding-left:10px;
+	padding-right:10px;
+	border: 1px solid;
+}
