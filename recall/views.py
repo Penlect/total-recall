@@ -55,7 +55,7 @@ def unique_lines_in_textarea(data: str, lower=False):
     return {line.strip() for line in data.split('\n') if line.strip()}
 
 
-@functools.lru_cache(maxsize=8)
+@functools.lru_cache(maxsize=16)
 def load_blob(recall_key):
     blob_file = os.path.join(
         app.root_path, f'database/{recall_key[0:2]}/{recall_key[2:6]}.json')
