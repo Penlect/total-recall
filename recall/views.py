@@ -444,10 +444,13 @@ class ClientRecallData:
         * username
         * recall_key
         * recall_cell_X values
+        * seconds_remaining
 
     The username is used to identify the user, the
     recall_key is used to identify the blob, the
     cells are the data that will be corrected.
+    seconds_remaining was the time remaining when
+    the submit was triggered.
 
     Remember that all values will be strings, even
     numbers in cells from number disciplines.
@@ -466,6 +469,7 @@ class ClientRecallData:
         self.username = _username
 
         self.recall_key = request_form['recall_key']
+        self.seconds_remaining = request_form['seconds_remaining']
 
         self._data = dict()
         for key in request_form:
