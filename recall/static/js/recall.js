@@ -235,13 +235,16 @@ function keydownHandlerDates(event, grid){
 
 var SECOND = 1000 // milliseconds
 
-function getRecallTimer(sec_remaining_element, submit_element){
-	var secondsRemaining = Number(sec_remaining_element.text());
+function getRecallTimer(sec_remaining_element, submit_element, progressbar){
+    var total_time = Number(sec_remaining_element.text());
+	var secondsRemaining = total_time;
 	var interval = SECOND; // ms
 	var expected = Date.now() + interval;
 	function step() {
 		secondsRemaining--;
 		sec_remaining_element.text(secondsRemaining);
+		progressbar.css("width", (100 - 100*secondsRemaining/total_time) + '%');
+		console.log(secondsRemaining/total_time);
 		if(secondsRemaining <= 0){
 			console.log('Recall timeout -> Submit');
 			submit_element.submit();
@@ -261,22 +264,22 @@ function getRecallTimer(sec_remaining_element, submit_element){
 /* ---------- CORRECTION ---------- */
 function recallResultColor(recall_cell_id, result){
     if(result == 'correct'){
-        $('#' + recall_cell_id).css('background-color', 'lime');
+        $('#' + recall_cell_id).addClass('recall_correct');
     }
     else if(result == 'wrong'){
-        $('#' + recall_cell_id).css('background-color', '#ff0022');
+        $('#' + recall_cell_id).addClass('recall_wrong');
     }
     else if(result == 'gap'){
-        $('#' + recall_cell_id).css('background-color', '#ff0022');
+        $('#' + recall_cell_id).addClass('recall_gap');
     }
     else if(result == 'not_reached'){
-        $('#' + recall_cell_id).css('background-color', '#eaeaea');
+        $('#' + recall_cell_id).addClass('recall_not_reached');
     }
     else if(result == 'off_limits'){
-        $('#' + recall_cell_id).css('background-color', 'lightgray');
+        $('#' + recall_cell_id).addClass('recall_off_limits');
     }
     else if(result == 'almost_correct'){
-        $('#' + recall_cell_id).css('background-color', '#ffff66');
+        $('#' + recall_cell_id).addClass('recall_almost_correct');
     }
     else{
         console.log('Got unexpected result status: ' + result);
