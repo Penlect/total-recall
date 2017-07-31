@@ -18,6 +18,13 @@ from recall import app
 
 import recall.xls
 
+import logging
+handler = logging.FileHandler('flask.log')
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+handler.setFormatter(formatter)
+app.logger.addHandler(handler)
+
 
 def sha(string):
     h = hashlib.sha1(string.encode())
@@ -57,10 +64,13 @@ def unique_lines_in_textarea(data: str, lower=False):
 
 @functools.lru_cache(maxsize=16)
 def load_blob(recall_key):
+    app.logger.info(f'Loading blob {recall_key} ...')
     blob_file = os.path.join(
         app.root_path, f'database/{recall_key[0:2]}/{recall_key[2:6]}.json')
     with open(blob_file, 'r', encoding='utf-8') as file:
-        return json.load(file)
+        blob_dict = json.load(file)
+        app.logger.info(f'Done loading blob {recall_key}.')
+        return blob_dict
 
 
 class Blob:
@@ -627,9 +637,10 @@ def arbeiter():
         else:
             filename = os.path.join(
                 app.root_path, f'recalldata/{time.time()}_{client_data.username}.pickle')
+            app.logger.info(f'Arbeiter writing pickle file ...')
             with open(filename, 'wb') as file:
                 pickle.dump((client_data, recall_correction), file)
-            app.logger.info(f'Arbeiter saved pickle file')
+            app.logger.info(f'Pickle written.')
         return jsonify(recall_correction)
     else:
         print('Wrong method!')
