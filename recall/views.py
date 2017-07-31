@@ -62,7 +62,7 @@ def unique_lines_in_textarea(data: str, lower=False):
     return {line.strip() for line in data.split('\n') if line.strip()}
 
 
-@functools.lru_cache(maxsize=16)
+@functools.lru_cache(maxsize=32)
 def load_blob(recall_key):
     app.logger.info(f'Loading blob {recall_key} ...')
     blob_file = os.path.join(
@@ -481,23 +481,12 @@ class ClientRecallData:
         self.recall_key = request_form['recall_key']
         self.seconds_remaining = request_form['seconds_remaining']
 
-        self._data = dict()
-        for key in request_form:
-            if key.startswith('recall_cell_'):
-                self._data[key] = request_form[key]
-        self._nr_recall_cells = len(self._data)
-
-        # Make sure the cells make a consecutive set
-        # of cells.
-        _temp_data = [None]*self._nr_recall_cells
-        for i in range(self._nr_recall_cells):
+        self._data = list()
+        for i in range(len(request_form)):
             try:
-                user_value = self._data[f'recall_cell_{i}']
+                self._data.append(request_form[f'recall_cell_{i}'])
             except KeyError:
-                raise Exception('Failed to get consecutive set of cells')
-            else:
-                _temp_data[i] = user_value
-        self._data = _temp_data
+                break
 
     def __repr__(self):
         return f'<ClientRecallData {self.recall_key}:{self.username}>'
@@ -518,7 +507,7 @@ class ClientRecallData:
         yield from self._data
 
     def __len__(self):
-        return self._nr_recall_cells
+        return len(self._data)
 
 
 class Arbeiter:
@@ -560,6 +549,8 @@ class Arbeiter:
         else:
             raise Exception(f'Blob contain invalid discipline: {d}')
 
+        start_of_emptiness = self._client_data.start_of_emptiness_before(
+            len(self._blob['data']))
         result = [None]*len(self._client_data)
         for i, user_value in enumerate(self._client_data, start=0):
             try:
@@ -569,8 +560,7 @@ class Arbeiter:
             else:
                 if not user_value.strip():
                     # Empty cell
-                    if i < self._client_data.start_of_emptiness_before(
-                            len(self._blob['data'])):
+                    if i < start_of_emptiness:
                         result[i] = 'gap'
                     else:
                         result[i] = 'not_reached'
