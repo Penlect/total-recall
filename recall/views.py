@@ -552,6 +552,7 @@ class Arbeiter:
         start_of_emptiness = self._client_data.start_of_emptiness_before(
             len(self._blob['data']))
         result = [None]*len(self._client_data)
+        # Todo: won't work for historical dates
         for i, user_value in enumerate(self._client_data, start=0):
             try:
                 correct_value = self._blob['data'][i]
