@@ -40,7 +40,7 @@
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#f442eb;">
-                    <form id="form_binary" class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
+                    <form id="form_binary" class="form-horizontal" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="binary">
                         {% block binary %}{% endblock %}
                         <div class="form-group">
@@ -71,13 +71,13 @@
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#5bc0de;">
-                    <form id="form_numbers" class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
+                    <form id="form_numbers" class="form-horizontal" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="decimals">
                         {% block numbers %}{% endblock %}
                         <div class="form-group">
                             <label for="time_numbers" class="col-sm-3 control-label">Time</label>
                             <div class="col-sm-9">
-                                <select name="base" class="form-control" id="time_numbers">
+                                <select name="time" class="form-control" id="time_numbers">
                                   <option value="5,15">5min / 15min</option>
                                   <option value="15,30">15min / 30min</option>
                                   <option value="30,60">30min / 60min</option>
@@ -104,13 +104,13 @@
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#ffff66;">
-                    <form id="form_words" class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
+                    <form id="form_words" class="form-horizontal" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="words">
                         {% block words %}{% endblock %}
                         <div class="form-group">
                             <label for="time_words" class="col-sm-3 control-label">Time</label>
                             <div class="col-sm-9">
-                                <select name="base" class="form-control" id="time_words">
+                                <select name="time" class="form-control" id="time_words">
                                   <option value="5,15">5min / 15min</option>
                                   <option value="15,30">15min / 30min</option>
                                 </select>
@@ -135,13 +135,13 @@
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#66ff99;">
-                    <form id="form_dates" class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
+                    <form id="form_dates" class="form-horizontal" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="dates">
                         {% block dates %}{% endblock %}
                         <div class="form-group">
                             <label for="time_dates" class="col-sm-3 control-label">Time</label>
                             <div class="col-sm-9">
-                                <select name="base" class="form-control" id="time_dates">
+                                <select name="time" class="form-control" id="time_dates">
                                   <option value="5,15">5min / 15min</option>
                                 </select>
                             </div>

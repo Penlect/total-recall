@@ -1,6 +1,7 @@
 
 import enum
 from datetime import datetime
+import re
 
 import os
 #os.remove('test.db')
@@ -57,14 +58,14 @@ class MemoData(db.Model):
     memo_time = db.Column(db.Integer, nullable=False)
     recall_time = db.Column(db.Integer, nullable=False)
 
-    memo_data = db.Column(db.PickleType, nullable=False)
     language = db.Column(db.String(40))
     pattern = db.Column(db.String(255))
+    data = db.Column(db.PickleType, nullable=False)
     generated = db.Column(db.Boolean, nullable=False)
 
     def __init__(self, ip, user_id, key,
                  discipline, memo_time, recall_time,
-                 memo_data, language, pattern,
+                 language, pattern, data,
                  generated):
 
         self.datetime = datetime.utcnow()
@@ -73,13 +74,27 @@ class MemoData(db.Model):
         self.key = key
 
         self.discipline = discipline
+        if memo_time < 0:
+            raise ValueError(f'memo_time cannot be negative: {memo_time}')
         self.memo_time = memo_time
+        if recall_time < 0:
+            raise ValueError(f'recall_time cannot be negative: {recall_time}')
         self.recall_time = recall_time
-        self.memo_time = memo_time
 
-        self.memo_data = memo_data
-        self.language = language
+        if discipline == Discipline.words or \
+                        discipline == Discipline.dates:
+            if not language:
+                raise ValueError(
+                    f'Language must be provided for "{discipline.value}"')
+            self.language = language.strip().lower()
+        else:
+            self.language = None
+        if pattern.strip():
+            if not re.fullmatch('(\d+)(,\s*\d+\s*)*', pattern):
+                raise ValueError('The pattern provided doesn\'t match a '
+                                 'comma separated list of numbers.')
         self.pattern = pattern
+        self.data = data
         self.generated = generated
 
     def __repr__(self):
@@ -93,9 +108,9 @@ class KeyStatus(db.Model):
 
     memo = db.relationship('MemoData', back_populates='key_status')
 
-    def __init__(self, key, status):
+    def __init__(self, key, public: bool):
         self.key = key
-        self.public = status
+        self.public = public
 
     def __repr__(self):
         return f'<KeyStatus {self.key}:public={self.public}>'

@@ -22,7 +22,7 @@ print(Language.query.all())
 
 m = MemoData('123.231.43.5', u1.id, 'abc123',
              Discipline.base2, 5, 15,
-             [1,2,3], 'swedish', '1,4,5',
+             'swedish', '1,4,5', [1,2,3],
              False)
 k = KeyStatus(m.key, True)
 d = XlsDoc(m.key, b'asdfkjadfasdf')
@@ -50,3 +50,8 @@ print(u2.username, u2.memos, u2.recalls)
 
 print(m.discipline, m.user, m.recalls, m.key_status, m.key_status.public, m.xls_doc.data)
 print(r.user, r.key, r.memo, r.memo.key_status.public)
+
+print('-----------------')
+
+db.session.delete(u1)
+db.session.commit()

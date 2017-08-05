@@ -1,7 +1,7 @@
 
 import os
 import re
-from flask import render_template, request, jsonify, url_for
+from flask import render_template, request, jsonify, send_file, url_for
 
 import random
 import time
@@ -13,8 +13,10 @@ from collections import namedtuple
 import pickle
 import functools
 import collections
+import io
 
-from recall import app
+from recall import app, db
+from recall import models
 
 import recall.xls
 
@@ -73,157 +75,141 @@ def load_blob(recall_key):
         return blob_dict
 
 
-class Blob:
+VALID_DISCIPLINES = {'binary', 'decimal', 'words', 'dates'}
+VALID_CORRECTIONS = {'kind', 'standard'}
 
-    VALID_DISCIPLINES = {'binary', 'decimal', 'words', 'dates'}
-    VALID_CORRECTIONS = {'kind', 'standard'}
 
-    def __init__(self, *,
-                 discipline: str,
-                 memo_time: int, recall_time: int,
-                 correction,
-                 data: str,  # Mandatory for 'create' but not 'generate'
+def form_to_blob(form, discipline:str):
+    # The request form is a ImmutableMultiDict
+    blob = Blob(
+        discipline=form['discipline'],
+        memo_time=form['memo_time'],
+        recall_time=form['recall_time'],
+        correction=form['correction'],
+        data=form.get('data'),
+        nr_items=form.get('nr_items'),
+        language=form.get('language'),
+        pattern=form['pattern']
+    )
+    h = blob.add_to_database()
+    app.logger.info(f'Created blob for {discipline}: {h}')
+    return blob
 
-                 language=None,  # Mandatory for 'dates' and 'words'
-                 nr_items=None,  # Mandatory for 'generate' but not 'create'
-                 pattern=''
-                 ):
 
-        self._recall_data = None # Only used for historical dates
-        self.recall_key = None  # Final hash for this blob
+def memo_from_request(request):
+    form = request.form
+    ip = request.remote_addr
 
-        # Assign values and check for errors in input
-        self.discipline = discipline.strip().lower()
-        if self.discipline not in self.VALID_DISCIPLINES:
-            raise ValueError(f'Invalid discipline: "{discipline}". '
-                             'Choose from ' + str(self.VALID_DISCIPLINES))
+    user_id = None  # Todo
+    key = sha(str(form))
 
-        self.memo_time = int(memo_time)
-        if self.memo_time < 0:
-            raise ValueError('Memo. time cannot be negative: '
-                             f'{self.memo_time}')
+    # Assign values and check for errors in input
+    d = form['discipline'].strip().lower()
+    if d == 'binary':
+        discipline = models.Discipline.base2
+    elif d == 'decimals':
+        discipline = models.Discipline.base10
+    elif d == 'words':
+        discipline = models.Discipline.words
+    elif d == 'dates':
+        discipline = models.Discipline.dates
+    else:
+        raise ValueError(f'Invalid discipline form form: "{discipline}"')
 
-        self.recall_time = int(recall_time)
-        if self.recall_time < 0:
-            raise ValueError('Recall time cannot be negative: '
-                             f'{self.recall_time}')
+    memo_time, recall_time = form['time'].strip().lower().split(',')
+    memo_time, recall_time = int(memo_time), int(recall_time)
 
-        self.correction = correction.strip().lower()
-        if self.correction not in self.VALID_CORRECTIONS:
-            raise ValueError(f'Invalid correction: "{correction}". '
-                             'Choose from ' + str(self.VALID_CORRECTIONS))
+    language = form.get('language')
+    pattern = form['pattern']
 
-        if language is None and self.discipline in {'words', 'dates'}:
-            raise ValueError('Language must be provided when discipline = ' +
-                             self.discipline)
-        elif language:
-            self.language = language.lower()
+    data = form.get('data')
+    nr_items = form.get('nr_items')
+    assert data or nr_items, "data or nr_items must be provided!"
+
+    if data is None:
+        # If data was not provided, we must generate it ourselves.
+        # In order to do so we need to know how many items to
+        # generate, + language if words or dates.
+        nr_items = int(nr_items)
+
+        if d == 'binary':
+            data = tuple(random.randint(0, 1) for _ in range(nr_items))
+        elif d == 'decimals':
+            data = tuple(random.randint(0, 9) for _ in range(nr_items))
+        elif d == 'words':
+            words = [word.value for word in
+                     load_database(DATABASE_WORDS, WordEntry)
+                     if word.language == language]
+            random.shuffle(words)
+            data = tuple(words[0:nr_items])
+        elif d == 'dates':
+            stories = [story.value for story in
+                       load_database(DATABASE_STORIES, StoryEntry)
+                       if story.language == language]
+            random.shuffle(stories)
+            stories = stories[0:nr_items]
+            dates = [random.randint(1000, 2099) for _ in stories]
+            data = tuple(zip(dates, stories))
+            recall_data = list(data)
+            random.shuffle(recall_data)
+            _recall_data = tuple(recall_data)
         else:
-            self.language = ''
-
-        if pattern.strip():
-            if not re.fullmatch('(\d+)(,\s*\d+\s*)*', pattern):
-                raise ValueError('The pattern provided doesn\'t match a '
-                                 'comma separated list of numbers.')
-        try:
-            self.pattern = tuple(int(p) for p in pattern.split(',')
-                                 if p.strip())
-        except Exception as e:
-            raise ValueError('The pattern could not be converted to a tuple '
-                             'of integers.' + str(e))
-
-        if data is None:
-            # If data was not provided, we must generate it ourselves.
-            # In order to do so we need to know how many items to
-            # generate, + language if words or dates.
-            assert nr_items is not None, 'Nr_items not provided to blob!'
-            self.nr_items = int(nr_items)
-
-            if self.discipline == 'binary':
-                self.data = tuple(random.randint(0, 1)
-                                  for _ in range(self.nr_items))
-            elif self.discipline == 'decimal':
-                self.data = tuple(random.randint(0, 9)
-                                  for _ in range(self.nr_items))
-            elif self.discipline == 'words':
-                words = [word.value for word in
-                         load_database(DATABASE_WORDS, WordEntry)
-                         if word.language == self.language]
-                random.shuffle(words)
-                self.data = tuple(words[0:self.nr_items])
-            elif self.discipline == 'dates':
-                stories = [story.value for story in
-                           load_database(DATABASE_STORIES, StoryEntry)
-                           if story.language == self.language]
-                random.shuffle(stories)
-                stories = stories[0:self.nr_items]
-                dates = [random.randint(1000, 2099) for _ in stories]
-                self.data = tuple(zip(dates, stories))
-                recall_data = list(self.data)
-                random.shuffle(recall_data)
-                self._recall_data = tuple(recall_data)
-            else:
-                raise Exception('Data generation for discipline '
-                                f'"{self.discipline}" not implemented.')
+            raise Exception('Data generation for discipline '
+                            f'"{discipline}" not implemented.')
+        generated = True
+    else:
+        # If data is provided, it's just a matter of parsing the data
+        # from the string
+        if d == 'binary':
+            data = tuple(int(digit) for digit in re.findall('[01]', data))
+        elif d == 'decimal':
+            data = tuple(int(digit) for digit in re.findall('\d', data))
+        elif d == 'words':
+            data = tuple(unique_lines_in_textarea(data, lower=True))
+        elif d == 'dates':
+            lines = unique_lines_in_textarea(data, lower=False)
+            historical_dates = []
+            for line in lines:
+                date, story = line.split(maxsplit=1)
+                if not (1000 <= int(date) <= 2099):
+                    raise ValueError(f'Date out of range: 1000 <= {date} <= 2099')
+                historical_dates.append((date.strip(), story.strip()))
+            data = tuple(historical_dates)
+            recall_data = list(data)
+            random.shuffle(recall_data)
+            _recall_data = tuple(recall_data)
         else:
-            # If data is provided, it's just a matter of parsing the data
-            # from the string
-            if self.discipline == 'binary':
-                self.data = tuple(int(digit) for digit in
-                                  re.findall('[01]', data))
-            elif self.discipline == 'decimal':
-                self.data = tuple(int(digit) for digit in
-                                  re.findall('\d', data))
-            elif self.discipline == 'words':
-                self.data = tuple(unique_lines_in_textarea(data, lower=True))
-            elif self.discipline == 'dates':
-                lines = unique_lines_in_textarea(data, lower=False)
-                historical_dates = []
-                for line in lines:
-                    date, story = line.split(maxsplit=1)
-                    if not (1000 <= int(date) <= 2099):
-                        raise ValueError(f'Date out of range: 1000 <= {date} <= 2099')
-                    historical_dates.append((date.strip(), story.strip()))
-                self.data = tuple(historical_dates)
-                recall_data = list(self.data)
-                random.shuffle(recall_data)
-                self._recall_data = tuple(recall_data)
-            else:
-                raise Exception('Data creation for discipline '
-                                f'"{self.discipline}" not implemented.')
+            raise Exception('Data creation for discipline '
+                            f'"{discipline}" not implemented.')
+        generated = False
 
-    def __iter__(self):
-        yield from (
-            ('discipline', self.discipline),
-            ('memo_time', self.memo_time),
-            ('recall_time', self.recall_time),
-            ('correction', self.correction),
-            ('data', self.data),
-            ('language', self.language),
-            ('pattern', self.pattern),
-            ('recall_key', self.recall_key),
-            ('date_created', time.time()),
-            ('_recall_data', self._recall_data)
-        )
+    return models.MemoData(
+        ip=ip,
+        user_id=user_id,
+        key=key,
+        discipline=discipline,
+        memo_time=memo_time,
+        recall_time=recall_time,
+        language=language,
+        pattern=pattern,
+        data=data,
+        generated=generated
+    )
 
-    def add_to_database(self):
-        """Write blob as json file to database"""
-        blob = dict(self)
-        hash_candidate = str(blob)
-        while True:
-            h = sha(hash_candidate)
-            output_file = os.path.join(app.root_path,
-                                       f'database/{h[0:2]}/{h[2:6]}.json')
-            if os.path.isfile(output_file):
-                hash_candidate = h
-            else:
-                break
-        self.recall_key = h
-        blob = dict(self)  # recall_key now available
-        os.makedirs(os.path.dirname(output_file), exist_ok=True)
-        with open(output_file, 'w', encoding='utf-8') as file:
-            json.dump(blob, file)
-        return h
+
+def asdf(self):
+    yield from (
+        ('discipline', self.discipline),
+        ('memo_time', self.memo_time),
+        ('recall_time', self.recall_time),
+        ('correction', self.correction),
+        ('data', self.data),
+        ('language', self.language),
+        ('pattern', self.pattern),
+        ('recall_key', self.recall_key),
+        ('date_created', time.time()),
+        ('_recall_data', self._recall_data)
+    )
 
 
 def alert(message):
@@ -313,23 +299,6 @@ def create():
     return render_template('make_create.html')
 
 
-def form_to_blob(form, discipline:str):
-    # The request form is a ImmutableMultiDict
-    blob = Blob(
-        discipline=discipline,
-        memo_time=form['memo_time'],
-        recall_time=form['recall_time'],
-        correction=form['correction'],
-        data=form.get('data'),
-        nr_items=form.get('nr_items'),
-        language=form.get('language'),
-        pattern=form['pattern']
-    )
-    h = blob.add_to_database()
-    app.logger.info(f'Created blob for {discipline}: {h}')
-    return blob
-
-
 def blob_to_xls_filename(blob):
     """Create xls filename containing blob data"""
     XLS_FILENAME_FMT = '{discipline}_{nr}st_{language}_{memo_time}-{recall_time}min_p{pattern_str}_{correction}_{recall_key}'
@@ -342,7 +311,7 @@ def blob_to_xls_filename(blob):
     return xls_filename
 
 
-def blob_to_table(blob):
+def memo_to_table(memo):
     """Take relevant data of blob and create table
 
     The table can later be saved to disk as .xls file.
@@ -350,60 +319,92 @@ def blob_to_table(blob):
 
     # Depending on which discipline we have, we'll need discipline
     # specific table and description
-    if blob.discipline == 'binary':
+    if memo.discipline == models.Discipline.base2:
         table = recall.xls.get_binary_table
-        description=f'{blob.discipline.title()} Numbers, {len(blob.data)} st.'
-    elif blob.discipline == 'decimal':
+    elif memo.discipline == models.Discipline.base10:
         table = recall.xls.get_decimal_table
-        description=f'{blob.discipline.title()} Numbers, {len(blob.data)} st.'
-    elif blob.discipline == 'words':
+    elif memo.discipline == models.Discipline.words:
         table = recall.xls.get_words_table
-        description=f'Words, {blob.language.title()}, {len(blob.data)} st.'
-    elif blob.discipline == 'dates':
+    elif memo.discipline == models.Discipline.dates:
         table = recall.xls.get_dates_table
-        description=f'Historical Dates, {blob.language.title()}, {len(blob.data)} st.'
     else:
         raise ValueError(
-            f'Invalid discipline in blob: "{blob.discipline}"'
+            f'Invalid discipline: "{memo.discipline}"'
         )
+
+    nr_items = len(memo.data)
+    if memo.language:
+        description = f'{memo.discipline.value}, {memo.language.title()}, {nr_items} st.'
+    else:
+        description = f'{memo.discipline.value}, {nr_items} st.'
+
     # Create header
     header = recall.xls.Header(
         title='Svenska Minnesförbundet',
         description=description,
-        recall_key=blob.recall_key,
-        memo_time=blob.memo_time,
-        recall_time=blob.recall_time
+        recall_key=memo.key,
+        memo_time=memo.memo_time,
+        recall_time=memo.recall_time
     )
     # Create table
-    t = table(header=header, pattern=blob.pattern)
+    t = table(header=header, pattern=memo.pattern)
     # Update the table with data
-    for n in blob.data:
+    for n in memo.data:
         t.add_item(n)
     return t
 
 
 @app.route('/make', methods=['POST'])
-def make_blob_and_sheets():
+def make_discipline():
     """Convert request form to blob, create xls file, return links"""
     if request.method == 'POST':
+        # ADD MEMO DATA TO MEMO_DATA TABLE
         try:
-            blob = form_to_blob(request.form, discipline=request.form['base'])
+            memo = memo_from_request(request)
+            db.session.add(memo)
         except Exception as e:
-            return alert(f'Failed to create blob of form data: {e}')
-        xls_filename = blob_to_xls_filename(blob)
+            return alert(f'Failed to create MemoData from form fields: {e}')
+
+        # ADD ENTRY TO KEY_STATUS TABLE
         try:
-            t = blob_to_table(blob)
+            key_status = models.KeyStatus(key=memo.key, public=True)
+            db.session.add(key_status)
+        except Exception as e:
+            return alert(f'Failed to create KeyStatus: {e}')
+
+        # CREATE XLS DOCUMENT
+        try:
+            table = memo_to_table(memo)
         except Exception as e:
             return alert(f'Failed to create table object of blob: {e}')
+
+        # ADD XLS DOCUMENT TO XLS_DOC TABLE
         try:
-            t.save(os.path.join(app.root_path, 'static/sheets/' + xls_filename))
+            filedata = io.BytesIO()
+            table.save(filedata)
+            filedata.seek(0)
+            xls_doc = models.XlsDoc(memo.key, filedata)
+            db.session.add(xls_doc)
         except Exception as e:
-            return alert(f'Failed to save xls file on server: {e}')
+            return alert(f'Failed to save xls file data to XlsDoc: {e}')
+
+        db.session.commit()
+
         return render_template(
             'make_links_memo_and_recall.html',
-            xls_filename=xls_filename,
-            recall_key=blob.recall_key
+            key=memo.key,
         )
+
+@app.route('/download/xls/<string:key>', methods=['GET'])
+def download_xls(key):
+    key = key.lower()
+    xls_doc = models.XlsDoc.query.filter_by(key=key).first()
+    # Todo: download only if public
+    return send_file(xls_doc.data,
+                     attachment_filename=f'{key}.xls',
+                     as_attachment=True,
+                     mimetype='application/vnd.ms-excel'
+                     )
 
 
 @app.route('/recall/<string:key>')

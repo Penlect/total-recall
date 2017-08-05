@@ -88,8 +88,13 @@ class Table:
         self.x_header = 0
 
         # Determine and create the style cycle for numbers
+        try:
+            pattern = tuple(int(p) for p in pattern.split(',') if p.strip())
+        except Exception as e:
+            raise ValueError('The pattern could not be converted to a tuple '
+                             'of integers.' + str(e))
         styles = list()
-        if not pattern:
+        if len(pattern) == 0:
             styles.append(self.style_item_normal)
         else:
             for p in pattern:
@@ -490,10 +495,10 @@ if __name__ == '__main__':
         memo_time='5',
         recall_time='15'
     )
-    d = get_decimal_table(header_decimal, pattern=[5, 3])
-    b = get_binary_table(header_binary, pattern=[4, 3, 3])
-    w = get_words_table(header_words, pattern=[2])
-    h = get_dates_table(header_dates, pattern=[10])
+    d = get_decimal_table(header_decimal, pattern='5, 3')
+    b = get_binary_table(header_binary, pattern='4, 3, 3')
+    w = get_words_table(header_words, pattern='2')
+    h = get_dates_table(header_dates, pattern='10')
 
     # Cards: Q\u2665 2\u2666 A\u2663
     words = itertools.cycle(['bacon', 'pizza', 'hej', 'vattenfall', 'åäö'])

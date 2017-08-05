@@ -1,5 +1,5 @@
 
 <ul class="nav nav-pills">
-    <li><a href="{{ url_for('static', filename='sheets/' + xls_filename) }}" style="font-family: Consolas, monaco, monospace;"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> {{ xls_filename }}</a></li>
-    <li><a href="{{ url_for('recall_', key=recall_key) }}" target="_blank" style="font-family: Consolas, monaco, monospace;"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span> Link to {{ recall_key }} recall</a></li>
+    <li><a href="{{ url_for('download_xls', key=key) }}" style="font-family: Consolas, monaco, monospace;"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> {{ key }}.xls</a></li>
+    <li><a href="{{ url_for('recall_', key=key) }}" target="_blank" style="font-family: Consolas, monaco, monospace;"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span> Link to {{ key }} recall</a></li>
 </ul>
