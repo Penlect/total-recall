@@ -8,30 +8,6 @@
 </div>
 
 <div class="form-group">
-    <label for="memoTime_{{ item_name }}" class="col-sm-3 control-label">Memo. time</label>
-    <div class="col-sm-9">
-      <input name="memo_time" type="number" min="1" max="1500" required class="form-control" id="memoTime_{{ item_name }}" placeholder="minutes">
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="recallTime_{{ item_name }}" class="col-sm-3 control-label">Recall time</label>
-    <div class="col-sm-9">
-      <input name="recall_time" type="number" min="1" max="1500" required class="form-control" id="recallTime_{{ item_name }}" placeholder="minutes">
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="correction_{{ item_name }}" class="col-sm-3 control-label">Correction</label>
-    <div class="col-sm-9">
-        <select name="correction" class="form-control" id="correction_{{ item_name }}">
-          <option>Standard</option>
-          <option>Kind</option>
-        </select>
-    </div>
-</div>
-
-<div class="form-group">
     <label class="col-sm-3 control-label"></label>
     <div class="col-sm-9">
         <button type="submit" type="button" class="btn btn-default btn-block">{{ button_name }}</button>
@@ -58,14 +34,58 @@
 
         <div class="row">
             <div class="col-md-12">
-                <h1>Numbers</h1>
+                <h1>Binary Numbers</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-{{ left_column_width }}">
+                <div class="well" style="background-color:#f442eb;">
+                    <form id="form_binary" class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
+                        <input name="discipline" type="hidden" value="binary">
+                        {% block binary %}{% endblock %}
+                        <div class="form-group">
+                            <label for="time_binary" class="col-sm-3 control-label">Time</label>
+                            <div class="col-sm-9">
+                                <select name="base" class="form-control" id="time_binary">
+                                  <option value="5,15">5min / 15min</option>
+                                  <option value="30,60">30min / 60min</option>
+                                </select>
+                            </div>
+                        </div>
+                        {{ common_fields('Digits', 'Generate') }}
+                    </form>
+                </div>
+                <p id="links_binary"><p>
+            </div>
+            <div class="col-md-{{ right_column_width }}">
+                {% block binary_instructions %}{% endblock %}
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Decimal Numbers</h1>
             </div>
         </div>
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#5bc0de;">
                     <form id="form_numbers" class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
+                        <input name="discipline" type="hidden" value="decimals">
                         {% block numbers %}{% endblock %}
+                        <div class="form-group">
+                            <label for="time_numbers" class="col-sm-3 control-label">Time</label>
+                            <div class="col-sm-9">
+                                <select name="base" class="form-control" id="time_numbers">
+                                  <option value="5,15">5min / 15min</option>
+                                  <option value="15,30">15min / 30min</option>
+                                  <option value="30,60">30min / 60min</option>
+                                  <option value="60,120">60min / 120min</option>
+                                </select>
+                            </div>
+                        </div>
+                        {{ common_fields('Digits', 'Generate') }}
                     </form>
                 </div>
                 <p id="links_numbers"><p>
@@ -85,7 +105,18 @@
             <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#ffff66;">
                     <form id="form_words" class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
+                        <input name="discipline" type="hidden" value="words">
                         {% block words %}{% endblock %}
+                        <div class="form-group">
+                            <label for="time_words" class="col-sm-3 control-label">Time</label>
+                            <div class="col-sm-9">
+                                <select name="base" class="form-control" id="time_words">
+                                  <option value="5,15">5min / 15min</option>
+                                  <option value="15,30">15min / 30min</option>
+                                </select>
+                            </div>
+                        </div>
+                        {{ common_fields('Digits', 'Generate') }}
                     </form>
                 </div>
                 <p id="links_words"><p>
@@ -105,7 +136,17 @@
             <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#66ff99;">
                     <form id="form_dates" class="form-horizontal" action="{{ url_for('make_blob_and_sheets') }}" method="post">
+                        <input name="discipline" type="hidden" value="dates">
                         {% block dates %}{% endblock %}
+                        <div class="form-group">
+                            <label for="time_dates" class="col-sm-3 control-label">Time</label>
+                            <div class="col-sm-9">
+                                <select name="base" class="form-control" id="time_dates">
+                                  <option value="5,15">5min / 15min</option>
+                                </select>
+                            </div>
+                        </div>
+                        {{ common_fields('Digits', 'Generate') }}
                     </form>
                 </div>
                 <p id="links_dates"><p>
@@ -123,6 +164,13 @@
 <script>
 
 $(document).ready(function(){
+
+   $('#form_binary').submit(function(event){
+	  event.preventDefault();
+      $.post($(this).attr('action'), $(this).serialize(), function(data){
+        $('#links_binary').prepend(data)
+      });
+   });
 
    $('#form_numbers').submit(function(event){
 	  event.preventDefault();

@@ -20,48 +20,42 @@
 <p>3. Click the Create-button</p>
 {% endblock %}
 
+<!-- ________________________ BINARY ________________________ -->
+{% block binary %}
+  <div class="form-group">
+    <label for="data_Binary" class="col-sm-3 control-label">Digits</label>
+    <div class="col-sm-9">
+        <textarea class="form-control" name="data" rows="10" id="data_Binary"></textarea>
+    </div>
+  </div>
+{% endblock %}
+
+{% block binary_instructions %}
+{% endblock %}
 
 <!-- ________________________ NUMBERS ________________________ -->
 {% block numbers %}
-<div class="form-group">
-    <label for="base_numbers" class="col-sm-3 control-label">Base</label>
-    <div class="col-sm-9">
-        <select name="base" class="form-control" id="base_numbers">
-          <option>Decimal</option>
-          <option>Binary</option>
-        </select>
-    </div>
-</div>
-
   <div class="form-group">
     <label for="data_Digits" class="col-sm-3 control-label">Digits</label>
     <div class="col-sm-9">
-        <textarea class="form-control" name="data" rows="20" id="data_Digits" placeholder="0123456789..."></textarea>
+        <textarea class="form-control" name="data" rows="10" id="data_Digits"></textarea>
     </div>
   </div>
-
-{{ common_fields('Digits', 'Create') }}
-
 {% endblock %}
+
 {% block numbers_instructions %}
 {% endblock %}
 
 
 <!-- ________________________ WORDS ________________________ -->
 {% block words %}
-
-<input name="base" type="hidden" value="words">
-
 {{ language('Words') }}
-
   <div class="form-group">
     <label for="data_Words" class="col-sm-3 control-label">Words</label>
     <div class="col-sm-9">
-        <textarea class="form-control" name="data" rows="20" id="data_Words" placeholder="kaffe"></textarea>
+        <textarea class="form-control" name="data" rows="15" id="data_Words"></textarea>
     </div>
   </div>
-
-{{ common_fields('Words', 'Create') }}
 {% endblock %}
 
 {% block words_instructions %}
@@ -70,19 +64,13 @@
 <!-- ________________________ HISTORICAL DATES ________________________ -->
 
 {% block dates %}
-
-<input name="base" type="hidden" value="dates">
-
 {{ language('Dates') }}
-
   <div class="form-group">
     <label for="data_Dates" class="col-sm-3 control-label">Historical Dates</label>
     <div class="col-sm-9">
-        <textarea class="form-control" name="data" rows="20" id="data_Dates" placeholder="2009 Första tävlingen i minne i Sverige"></textarea>
+        <textarea class="form-control" name="data" rows="15" id="data_Dates"></textarea>
     </div>
   </div>
-
-{{ common_fields('Dates', 'Create') }}
 {% endblock %}
 
 {% block dates_instructions %}

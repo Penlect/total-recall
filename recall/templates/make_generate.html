@@ -1,7 +1,5 @@
 {% extends "make.html" %}
 
-{% from 'make.html' import common_fields %}
-
 {% macro nr_items(item_name, max) %}
 <div class="form-group">
     <label for="nr{{ item_name }}" class="col-sm-3 control-label">Nr {{ item_name }}</label>
@@ -32,38 +30,27 @@
 <p>3. Click the Generate-button</p>
 {% endblock %}
 
+<!-- ________________________ BINARY ________________________ -->
+{% block binary %}
+{{ nr_items('Digits', max=20000) }}
+{% endblock %}
+
+{% block binary_instructions %}
+{% endblock %}
 
 <!-- ________________________ NUMBERS ________________________ -->
 {% block numbers %}
-<div class="form-group">
-    <label for="base_numbers" class="col-sm-3 control-label">Base</label>
-    <div class="col-sm-9">
-        <select name="base" class="form-control" id="base_numbers">
-          <option>Decimal</option>
-          <option>Binary</option>
-        </select>
-    </div>
-</div>
-
 {{ nr_items('Digits', max=10000) }}
-
-{{ common_fields('Digits', 'Generate') }}
-
 {% endblock %}
+
 {% block numbers_instructions %}
 {% endblock %}
 
 
 <!-- ________________________ WORDS ________________________ -->
 {% block words %}
-
-<input name="base" type="hidden" value="words">
-
 {{ languages('Words')}}
-
 {{ nr_items('Words', max=500) }}
-
-{{ common_fields('Words', 'Generate') }}
 {% endblock %}
 
 {% block words_instructions %}
@@ -72,14 +59,8 @@
 <!-- ________________________ HISTORICAL DATES ________________________ -->
 
 {% block dates %}
-
-<input name="base" type="hidden" value="dates">
-
 {{ languages('Dates')}}
-
 {{ nr_items('Dates', max=500) }}
-
-{{ common_fields('Dates', 'Generate') }}
 {% endblock %}
 
 {% block dates_instructions %}
