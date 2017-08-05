@@ -8,9 +8,9 @@
 {% block body %}
 
     <div class="page-header">
-        <h1>Recall <small>(key={{ blob.recall_key }})</small></h1>
+        <h1>Recall <small>(key={{ memo.key }})</small></h1>
     </div>
-    <h3>{{ blob.discipline|title }} numbers, {{ blob.recall_time }} min Recall</h3>
+    <h3>{{ memo.discipline.value }}, {{ memo.recall_time }} min Recall</h3>
     <p>
         Seconds remaining: {{ client_data.seconds_remaining }}
     </p>

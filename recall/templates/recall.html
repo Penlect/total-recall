@@ -10,10 +10,10 @@
 {% block body %}
 
     <div class="page-header">
-        <h1>Recall <small>(key={{ blob.recall_key }})</small></h1>
+        <h1>Recall <small>(key={{ memo.key }})</small></h1>
     </div>
     {% block subheader %}
-    <h3>{{ blob.discipline|title }} numbers, {{ blob.data|length }} st, {{ blob.recall_time }} min Recall</h3>
+    <h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.recall_time }} min Recall</h3>
     {% endblock %}
 
     <form action="{{ url_for('arbeiter') }}" method="post">
@@ -35,7 +35,7 @@
           </div>
         </div>
 
-        <input name="recall_key" type="hidden" value="{{ key }}">
+        <input name="key" type="hidden" value="{{ memo.key }}">
         <input id="seconds_remaining_field" name="seconds_remaining" type="hidden">
 
         {% block table_logic %}

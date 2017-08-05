@@ -1,5 +1,5 @@
 import os
-os.remove('test.db')
+#os.remove('test.db')
 
 from recall import db
 from recall.models import User, Language, MemoData, XlsDoc, KeyStatus, RecallData, Word, WordClass, Discipline

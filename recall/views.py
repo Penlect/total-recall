@@ -64,38 +64,6 @@ def unique_lines_in_textarea(data: str, lower=False):
     return {line.strip() for line in data.split('\n') if line.strip()}
 
 
-@functools.lru_cache(maxsize=32)
-def load_blob(recall_key):
-    app.logger.info(f'Loading blob {recall_key} ...')
-    blob_file = os.path.join(
-        app.root_path, f'database/{recall_key[0:2]}/{recall_key[2:6]}.json')
-    with open(blob_file, 'r', encoding='utf-8') as file:
-        blob_dict = json.load(file)
-        app.logger.info(f'Done loading blob {recall_key}.')
-        return blob_dict
-
-
-VALID_DISCIPLINES = {'binary', 'decimal', 'words', 'dates'}
-VALID_CORRECTIONS = {'kind', 'standard'}
-
-
-def form_to_blob(form, discipline:str):
-    # The request form is a ImmutableMultiDict
-    blob = Blob(
-        discipline=form['discipline'],
-        memo_time=form['memo_time'],
-        recall_time=form['recall_time'],
-        correction=form['correction'],
-        data=form.get('data'),
-        nr_items=form.get('nr_items'),
-        language=form.get('language'),
-        pattern=form['pattern']
-    )
-    h = blob.add_to_database()
-    app.logger.info(f'Created blob for {discipline}: {h}')
-    return blob
-
-
 def memo_from_request(request):
     form = request.form
     ip = request.remote_addr
@@ -103,7 +71,6 @@ def memo_from_request(request):
     user_id = None  # Todo
     key = sha(str(form))
 
-    # Assign values and check for errors in input
     d = form['discipline'].strip().lower()
     if d == 'binary':
         discipline = models.Discipline.base2
@@ -409,106 +376,70 @@ def download_xls(key):
 
 @app.route('/recall/<string:key>')
 def recall_(key):
-    try:
-        blob = load_blob(key)
-    except FileNotFoundError:
-        return f'No blob for key "{key}" exists'
+    memo = models.MemoData.query.filter_by(key=key).first()
+    if memo is None:
+        return f'Key "{key}" does not exists or is private'
+    nr_items = len(memo.data)
 
-    if blob['discipline'] == 'binary':
-        nr_rows = math.ceil(len(blob['data'])/30)
-        return render_template('recall_numbers.html', key=key, blob=blob,
+    if memo.discipline == models.Discipline.base2:
+        nr_rows = math.ceil(nr_items/30)
+        return render_template('recall_numbers.html', memo=memo,
                                nr_cols=30, nr_rows=nr_rows)
-    elif blob['discipline'] == 'decimal':
-        nr_rows = math.ceil(len(blob['data'])/40)
-        return render_template('recall_numbers.html', key=key, blob=blob,
+    elif memo.discipline == models.Discipline.base10:
+        nr_rows = math.ceil(nr_items/40)
+        return render_template('recall_numbers.html', memo=memo,
                                nr_cols=40, nr_rows=nr_rows)
-    elif blob['discipline'] == 'words':
-        nr_cols = math.ceil(len(blob['data'])/20)
+    elif memo.discipline == models.Discipline.words:
+        nr_cols = math.ceil(nr_items/20)
         if nr_cols%5 == 0:
             nr_cols_iter = [5]*(nr_cols//5)
         else:
             nr_cols_iter = [5]*(nr_cols//5) + [nr_cols%5]
-        return render_template('recall_words.html', key=key, blob=blob,
+        return render_template('recall_words.html', memo=memo,
                                nr_cols_iter=nr_cols_iter)
-    elif blob['discipline'] == 'dates':
-        return render_template('recall_dates.html', key=key, blob=blob)
+    elif memo.discipline == models.Discipline.dates:
+        return render_template('recall_dates.html', memo=memo)
     else:
-        return 'Not implemented yet: ' + blob['discipline']
+        return 'Recall not implemented yet: ' + memo.discipline
 
 
 def _arbeiter(key, dictionary):
     pass
 
 
-class ClientRecallData:
-    """Collect and hold submitted recall data
+def recall_from_request(request):
 
-    The user will after recall press the submit button
-    or wait until the time runs out and the submit is
-    triggered automatically.
+    form = request.form
+    ip = request.remote_addr
+    user_id = None  # Todo
+    username = form['username'].strip().lower()
+    key = form['key'] # From memo
+    time_remaining = float(form['seconds_remaining'])
 
-    The server will receive a form from the client
-    that this class will take care of.
+    data = list()
+    for i in range(len(form)):
+        try:
+            data.append(form[f'recall_cell_{i}'])
+        except KeyError:
+            break
 
-    The important fields in the form that must exist
-    are:
-        * username
-        * recall_key
-        * recall_cell_X values
-        * seconds_remaining
+    return models.RecallData(
+        ip=ip,
+        user_id=user_id,
+        key=key,
+        data=data,
+        time_remaining=time_remaining
+    )
 
-    The username is used to identify the user, the
-    recall_key is used to identify the blob, the
-    cells are the data that will be corrected.
-    seconds_remaining was the time remaining when
-    the submit was triggered.
 
-    Remember that all values will be strings, even
-    numbers in cells from number disciplines.
-    """
-    # Todo: add seconds_remaining, ip address(?)
-    def __init__(self, request_form):
-
-        # Clean and set username
-        _username = request_form['username']
-        if not _username.strip():
-            _username = 'Unknown'
-        # Replace whitespace with '_'
-        _username = re.sub(r'\s', '_', _username)
-        # Remove non-word characters
-        _username = re.sub(r'[^\w-]', '', _username)
-        self.username = _username
-
-        self.recall_key = request_form['recall_key']
-        self.seconds_remaining = request_form['seconds_remaining']
-
-        self._data = list()
-        for i in range(len(request_form)):
-            try:
-                self._data.append(request_form[f'recall_cell_{i}'])
-            except KeyError:
-                break
-
-    def __repr__(self):
-        return f'<ClientRecallData {self.recall_key}:{self.username}>'
-
-    def start_of_emptiness_before(self, index):
-        index_of_empty_cell = index
-        for i in reversed(range(index)):
-            if self[i].strip():
-                break
-            else:
-                index_of_empty_cell = i
-        return index_of_empty_cell
-
-    def __getitem__(self, item):
-            return self._data[item]
-
-    def __iter__(self):
-        yield from self._data
-
-    def __len__(self):
-        return len(self._data)
+def start_of_emptiness_before(data, index):
+    index_of_empty_cell = index
+    for i in reversed(range(index)):
+        if data[i].strip():
+            break
+        else:
+            index_of_empty_cell = i
+    return index_of_empty_cell
 
 
 class Arbeiter:
@@ -520,10 +451,10 @@ class Arbeiter:
     def __init__(self):
         pass
 
-    def correct(self, client_data):
+    def correct(self, recall):
         """Correct client_data (user's recall data)"""
-        self._client_data = client_data
-        self._blob = load_blob(client_data.recall_key)
+        self.recall = recall
+        self.memo = models.MemoData.query.filter_by(key=recall.key).first()
 
         cell_by_cell_result = self._correct_cells()
         count = dict(collections.Counter(cell_by_cell_result))
@@ -538,25 +469,26 @@ class Arbeiter:
         }
 
     def _correct_cells(self):
-        d = self._blob['discipline']
-        if d == 'binary':
+        d = self.memo.discipline
+        if d == models.Discipline.base2:
             correcter = self._correct_binary
-        elif d == 'decimal':
+        elif d == models.Discipline.base10:
             correcter = self._correct_decimals
-        elif d == 'words':
+        elif d == models.Discipline.words:
             correcter = self._correct_words
-        elif d == 'dates':
+        elif d == models.Discipline.dates:
             correcter = self._correct_dates
         else:
             raise Exception(f'Blob contain invalid discipline: {d}')
 
-        start_of_emptiness = self._client_data.start_of_emptiness_before(
-            len(self._blob['data']))
-        result = [None]*len(self._client_data)
+        start_of_emptiness = start_of_emptiness_before(
+            self.recall.data,
+            len(self.memo.data))
+        result = [None]*len(self.recall.data)
         # Todo: won't work for historical dates
-        for i, user_value in enumerate(self._client_data, start=0):
+        for i, user_value in enumerate(self.recall.data, start=0):
             try:
-                correct_value = self._blob['data'][i]
+                correct_value = self.memo.data[i]
             except IndexError:
                 result[i] = 'off_limits'
             else:
@@ -616,23 +548,17 @@ def arbeiter():
     app.logger.info(f'Arbeiter got data from {request.remote_addr}')
     if request.method == 'POST':
         try:
-            client_data = ClientRecallData(request.form)
-            recall_correction = Arbeiter().correct(client_data)
+            app.logger.info(str(request.form))
+            recall = recall_from_request(request)
+            db.session.add(recall)
+            db.session.commit()
+
+            recall_correction = Arbeiter().correct(recall)
             app.logger.info(f'Arbeiter has corrected {request.remote_addr}')
         except Exception as e:
             app.logger.error(str(e))
-            filename = os.path.join(
-                app.root_path, f'recalldata/error_{time.time()}.json')
-            with open(filename, 'w', encoding='utf-8') as file:
-                json.dump(dict(request.form), file)
             return jsonify({'error': str(e)})
-        else:
-            filename = os.path.join(
-                app.root_path, f'recalldata/{time.time()}_{client_data.username}.pickle')
-            app.logger.info(f'Arbeiter writing pickle file ...')
-            with open(filename, 'wb') as file:
-                pickle.dump((client_data, recall_correction), file)
-            app.logger.info(f'Pickle written.')
+
         return jsonify(recall_correction)
     else:
         print('Wrong method!')

@@ -6,7 +6,7 @@
 
 
 {% block subheader %}
-<h3>{{ blob.discipline|title }}, {{ blob.data|length }} st, {{ blob.language|title }}, {{ blob.recall_time }} min Recall</h3>
+<h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.language|title }}, {{ memo.recall_time }} min Recall</h3>
 {% endblock %}
 
 {% block seconds_remaining %}30{% endblock %}

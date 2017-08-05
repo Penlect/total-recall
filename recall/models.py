@@ -141,19 +141,19 @@ class RecallData(db.Model):
     key = db.Column(db.String(6), db.ForeignKey('memo_data.key'))
     memo = db.relationship('MemoData', back_populates='recalls')
 
-    recall_data = db.Column(db.PickleType, nullable=False)
+    data = db.Column(db.PickleType, nullable=False)
     time_remaining = db.Column(db.Float, nullable=False)
     #__table_args__ = (db.UniqueConstraint('account_id', 'name', name='_account_branch_uc'), )
 
     def __init__(self, ip, user_id, key,
-                 recall_data, time_remaining):
+                 data, time_remaining):
 
         self.datetime = datetime.utcnow()
         self.ip = ip
         self.user_id = user_id
         self.key = key
 
-        self.recall_data = recall_data
+        self.data = data
         self.time_remaining = time_remaining
 
     def __repr__(self):
