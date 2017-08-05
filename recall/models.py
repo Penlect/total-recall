@@ -3,7 +3,7 @@ import enum
 from datetime import datetime
 
 import os
-#os.remove('recall/test.db')
+#os.remove('test.db')
 
 from recall import db
 
@@ -60,10 +60,12 @@ class MemoData(db.Model):
     memo_data = db.Column(db.PickleType, nullable=False)
     language = db.Column(db.String(40))
     pattern = db.Column(db.String(255))
+    generated = db.Column(db.Boolean, nullable=False)
 
     def __init__(self, ip, user_id, key,
                  discipline, memo_time, recall_time,
-                 memo_data, language, pattern):
+                 memo_data, language, pattern,
+                 generated):
 
         self.datetime = datetime.utcnow()
         self.ip = ip
@@ -78,6 +80,7 @@ class MemoData(db.Model):
         self.memo_data = memo_data
         self.language = language
         self.pattern = pattern
+        self.generated = generated
 
     def __repr__(self):
         return f'<MemoData {self.key}>'
@@ -179,50 +182,3 @@ class Word(db.Model):
 
     def __repr__(self):
         return f'<Word {self.word}>'
-
-
-db.create_all()
-
-if __name__ == '__main__':
-
-    u1 = User('penlect')
-    u2 = User('daniel')
-    l1 = Language('swedish')
-    l2 = Language('english')
-    db.session.add(u1)
-    db.session.add(u2)
-    db.session.add(l1)
-    db.session.add(l2)
-    db.session.commit()
-    print(User.query.all())
-    print(Language.query.all())
-
-    m = MemoData('123.231.43.5', u1.id, 'abc123',
-                 Discipline.base2, 5, 15,
-                 [1,2,3], 'swedish', '1,4,5')
-    k = KeyStatus(m.key, True)
-    d = XlsDoc(m.key, b'asdfkjadfasdf')
-
-    r = RecallData('123.231.43.5', u1.id, m.key,
-                 [4, 6, 2], 34.543)
-
-
-    w = Word('123.231.43.5', u1.id, 'caffe',
-              WordClass.abstract_noun, l1.id)
-
-    db.session.add(m)
-    db.session.add(k)
-    db.session.add(d)
-    db.session.add(r)
-    db.session.add(w)
-    db.session.commit()
-
-    print(MemoData.query.all())
-    print(RecallData.query.all())
-    print(Word.query.all())
-
-    print(u1.username, u1.memos, u1.recalls)
-    print(u2.username, u2.memos, u2.recalls)
-
-    print(m.discipline, m.user, m.recalls, m.key_status, m.key_status.public, m.xls_doc.data)
-    print(r.user, r.key, r.memo, r.memo.key_status.public)
