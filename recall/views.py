@@ -17,6 +17,8 @@ import functools
 import collections
 import io
 
+import sqlalchemy.orm
+
 from recall import app, db, login_manager
 from recall import models
 
@@ -179,7 +181,6 @@ def memo_from_request(request):
     memo_time, recall_time = int(memo_time), int(recall_time)
 
     language = form.get('language')
-    pattern = form['pattern']
 
     data = form.get('data')
     nr_items = form.get('nr_items')
@@ -250,7 +251,6 @@ def memo_from_request(request):
         memo_time=memo_time,
         recall_time=recall_time,
         language=language,
-        pattern=pattern,
         data=data,
         generated=generated
     )
@@ -377,7 +377,7 @@ def blob_to_xls_filename(blob):
     return xls_filename
 
 
-def memo_to_table(memo):
+def memo_to_table(memo, pattern):
     """Take relevant data of blob and create table
 
     The table can later be saved to disk as .xls file.
@@ -413,7 +413,7 @@ def memo_to_table(memo):
         recall_time=memo.recall_time
     )
     # Create table
-    t = table(header=header, pattern=memo.pattern)
+    t = table(header=header, pattern=pattern)
     # Update the table with data
     for n in memo.data:
         t.add_item(n)
@@ -438,22 +438,6 @@ def make_discipline():
         except Exception as e:
             return alert(f'Failed to create KeyStatus: {e}')
 
-        # CREATE XLS DOCUMENT
-        try:
-            table = memo_to_table(memo)
-        except Exception as e:
-            return alert(f'Failed to create table object of blob: {e}')
-
-        # ADD XLS DOCUMENT TO XLS_DOC TABLE
-        try:
-            filedata = io.BytesIO()
-            table.save(filedata)
-            filedata.seek(0)
-            xls_doc = models.XlsDoc(memo.key, filedata)
-            db.session.add(xls_doc)
-        except Exception as e:
-            return alert(f'Failed to save xls file data to XlsDoc: {e}')
-
         db.session.commit()
 
         return render_template(
@@ -464,7 +448,44 @@ def make_discipline():
 @app.route('/download/xls/<string:key>', methods=['GET'])
 def download_xls(key):
     key = key.lower()
-    xls_doc = models.XlsDoc.query.filter_by(key=key).one()
+    pattern = request.args.get('pattern')
+    if pattern:
+        if not re.fullmatch('(\d+)(,\s*\d+\s*)*', pattern):
+            raise ValueError('The pattern provided doesn\'t match a '
+                             'comma separated list of numbers.')
+        try:
+            pattern_ints = [int(p) for p in pattern.split(',') if p.strip()]
+        except Exception as e:
+            raise ValueError('The pattern could not be converted to a list '
+                             'of integers. ' + str(e))
+        pattern = ','.join(str(p) for p in pattern_ints)
+    # pattern will now be either None or a nice string
+    try:
+        xls_doc = models.XlsDoc.query.filter_by(key=key, pattern=pattern).one()
+    except sqlalchemy.orm.exc.NoResultFound:
+
+        try:
+            memo = models.MemoData.query.filter_by(key=key).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            return f'Could not find memo for key={key}'
+
+        # CREATE XLS DOCUMENT
+        try:
+            table = memo_to_table(memo, pattern=pattern)
+        except Exception as e:
+            return alert(f'Failed to create table object of blob: {e}')
+
+        # ADD XLS DOCUMENT TO XLS_DOC TABLE
+        try:
+            filedata = io.BytesIO()
+            table.save(filedata)
+            filedata.seek(0)
+            xls_doc = models.XlsDoc(memo.key, pattern, filedata)
+            db.session.add(xls_doc)
+            db.session.commit()
+        except Exception as e:
+            return alert(f'Failed to save xls file data to XlsDoc: {e}')
+
     # Todo: download only if public
     return send_file(xls_doc.data,
                      attachment_filename=f'{key}.xls',

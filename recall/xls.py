@@ -88,6 +88,8 @@ class Table:
         self.x_header = 0
 
         # Determine and create the style cycle for numbers
+        if pattern is None:
+            pattern = ''
         try:
             pattern = tuple(int(p) for p in pattern.split(',') if p.strip())
         except Exception as e:

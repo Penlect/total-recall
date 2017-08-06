@@ -71,7 +71,6 @@ class MemoData(db.Model):
                               uselist=False,
                               cascade="save-update, merge, delete")
     xls_doc = db.relationship('XlsDoc', back_populates='memo',
-                              uselist=False,
                               cascade="save-update, merge, delete")
     recalls = db.relationship('RecallData', back_populates='memo',
                               cascade="save-update, merge, delete")
@@ -82,13 +81,12 @@ class MemoData(db.Model):
     recall_time = db.Column(db.Integer, nullable=False)
 
     language = db.Column(db.String(40))
-    pattern = db.Column(db.String(255))
     data = db.Column(db.PickleType, nullable=False)
     generated = db.Column(db.Boolean, nullable=False)
 
     def __init__(self, ip, user_id, key,
                  discipline, memo_time, recall_time,
-                 language, pattern, data,
+                 language, data,
                  generated):
 
         self.datetime = datetime.utcnow()
@@ -112,11 +110,6 @@ class MemoData(db.Model):
             self.language = language.strip().lower()
         else:
             self.language = None
-        if pattern.strip():
-            if not re.fullmatch('(\d+)(,\s*\d+\s*)*', pattern):
-                raise ValueError('The pattern provided doesn\'t match a '
-                                 'comma separated list of numbers.')
-        self.pattern = pattern
         self.data = data
         self.generated = generated
 
@@ -141,17 +134,19 @@ class KeyStatus(db.Model):
 
 class XlsDoc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    key = db.Column(db.String(6), db.ForeignKey('memo_data.key'), unique=True)
+    key = db.Column(db.String(6), db.ForeignKey('memo_data.key'))
+    pattern = db.Column(db.String(120))
     data = db.Column(db.PickleType, nullable=False)
 
     memo = db.relationship('MemoData', back_populates='xls_doc')
 
-    def __init__(self, key, data):
+    def __init__(self, key, pattern, data):
         self.key = key
+        self.pattern = pattern
         self.data = data
 
     def __repr__(self):
-        return f'<XlsDoc {self.key}>'
+        return f'<XlsDoc {self.key}; {self.pattern}; {len(self.data)} bytes>'
 
 
 class RecallData(db.Model):

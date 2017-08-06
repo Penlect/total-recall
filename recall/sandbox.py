@@ -20,17 +20,17 @@ db.session.commit()
 
 m = MemoData('123.231.43.5', u1.id, 'abc123',
              Discipline.base2, 5, 15,
-             'swedish', '1,4,5', [1,2,3],
+             'swedish', [1,2,3],
              False)
 m2 = MemoData('44.66.4773.5', u1.id, '454fds',
              Discipline.base2, 5, 15,
-             'swedish', '1,4,5', [1,2,3],
+             'swedish', [1,2,3],
              False)
 k = KeyStatus(m.key, True)
 k2 = KeyStatus(m2.key, True)
 
-d = XlsDoc(m.key, b'asdfkjadfasdf')
-d2 = XlsDoc(m2.key, b'asdfkjadfasdf')
+d = XlsDoc(m.key, '1,3,4', b'asdfkjadfasdf')
+d2 = XlsDoc(m2.key, '4,5,6', b'asdfkjadfasdf')
 
 r = RecallData('123.231.43.5', u1.id, m.key,
              [4, 6, 2], 34.543)

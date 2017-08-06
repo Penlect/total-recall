@@ -74,7 +74,7 @@
                         <td>{{ memo.memo_time }} / {{memo.recall_time }}</td>
                         <td>{{ memo.language|title }}</td>
                         <td>{{ memo.data|length }}</td>
-                        <td><a href="{{ url_for('download_xls', key=memo.key) }}">{{ memo.key }}.xls</a></td>
+                        <td><a href="{{ url_for('download_xls', key=memo.key) }}" onclick="myFunction()">{{ memo.key }}.xls</a></td>
                         <td><a href="{{ url_for('recall_', key=memo.key) }}" target="_blank">{{ memo.key }}</a></td>
                         <td>{{ memo.key_status.public }}</td>
                         <td><a href="{{ url_for('delete_memo', id=memo.id) }}"
@@ -123,4 +123,13 @@
 {% endblock %}
 
 {% block javascript %}
+<script>
+$(document).ready (function () {
+    $('a').one('click', function (e) {
+        var pattern = prompt("Please enter pattern", "");
+        alert(this.href + '?pattern=' + pattern);
+        this.href = this.href + '?pattern=' + pattern;
+    });
+});
+</script>
 {% endblock %}
