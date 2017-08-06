@@ -30,8 +30,10 @@ class User(db.Model):
     real_name = db.Column(db.String(120))
     country = db.Column(db.String(120))
 
-    memos = db.relationship('MemoData', back_populates="user")
-    recalls = db.relationship('RecallData', back_populates="user")
+    memos = db.relationship('MemoData', back_populates="user",
+                              cascade="save-update, merge, delete")
+    recalls = db.relationship('RecallData', back_populates="user",
+                              cascade="save-update, merge, delete")
 
     def __init__(self, username, email, real_name, country):
         self.datetime = datetime.utcnow()
@@ -66,10 +68,13 @@ class MemoData(db.Model):
 
     key = db.Column(db.String(6), unique=True, nullable=False)
     key_status = db.relationship('KeyStatus', back_populates='memo',
-                              uselist=False)
+                              uselist=False,
+                              cascade="save-update, merge, delete")
     xls_doc = db.relationship('XlsDoc', back_populates='memo',
-                              uselist=False)
-    recalls = db.relationship('RecallData', back_populates='memo')
+                              uselist=False,
+                              cascade="save-update, merge, delete")
+    recalls = db.relationship('RecallData', back_populates='memo',
+                              cascade="save-update, merge, delete")
 
     discipline = db.Column(db.Enum(Discipline), nullable=False)
     # The unit will be seconds
@@ -153,10 +158,10 @@ class RecallData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)
     ip = db.Column(db.String(40), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates="recalls")
 
-    key = db.Column(db.String(6), db.ForeignKey('memo_data.key'))
+    key = db.Column(db.String(6), db.ForeignKey('memo_data.key'), nullable=False)
     memo = db.relationship('MemoData', back_populates='recalls')
 
     data = db.Column(db.PickleType, nullable=False)

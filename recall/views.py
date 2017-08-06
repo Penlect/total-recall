@@ -314,6 +314,11 @@ def database_words_modify():
             modification_time=modification_time
         )
 
+@app.route('/users')
+@login_required
+def users():
+    users = models.User.query.all()
+    return render_template('users.html', users=users)
 
 @app.route('/generate')
 @login_required
