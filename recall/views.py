@@ -123,6 +123,39 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route('/delete/account')
+@login_required
+def delete_account():
+    db.session.delete(current_user)
+    db.session.commit()
+    logout_user()
+    return 'Account deleted.'
+
+@app.route('/delete/memo/<int:id>')
+@login_required
+def delete_memo(id):
+    memo = models.MemoData.query.get(id)
+    if memo is None:
+        return 'Can\'t delete memo, not found in database'
+    if memo.user.id != current_user.id:
+        return 'You can only delete your own memos'
+    db.session.delete(memo)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+@app.route('/delete/memo/<int:id>')
+@login_required
+def delete_recall(id):
+    memo = models.MemoData.query.get(id)
+    if memo is None:
+        return 'Can\'t delete memo, not found in database'
+    if memo.user.id != current_user.id:
+        return 'You can only delete your own memos'
+    db.session.delete(memo)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+
 def memo_from_request(request):
     form = request.form
     ip = request.remote_addr

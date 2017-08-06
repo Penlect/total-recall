@@ -3,17 +3,33 @@
 {% block body %}
 
 <div class="container">
-
     <div class="row">
         <div class="col-md-12">
             <h1>Total-Recall</h1>
+        </div>
+    </div>
 
-
-            <ul>
-                <li><a href="{{ url_for('logout') }}">Logout</a></li>
-                <li><a href="{{ url_for('generate') }}">Generate</a></li>
-                <li><a href="{{ url_for('create') }}">Create</a></li>
+    <div class="row">
+        <div class="col-md-6">
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation"><a href="{{ url_for('generate') }}">Generate</a></li>
+                <li role="presentation"><a href="{{ url_for('create') }}">Create</a></li>
+                <li role="presentation"><a href="#">Recall</a></li>
             </ul>
+        </div>
+        <div class="col-md-6">
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation"><a href="{{ url_for('login') }}">Login</a></li>
+                <li role="presentation"><a href="{{ url_for('logout') }}">Logout</a></li>
+                <li role="presentation"><a href="{{ url_for('delete_account') }}"
+                       onclick="return confirm('Permanently delete account {{ current_user.username }}?')">
+                    Delete Account</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
 
             <h3>Current user</h3>
             <table class="table table-condensed">
@@ -41,12 +57,13 @@
                   <tr>
                     <th>Created</th>
                     <th>Discipline</th>
-                    <th>Time</th>
+                    <th>Min</th>
                     <th>Language</th>
                     <th>#</th>
-                    <th>Sheet</th>
+                    <th><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> Sheet</th>
                     <th>Recall</th>
                     <th>Public</th>
+                    <th>Delete</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -54,12 +71,16 @@
                       <tr>
                         <td>{{ memo.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                         <td>{{ memo.discipline.value }}</td>
-                        <td>{{ memo.memo_time }} / {{memo.recall_time }} min</td>
+                        <td>{{ memo.memo_time }} / {{memo.recall_time }}</td>
                         <td>{{ memo.language|title }}</td>
                         <td>{{ memo.data|length }}</td>
-                        <td><a href="{{ url_for('download_xls', key=memo.key) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> {{ memo.key }}.xls</a></td>
-                        <td><a href="{{ url_for('recall_', key=memo.key) }}" target="_blank"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span> {{ memo.key }} </a></td>
+                        <td><a href="{{ url_for('download_xls', key=memo.key) }}">{{ memo.key }}.xls</a></td>
+                        <td><a href="{{ url_for('recall_', key=memo.key) }}" target="_blank">{{ memo.key }}</a></td>
                         <td>{{ memo.key_status.public }}</td>
+                        <td><a href="{{ url_for('delete_memo', id=memo.id) }}"
+                        onclick="return confirm('Permanently delete {{ memo.key }}?')">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+                        </td>
                       </tr>
                 {% endfor %}
                 </tbody>
@@ -72,7 +93,7 @@
                   <tr>
                     <th>Recalled</th>
                     <th>Discipline</th>
-                    <th>Time</th>
+                    <th>Min</th>
                     <th>Language</th>
                     <th>Raw Score</th>
                     <th>View</th>
@@ -84,10 +105,10 @@
                       <tr>
                         <td>{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                         <td>{{ recall.memo.discipline.value }}</td>
-                        <td>{{ recall.memo.memo_time }} / {{recall.memo.recall_time }} min</td>
+                        <td>{{ recall.memo.memo_time }} / {{recall.memo.recall_time }}</td>
                         <td>{{ recall.memo.language|title }}</td>
                         <td>321</td>
-                        <td><a href="{{ url_for('download_xls', key=recall.memo.key) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> {{ recall.memo.key }}.xls</a></td>
+                        <td><a href="{{ url_for('download_xls', key=recall.memo.key) }}">{{ recall.memo.key }}.xls</a></td>
                         <td>{{ recall.time_remaining }}</td>
                       </tr>
                 {% endfor %}
