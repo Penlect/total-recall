@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Total-Recall</h1>
+
+
+            <ul>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                <li><a href="{{ url_for('generate') }}">Generate</a></li>
+                <li><a href="{{ url_for('create') }}">Create</a></li>
+            </ul>
+
+            <h3>Current user</h3>
+            <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Country</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ current_user.username }}</td>
+                <td>{{ current_user.real_name }}</td>
+                <td>{{ current_user.country }}</td>
+                <td>{{ current_user.email }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+            <h3>{{ current_user.username|title }}'s memorization sheets</h3>
+            <table class="table table-condensed">
+                <thead>
+                  <tr>
+                    <th>Created</th>
+                    <th>Discipline</th>
+                    <th>Time</th>
+                    <th>Language</th>
+                    <th>#</th>
+                    <th>Sheet</th>
+                    <th>Recall</th>
+                    <th>Public</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for memo in current_user.memos %}
+                      <tr>
+                        <td>{{ memo.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ memo.discipline.value }}</td>
+                        <td>{{ memo.memo_time }} / {{memo.recall_time }} min</td>
+                        <td>{{ memo.language|title }}</td>
+                        <td>{{ memo.data|length }}</td>
+                        <td><a href="{{ url_for('download_xls', key=memo.key) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> {{ memo.key }}.xls</a></td>
+                        <td><a href="{{ url_for('recall_', key=memo.key) }}" target="_blank"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span> {{ memo.key }} </a></td>
+                        <td>{{ memo.key_status.public }}</td>
+                      </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+
+
+            <h3>{{ current_user.username|title }}'s recalls</h3>
+            <table class="table table-condensed">
+                <thead>
+                  <tr>
+                    <th>Recalled</th>
+                    <th>Discipline</th>
+                    <th>Time</th>
+                    <th>Language</th>
+                    <th>Raw Score</th>
+                    <th>View</th>
+                    <th>Time remaining</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for recall in current_user.recalls %}
+                      <tr>
+                        <td>{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ recall.memo.discipline.value }}</td>
+                        <td>{{ recall.memo.memo_time }} / {{recall.memo.recall_time }} min</td>
+                        <td>{{ recall.memo.language|title }}</td>
+                        <td>321</td>
+                        <td><a href="{{ url_for('download_xls', key=recall.memo.key) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> {{ recall.memo.key }}.xls</a></td>
+                        <td>{{ recall.time_remaining }}</td>
+                      </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

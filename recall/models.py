@@ -24,16 +24,34 @@ class WordClass(enum.Enum):
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    datetime = db.Column(db.DateTime, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120))
-    first_name = db.Column(db.String(120))
-    last_name = db.Column(db.String(120))
+    real_name = db.Column(db.String(120))
+    country = db.Column(db.String(120))
 
     memos = db.relationship('MemoData', back_populates="user")
     recalls = db.relationship('RecallData', back_populates="user")
 
-    def __init__(self, username):
+    def __init__(self, username, email, real_name, country):
+        self.datetime = datetime.utcnow()
         self.username = username
+        self.email = email
+        self.real_name = real_name
+        self.country = country
+
+    # https://flask-login.readthedocs.io/en/latest/#your-user-class
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.username
 
     def __repr__(self):
         return f'<User {self.username}>'

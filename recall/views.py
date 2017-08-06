@@ -1,8 +1,10 @@
 
 import os
 import re
-from flask import render_template, request, jsonify, send_file, url_for
-
+import flask
+from flask import (render_template, request, jsonify, send_file, url_for,
+                   flash, redirect)
+from flask_login import login_user , logout_user , current_user , login_required
 import random
 import time
 import math
@@ -15,7 +17,7 @@ import functools
 import collections
 import io
 
-from recall import app, db
+from recall import app, db, login_manager
 from recall import models
 
 import recall.xls
@@ -64,11 +66,68 @@ def unique_lines_in_textarea(data: str, lower=False):
     return {line.strip() for line in data.split('\n') if line.strip()}
 
 
+@app.route('/')
+@app.route('/index')
+@login_required
+def index():
+    return render_template('index.html')
+
+
+@login_manager.user_loader
+def load_user(username):
+    return models.User.query.filter_by(username=username).first()
+login_manager.login_view = 'login'
+login_manager.login_message = 'Please log in to access this page.'
+login_manager.login_message_category = 'info'
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('register.html')
+    user = models.User(
+        username=request.form['username'],
+        email=request.form['email'],
+        real_name=request.form['real_name'],
+        country=request.form['country']
+    )
+    db.session.add(user)
+    db.session.commit()
+    flash('User successfully registered', 'success')
+    return redirect(url_for('login'))
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    username = request.form['username']
+    registered_user = models.User.query.filter_by(username=username).first()
+    if registered_user is None:
+        flash('Username or Password is invalid', 'danger')
+        return redirect(url_for('login'))
+    login_user(registered_user)
+    flash('Logged in successfully', 'success')
+    next = request.args.get('next')
+    # is_safe_url should check if the url is safe for redirects.
+    # See http://flask.pocoo.org/snippets/62/ for an example.
+    if not True: #is_safe_url(next):
+        return flask.abort(400)
+
+    return flask.redirect(next or flask.url_for('index'))
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
 def memo_from_request(request):
     form = request.form
     ip = request.remote_addr
 
-    user_id = None  # Todo
+    user_id = current_user.id
     key = sha(str(form))
 
     d = form['discipline'].strip().lower()
@@ -257,11 +316,13 @@ def database_words_modify():
 
 
 @app.route('/generate')
+@login_required
 def generate():
     return render_template('make_generate.html')
 
 
 @app.route('/create')
+@login_required
 def create():
     return render_template('make_create.html')
 
@@ -365,7 +426,7 @@ def make_discipline():
 @app.route('/download/xls/<string:key>', methods=['GET'])
 def download_xls(key):
     key = key.lower()
-    xls_doc = models.XlsDoc.query.filter_by(key=key).first()
+    xls_doc = models.XlsDoc.query.filter_by(key=key).one()
     # Todo: download only if public
     return send_file(xls_doc.data,
                      attachment_filename=f'{key}.xls',
@@ -375,8 +436,9 @@ def download_xls(key):
 
 
 @app.route('/recall/<string:key>')
+@login_required
 def recall_(key):
-    memo = models.MemoData.query.filter_by(key=key).first()
+    memo = models.MemoData.query.filter_by(key=key).one()
     if memo is None:
         return f'Key "{key}" does not exists or is private'
     nr_items = len(memo.data)
@@ -411,9 +473,10 @@ def recall_from_request(request):
 
     form = request.form
     ip = request.remote_addr
-    user_id = None  # Todo
+    user_id = current_user.id
     username = form['username'].strip().lower()
-    key = form['key'] # From memo
+    key = form['key'].strip().lower()
+    memo = models.MemoData.query.filter_by(key=key).one()
     time_remaining = float(form['seconds_remaining'])
 
     data = list()
@@ -426,7 +489,7 @@ def recall_from_request(request):
     return models.RecallData(
         ip=ip,
         user_id=user_id,
-        key=key,
+        key=memo.key,
         data=data,
         time_remaining=time_remaining
     )
@@ -454,7 +517,7 @@ class Arbeiter:
     def correct(self, recall):
         """Correct client_data (user's recall data)"""
         self.recall = recall
-        self.memo = models.MemoData.query.filter_by(key=recall.key).first()
+        self.memo = models.MemoData.query.filter_by(key=recall.key).one()
 
         cell_by_cell_result = self._correct_cells()
         count = dict(collections.Counter(cell_by_cell_result))
