@@ -17,6 +17,7 @@ https://github.com/python-excel/tutorial/raw/master/python-excel.pdf
 """
 
 import itertools
+import re
 import xlwt
 
 
@@ -26,6 +27,24 @@ def convert_row_width(cm):
 
 def convert_row_height(cm):
     return round(1000*cm/1.76)
+
+
+def verify_and_clean_pattern(pattern):
+    # Pattern must be string
+    if pattern.strip() == '':
+        return ''
+    if not re.fullmatch('(\d+)(,\s*\d+\s*)*', pattern):
+        raise ValueError(f'The pattern "{pattern}" is not a comma-separated '
+                         f'list of integers.')
+    try:
+        pattern_ints = [int(p) for p in pattern.split(',') if p.strip()]
+    except Exception:
+        raise ValueError(f'The pattern "{pattern}" could not be converted '
+                         f'to a list of integers.')
+    if any(p <= 0 for p in pattern_ints):
+        raise ValueError(f'The pattern "{pattern}" contains non-positive '
+                         f'integers.')
+    return ','.join(str(p) for p in pattern_ints)
 
 
 class Table:

@@ -29,6 +29,7 @@ class User(db.Model):
     email = db.Column(db.String(120))
     real_name = db.Column(db.String(120))
     country = db.Column(db.String(120))
+    settings = db.Column(db.PickleType)
 
     memos = db.relationship('MemoData', back_populates="user",
                               cascade="save-update, merge, delete")
@@ -41,6 +42,12 @@ class User(db.Model):
         self.email = email
         self.real_name = real_name
         self.country = country
+        self.settings = {
+            'pattern_binary': '',
+            'pattern_decimals': '',
+            'pattern_words': '',
+            'pattern_dates': ''
+        }
 
     # https://flask-login.readthedocs.io/en/latest/#your-user-class
     def is_authenticated(self):

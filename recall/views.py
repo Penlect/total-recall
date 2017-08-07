@@ -37,6 +37,7 @@ def sha(string):
     h.update(str(random.random()).encode())
     return h.hexdigest()[0:6]
 
+
 DATABASE_WORDS = os.path.join(app.root_path, 'db_words.txt')
 DATABASE_STORIES = os.path.join(app.root_path, 'db_stories.txt')
 WordEntry = namedtuple('WordEntry', 'language value name date word_class')
@@ -68,11 +69,29 @@ def unique_lines_in_textarea(data: str, lower=False):
     return {line.strip() for line in data.split('\n') if line.strip()}
 
 
-@app.route('/')
-@app.route('/index')
+
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    return render_template('index.html')
+    if request.method == 'GET':
+        return render_template('index.html')
+    settings = dict(current_user.settings)  # Must have new id
+    # Verify patterns
+    for key in request.form:
+        if key.startswith('pattern_'):
+            pattern = request.form[key]
+            try:
+                settings[key] = recall.xls.verify_and_clean_pattern(pattern)
+            except ValueError as err:
+                flash(str(err) + ' Settings not saved.', 'danger')
+                break
+    else:
+        current_user.settings = settings
+        db.session.commit()
+        flash('Settings successfully updated', 'success')
+    return redirect(url_for('index'))
 
 
 @login_manager.user_loader
@@ -156,6 +175,7 @@ def delete_recall(id):
     db.session.delete(memo)
     db.session.commit()
     return redirect(url_for('index'))
+
 
 
 def memo_from_request(request):
@@ -450,15 +470,7 @@ def download_xls(key):
     key = key.lower()
     pattern = request.args.get('pattern')
     if pattern:
-        if not re.fullmatch('(\d+)(,\s*\d+\s*)*', pattern):
-            raise ValueError('The pattern provided doesn\'t match a '
-                             'comma separated list of numbers.')
-        try:
-            pattern_ints = [int(p) for p in pattern.split(',') if p.strip()]
-        except Exception as e:
-            raise ValueError('The pattern could not be converted to a list '
-                             'of integers. ' + str(e))
-        pattern = ','.join(str(p) for p in pattern_ints)
+        pattern = recall.xls.verify_and_clean_pattern(pattern)
     # pattern will now be either None or a nice string
     try:
         xls_doc = models.XlsDoc.query.filter_by(key=key, pattern=pattern).one()
