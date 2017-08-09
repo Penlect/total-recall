@@ -1,0 +1,8 @@
+{% extends "base_user.html" %}
+
+
+{% block configure_user %}
+{% if logged_in %}
+{{ super() }}
+{% endif %}
+{% endblock %}

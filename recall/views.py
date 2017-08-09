@@ -71,31 +71,17 @@ def unique_lines_in_textarea(data: str, lower=False):
 
 
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
 @login_required
 def index():
     if request.method == 'GET':
         return render_template('index.html')
-    settings = dict(current_user.settings)  # Must have new id
-    # Verify patterns
-    for key in request.form:
-        if key.startswith('pattern_'):
-            pattern = request.form[key]
-            try:
-                settings[key] = recall.xls.verify_and_clean_pattern(pattern)
-            except ValueError as err:
-                flash(str(err) + ' Settings not saved.', 'danger')
-                break
-    else:
-        current_user.settings = settings
-        db.session.commit()
-        flash('Settings successfully updated', 'success')
-    return redirect(url_for('index'))
 
 
 @login_manager.user_loader
 def load_user(username):
+    username = username.strip().lower()
     return models.User.query.filter_by(username=username).first()
 login_manager.login_view = 'login'
 login_manager.login_message = 'Please log in to access this page.'
@@ -107,7 +93,8 @@ def register():
     if request.method == 'GET':
         return render_template('register.html')
     user = models.User(
-        username=request.form['username'],
+        # Todo: restrict username characters
+        username=request.form['username'].strip().lower(),
         email=request.form['email'],
         real_name=request.form['real_name'],
         country=request.form['country']
@@ -122,7 +109,7 @@ def register():
 def login():
     if request.method == 'GET':
         return render_template('login.html')
-    username = request.form['username']
+    username = request.form['username'].strip().lower()
     registered_user = models.User.query.filter_by(username=username).first()
     if registered_user is None:
         flash('Username or Password is invalid', 'danger')
@@ -372,6 +359,41 @@ def database_words_modify():
 def users():
     users = models.User.query.all()
     return render_template('users.html', users=users)
+
+@app.route('/user/<string:username>', methods=['GET', 'POST'])
+@login_required
+def user(username):
+    username = username.strip().lower()
+    memo_page = request.args.get('memo_page', 1)
+    recall_page = request.args.get('recall_page', 1)
+    try:
+        user = models.User.query.filter_by(username=username).one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        return f'No such user "{username}"'
+
+    if user.id != current_user.id:
+        return render_template('user.html', user=user, logged_in=False)
+
+    if request.method == 'POST':
+        settings = dict(current_user.settings)  # Must have new id
+        # Verify patterns
+        for key in request.form:
+            if key.startswith('pattern_'):
+                pattern = request.form[key]
+                try:
+                    settings[key] = recall.xls.verify_and_clean_pattern(pattern)
+                except ValueError as err:
+                    flash(str(err) + ' Settings not saved.', 'danger')
+                    break
+        else:
+            current_user.settings = settings
+            db.session.commit()
+            flash('Settings successfully updated', 'success')
+
+    return render_template('user.html', user=current_user, logged_in=True,
+                           memos=current_user.memos.paginate(int(memo_page), 10, False),
+                           recalls=current_user.recalls.paginate(int(recall_page), 10, False))
+
 
 @app.route('/generate')
 @login_required

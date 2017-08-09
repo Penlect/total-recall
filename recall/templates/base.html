@@ -19,12 +19,13 @@
     {% block css %}{% endblock %}
   </head>
   <body>
-  {%- for category, message in get_flashed_messages(with_categories=true) %}
-    <div class="alert alert-{{ category }}">
-      {{ message }}
-    </div>
-  {%- endfor %}
-    {% block body %}{% endblock %}
+    {% block body %}
+      {%- for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="alert alert-{{ category }}">
+          {{ message }}
+        </div>
+      {%- endfor %}
+    {% endblock %}
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->

@@ -4,6 +4,7 @@ os.remove('test.db')
 from recall import db
 from recall.models import User, Language, MemoData, XlsDoc, KeyStatus, RecallData, Word, WordClass, Discipline
 
+import random
 
 print(os.getcwd())
 db.create_all()
@@ -18,41 +19,34 @@ db.session.add(l1)
 db.session.add(l2)
 db.session.commit()
 
-m = MemoData('123.231.43.5', u1.id, 'abc123',
-             Discipline.base2, 5, 15,
-             'swedish', [1,2,3],
-             False)
-m2 = MemoData('44.66.4773.5', u1.id, '454fds',
-             Discipline.base2, 5, 15,
-             'swedish', [1,2,3],
-             False)
-k = KeyStatus(m.key, True)
-k2 = KeyStatus(m2.key, True)
+for i in range(33):
 
-d = XlsDoc(m.key, '1,3,4', b'asdfkjadfasdf')
-d2 = XlsDoc(m2.key, '4,5,6', b'asdfkjadfasdf')
+    m = MemoData(
+        ip='.'.join(str(random.randint(0,99)) for _ in range(4)),
+        user_id=u1.id,
+        key=str(10000 + i),
+        discipline=random.choice(list(Discipline)),
+        memo_time=5,
+        recall_time=15,
+        language=random.choice(['swedish', 'english']),
+        data=[1,2,3],
+        generated=True
+    )
+    k = KeyStatus(m.key, True)
 
-r = RecallData('123.231.43.5', u1.id, m.key,
-             [4, 6, 2], 34.543)
+    d = XlsDoc(m.key, '2,1', b'asdfkjadfasdf')
 
-r2 = RecallData('123.231.43.5', u1.id, m2.key,
-             [4, 6, 2], 34.543)
+    r = RecallData('123.231.43.5', u1.id, m.key,
+                 [4, 6, 2], 12.543)
 
-r3 = RecallData('123.6.43.5', u1.id, m2.key,
-             [4, 6, 2], 314.543)
+    db.session.add(m)
+    db.session.add(k)
+    db.session.add(d)
+    db.session.add(r)
 
 w = Word('123.231.43.5', u1.id, 'caffe',
           WordClass.abstract_noun, l1.id)
 
-db.session.add(m)
-db.session.add(k)
-db.session.add(d)
-db.session.add(m2)
-db.session.add(k2)
-db.session.add(d2)
-db.session.add(r)
-db.session.add(r2)
-db.session.add(r3)
 db.session.add(w)
 db.session.commit()
 
@@ -72,7 +66,4 @@ def disp():
     print('-----------------')
     print
 
-disp()
-db.session.delete(m2)
-db.session.commit()
 disp()

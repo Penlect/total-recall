@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Memo</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="{{ url_for('user', username=current_user.username)}}">Home</a></li>
+        <li><a href="{{ url_for('generate') }}">Generate</a></li>
+          <li><a href="{{ url_for('create') }}">Create</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">One more separated link</a></li>
+          </ul>
+        </li>
+      </ul>
+      <form class="navbar-form navbar-left">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="recall key">
+        </div>
+        <button type="submit" class="btn btn-default">Recall</button>
+      </form>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+{{ super() }}
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <h1>{{ user.username }} <small>{{ user.real_name }} {{ '-' if user.country else ''}} {{ user.country }}</small></h1>
+
+            {% block configure_user %}
+
+            <div class="panel-group">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" href="#manageaccount"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Manage Account</a></h3>
+              </div>
+                <div id="manageaccount" class="panel-collapse collapse">
+              <div class="panel-body">
+
+            <ul>
+                <li role="presentation"><a href="{{ url_for('delete_account') }}"
+                       onclick="return confirm('Permanently delete account {{ user.username }}?')">
+                    Delete Account</a></li>
+                <li role="presentation"><a href="#"
+                       onclick="return confirm('Delete all memorizations?')">
+                    Delete All Memorizations</a></li>
+            </ul>
+
+              </div></div>
+            </div>
+            </div>
+
+
+            <div class="panel-group">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" href="#settings"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Settings</a></h3>
+              </div>
+                <div id="settings" class="panel-collapse collapse">
+              <div class="panel-body">
+
+<form action="" method=post class="form-horizontal">
+  <div class="form-group">
+    <label for="binary" class="col-sm-2 control-label">Binary Numbers</label>
+    <div class="col-sm-10">
+      <input name="pattern_binary" type="text" class="form-control" id="binary" placeholder="pattern" value="{{user.settings.pattern_binary}}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="decimal" class="col-sm-2 control-label">Decimal Numbers</label>
+    <div class="col-sm-10">
+      <input name="pattern_decimals" type="text" class="form-control" id="decimal" placeholder="pattern" value="{{user.settings.pattern_decimals}}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="words" class="col-sm-2 control-label">Random Words</label>
+    <div class="col-sm-10">
+      <input name="pattern_words" type="text" class="form-control" id="words" placeholder="pattern" value="{{user.settings.pattern_words}}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="dates" class="col-sm-2 control-label">Historical Dates</label>
+    <div class="col-sm-10">
+      <input name="pattern_dates" type="text" class="form-control" id="dates" placeholder="pattern" value="{{user.settings.pattern_dates}}">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-default">Save</button>
+    </div>
+  </div>
+</form>
+              </div></div>
+            </div>
+            </div>
+
+            {% endblock configure_user %}
+
+            <h3>Memorizations</h3>
+            <table class="table table-condensed table-bordered">
+                <thead>
+                  <tr>
+                    <th>Created</th>
+                    <th>Discipline</th>
+                    <th>Min</th>
+                    <th>Language</th>
+                    <th>#</th>
+                    <th><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> Sheet</th>
+                    <th>Recall</th>
+                    <th>Public</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for memo in memos.items %}
+                      <tr>
+                        <td>{{ memo.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ memo.discipline.value }}</td>
+                        <td>{{ memo.memo_time }} / {{memo.recall_time }}</td>
+                        <td>{{ memo.language|title }}</td>
+                        <td>{{ memo.data|length }}</td>
+                        <td><a href="{{ url_for('download_xls', key=memo.key, pattern=user.settings.pattern_decimals) }}">{{ memo.key }}.xls</a></td>
+                        <td><a href="{{ url_for('recall_', key=memo.key) }}" target="_blank">{{ memo.key }}</a></td>
+                        <td>{{ memo.key_status.public }}</td>
+                        <td><a href="{{ url_for('delete_memo', id=memo.id) }}"
+                        onclick="return confirm('Permanently delete {{ memo.key }}?')">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+                        </td>
+                      </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            {% if memos.has_prev %}<a href="{{ url_for('user', username=user.username, recall_page=recalls.page, memo_page=memos.prev_num) }}">&lt;&lt; Newer </a>{% else %}&lt;&lt; Newer {% endif %} |
+            {% if memos.has_next %}<a href="{{ url_for('user', username=user.username, recall_page=recalls.page, memo_page=memos.next_num) }}">Older &gt;&gt;</a>{% else %}Older &gt;&gt;{% endif %}
+
+
+            <h3>Recalls</h3>
+            <table class="table table-condensed table-bordered">
+                <thead>
+                  <tr>
+                    <th>Recalled</th>
+                    <th>Discipline</th>
+                    <th>Min</th>
+                    <th>Language</th>
+                    <th>Raw Score</th>
+                    <th>View</th>
+                    <th>Time remaining</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for recall in recalls.items %}
+                      <tr>
+                        <td>{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ recall.memo.discipline.value }}</td>
+                        <td>{{ recall.memo.memo_time }} / {{recall.memo.recall_time }}</td>
+                        <td>{{ recall.memo.language|title }}</td>
+                        <td>321</td>
+                        <td><a href="{{ url_for('download_xls', key=recall.memo.key) }}">{{ recall.memo.key }}.xls</a></td>
+                        <td>{{ recall.time_remaining }}</td>
+                      </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            {% if recalls.has_prev %}<a href="{{ url_for('user', username=user.username, recall_page=recalls.prev_num, memo_page=memos.page) }}">&lt;&lt; Newer</a>{% else %}&lt;&lt; Newer{% endif %} |
+            {% if recalls.has_next %}<a href="{{ url_for('user', username=user.username, recall_page=recalls.next_num, memo_page=memos.page) }}">Older &gt;&gt;</a>{% else %}Older &gt;&gt;{% endif %}
+
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

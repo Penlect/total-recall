@@ -32,9 +32,11 @@ class User(db.Model):
     settings = db.Column(db.PickleType)
 
     memos = db.relationship('MemoData', back_populates="user",
-                              cascade="save-update, merge, delete")
+                            cascade="save-update, merge, delete",
+                            lazy='dynamic')
     recalls = db.relationship('RecallData', back_populates="user",
-                              cascade="save-update, merge, delete")
+                              cascade="save-update, merge, delete",
+                              lazy='dynamic')
 
     def __init__(self, username, email, real_name, country):
         self.datetime = datetime.utcnow()
