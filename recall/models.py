@@ -16,6 +16,12 @@ class Discipline(enum.Enum):
     dates = 'Historical Dates'
 
 
+class State(enum.Enum):
+    private = 'Private'
+    competition = 'Competition'
+    public = 'Public'
+
+
 class WordClass(enum.Enum):
     concrete_noun = "Concrete Noun"
     abstract_noun = "Abstract Noun"
@@ -76,7 +82,7 @@ class MemoData(db.Model):
     user = db.relationship('User', back_populates="memos")
 
     key = db.Column(db.String(6), unique=True, nullable=False)
-    key_status = db.relationship('KeyStatus', back_populates='memo',
+    key_state = db.relationship('KeyState', back_populates='memo',
                               uselist=False,
                               cascade="save-update, merge, delete")
     xls_doc = db.relationship('XlsDoc', back_populates='memo',
@@ -126,19 +132,19 @@ class MemoData(db.Model):
         return f'<MemoData {self.key}>'
 
 
-class KeyStatus(db.Model):
+class KeyState(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(6), db.ForeignKey('memo_data.key'), unique=True)
-    public = db.Column(db.Boolean, nullable=False)
+    state = db.Column(db.Enum(State), nullable=False)
 
-    memo = db.relationship('MemoData', back_populates='key_status')
+    memo = db.relationship('MemoData', back_populates='key_state')
 
-    def __init__(self, key, public: bool):
+    def __init__(self, key, state=State.private):
         self.key = key
-        self.public = public
+        self.state = state
 
     def __repr__(self):
-        return f'<KeyStatus {self.key}:public={self.public}>'
+        return f'<KeyState {self.key}:public={self.state}>'
 
 
 class XlsDoc(db.Model):
@@ -155,7 +161,7 @@ class XlsDoc(db.Model):
         self.data = data
 
     def __repr__(self):
-        return f'<XlsDoc {self.key}; {self.pattern}; {len(self.data)} bytes>'
+        return f'<XlsDoc {self.key}; p={self.pattern}; {len(self.data)} bytes>'
 
 
 class RecallData(db.Model):

@@ -2,7 +2,7 @@ import os
 os.remove('test.db')
 
 from recall import db
-from recall.models import User, Language, MemoData, XlsDoc, KeyStatus, RecallData, Word, WordClass, Discipline
+from recall.models import User, Language, MemoData, XlsDoc, KeyState, RecallData, Word, WordClass, Discipline
 
 import random
 
@@ -32,7 +32,7 @@ for i in range(33):
         data=[1,2,3],
         generated=True
     )
-    k = KeyStatus(m.key, True)
+    k = KeyState(m.key)
 
     d = XlsDoc(m.key, '2,1', b'asdfkjadfasdf')
 

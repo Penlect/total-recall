@@ -54,7 +54,7 @@
     <div class="row">
         <div class="col-md-12">
 
-            <h1>{{ user.username }} <small>{{ user.real_name }} {{ '-' if user.country else ''}} {{ user.country }}</small></h1>
+            <h1>{{ user.username }} <small>{{ user.real_name }} {{ '-' if user.country else ''}} {{ user.country|title }}</small></h1>
 
             {% block configure_user %}
 
@@ -125,36 +125,70 @@
 
             {% endblock configure_user %}
 
-            <h3>Memorizations</h3>
+            <h3>{{ user.username }}'s Memorizations</h3>
             <table class="table table-condensed table-bordered">
                 <thead>
                   <tr>
+                    <th>Key</th>
                     <th>Created</th>
                     <th>Discipline</th>
                     <th>Min</th>
                     <th>Language</th>
+
                     <th>#</th>
                     <th><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> Sheet</th>
                     <th>Recall</th>
-                    <th>Public</th>
+                    <th>State</th>
+                      {% if users_home_page %}
                     <th>Delete</th>
+                      {% endif %}
                   </tr>
                 </thead>
                 <tbody>
                 {% for memo in memos.items %}
                       <tr>
+                        <td>{{ memo.key }}</td>
                         <td>{{ memo.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                         <td>{{ memo.discipline.value }}</td>
                         <td>{{ memo.memo_time }} / {{memo.recall_time }}</td>
+                          <!-- Language -->
+                          {% if memo.language %}
                         <td>{{ memo.language|title }}</td>
+                          {% else %}
+                        <td>-</td>
+                          {% endif %}
+
                         <td>{{ memo.data|length }}</td>
+
+                          <!-- Discipline -->
+                        {% if users_home_page or (not users_home_page and memo.key_state.state.value == 'Public')%}
                         <td><a href="{{ url_for('download_xls', key=memo.key, pattern=user.settings.pattern_decimals) }}">{{ memo.key }}.xls</a></td>
+                        {% else %}
+                         <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                        {% endif %}
+
+                          <!-- Recall -->
+                          <!-- And if competition, you should only be able to do recall once (if not memo_owner) -->
+                          {% if users_home_page or (not users_home_page and memo.key_state.state.value != 'Private')%}
                         <td><a href="{{ url_for('recall_', key=memo.key) }}" target="_blank">{{ memo.key }}</a></td>
-                        <td>{{ memo.key_status.public }}</td>
+                        {% else %}
+                         <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                        {% endif %}
+
+                          <!-- State -->
+                        <td>{{ memo.key_state.state.value }}</td>
+
+                          <!-- Delete -->
+                      {% if users_home_page %}
+                          {% if memo.key_state.state.value == 'Competition' %}
+                            <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                          {% else %}
                         <td><a href="{{ url_for('delete_memo', id=memo.id) }}"
                         onclick="return confirm('Permanently delete {{ memo.key }}?')">
                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
                         </td>
+                          {% endif %}
+                      {% endif %}
                       </tr>
                 {% endfor %}
                 </tbody>
@@ -163,29 +197,63 @@
             {% if memos.has_next %}<a href="{{ url_for('user', username=user.username, recall_page=recalls.page, memo_page=memos.next_num) }}">Older &gt;&gt;</a>{% else %}Older &gt;&gt;{% endif %}
 
 
-            <h3>Recalls</h3>
+            <h3>{{ user.username }}'s Recalls</h3>
             <table class="table table-condensed table-bordered">
                 <thead>
                   <tr>
+                    <th>Key</th>
                     <th>Recalled</th>
                     <th>Discipline</th>
                     <th>Min</th>
                     <th>Language</th>
+
                     <th>Raw Score</th>
-                    <th>View</th>
+                    <th>Points</th>
                     <th>Time remaining</th>
+                    <th>View</th>
+                      {% if users_home_page %}
+                    <th>Delete</th>
+                      {% endif %}
                   </tr>
                 </thead>
                 <tbody>
                 {% for recall in recalls.items %}
                       <tr>
+                        <td>{{ recall.memo.key }}</td>
                         <td>{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                         <td>{{ recall.memo.discipline.value }}</td>
                         <td>{{ recall.memo.memo_time }} / {{recall.memo.recall_time }}</td>
+
+                          <!-- Language -->
+                          {% if recall.memo.language %}
                         <td>{{ recall.memo.language|title }}</td>
+                          {% else %}
+                        <td>-</td>
+                          {% endif %}
+
                         <td>321</td>
-                        <td><a href="{{ url_for('download_xls', key=recall.memo.key) }}">{{ recall.memo.key }}.xls</a></td>
+                        <td>754</td>
                         <td>{{ recall.time_remaining }}</td>
+
+                          <!-- View -->
+                          {% if users_home_page or (not users_home_page and recall.memo.key_state.state.value == 'Public') %}
+                        <td><a href="{{ url_for('download_xls', key=recall.memo.key) }}">{{ recall.memo.key }}.xls</a></td>
+                        {% else %}
+                         <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                        {% endif %}
+
+                          <!-- Delete -->
+                      {% if users_home_page %}
+                          {% if recall.memo.user_id == user.id %}
+                        <td><a href="#"
+                        onclick="return confirm('Permanently delete?')">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+                        </td>
+                          {% else %}
+                            <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> </td>
+                          {% endif %}
+                      {% endif %}
+
                       </tr>
                 {% endfor %}
                 </tbody>
@@ -193,7 +261,7 @@
             {% if recalls.has_prev %}<a href="{{ url_for('user', username=user.username, recall_page=recalls.prev_num, memo_page=memos.page) }}">&lt;&lt; Newer</a>{% else %}&lt;&lt; Newer{% endif %} |
             {% if recalls.has_next %}<a href="{{ url_for('user', username=user.username, recall_page=recalls.next_num, memo_page=memos.page) }}">Older &gt;&gt;</a>{% else %}Older &gt;&gt;{% endif %}
 
-
+            <h3>Others' recalls on my Memos</h3>
         </div>
     </div>
 

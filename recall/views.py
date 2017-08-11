@@ -263,21 +263,6 @@ def memo_from_request(request):
     )
 
 
-def asdf(self):
-    yield from (
-        ('discipline', self.discipline),
-        ('memo_time', self.memo_time),
-        ('recall_time', self.recall_time),
-        ('correction', self.correction),
-        ('data', self.data),
-        ('language', self.language),
-        ('pattern', self.pattern),
-        ('recall_key', self.recall_key),
-        ('date_created', time.time()),
-        ('_recall_data', self._recall_data)
-    )
-
-
 def alert(message):
     return f'<div class="alert alert-danger">{message}</div>'
 
@@ -372,7 +357,9 @@ def user(username):
         return f'No such user "{username}"'
 
     if user.id != current_user.id:
-        return render_template('user.html', user=user, logged_in=False)
+        return render_template('user.html', user=user, users_home_page=False,
+                           memos=user.memos.paginate(int(memo_page), 10, False),
+                           recalls=user.recalls.paginate(int(recall_page), 10, False))
 
     if request.method == 'POST':
         settings = dict(current_user.settings)  # Must have new id
@@ -390,9 +377,15 @@ def user(username):
             db.session.commit()
             flash('Settings successfully updated', 'success')
 
-    return render_template('user.html', user=current_user, logged_in=True,
+    # Others_recalls: Take all recalls ever and remove them not having memo
+    # I've created
+    #q = models.RecallData.query.join(models.MemoData, models.RecallData.user_id=models.MemoData)
+    #return str(q) + '<br>' + str(q.all())
+
+    return render_template('user.html', user=current_user, users_home_page=True,
                            memos=current_user.memos.paginate(int(memo_page), 10, False),
                            recalls=current_user.recalls.paginate(int(recall_page), 10, False))
+                           #others_recalls=models.RecallData.query.filter_by(memo=current_user.id))
 
 
 @app.route('/generate')
@@ -475,10 +468,10 @@ def make_discipline():
 
         # ADD ENTRY TO KEY_STATUS TABLE
         try:
-            key_status = models.KeyStatus(key=memo.key, public=True)
+            key_status = models.KeyState(key=memo.key)
             db.session.add(key_status)
         except Exception as e:
-            return alert(f'Failed to create KeyStatus: {e}')
+            return alert(f'Failed to create KeyState: {e}')
 
         db.session.commit()
 
@@ -567,7 +560,6 @@ def recall_from_request(request):
     form = request.form
     ip = request.remote_addr
     user_id = current_user.id
-    username = form['username'].strip().lower()
     key = form['key'].strip().lower()
     memo = models.MemoData.query.filter_by(key=key).one()
     time_remaining = float(form['seconds_remaining'])
