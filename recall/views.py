@@ -163,6 +163,19 @@ def delete_recall(id):
     db.session.commit()
     return redirect(url_for('index'))
 
+@app.route('/togglekey/<string:key>')
+@login_required
+def toggle_key_state(key):
+    key_state = models.KeyState.query.filter_by(key=key).first()
+    if key_state.state == models.State.private:
+        key_state.state = models.State.competition
+    elif key_state.state == models.State.competition:
+        key_state.state = models.State.public
+    elif key_state.state == models.State.public:
+        key_state.state = models.State.private
+    db.session.commit()
+    return redirect(url_for('index'))
+
 
 
 def memo_from_request(request):

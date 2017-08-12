@@ -176,7 +176,10 @@
                         {% endif %}
 
                           <!-- State -->
-                        <td>{{ memo.key_state.state.value }}</td>
+                        <td><a href="{{ url_for('toggle_key_state', key=memo.key) }}"
+                        onclick="return confirm('Change to next state?')">
+                            {{ memo.key_state.state.value }}</a>
+                        </td>
 
                           <!-- Delete -->
                       {% if users_home_page %}
@@ -195,6 +198,7 @@
               </table>
             {% if memos.has_prev %}<a href="{{ url_for('user', username=user.username, recall_page=recalls.page, memo_page=memos.prev_num) }}">&lt;&lt; Newer </a>{% else %}&lt;&lt; Newer {% endif %} |
             {% if memos.has_next %}<a href="{{ url_for('user', username=user.username, recall_page=recalls.page, memo_page=memos.next_num) }}">Older &gt;&gt;</a>{% else %}Older &gt;&gt;{% endif %}
+
 
 
             <h3>{{ user.username }}'s Recalls</h3>
