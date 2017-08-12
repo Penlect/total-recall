@@ -73,7 +73,6 @@ def unique_lines_in_textarea(data: str, lower=False):
 
 @app.route('/', methods=['GET'])
 @app.route('/index', methods=['GET'])
-@login_required
 def index():
     if request.method == 'GET':
         return render_template('index.html')
@@ -122,13 +121,13 @@ def login():
     if not True: #is_safe_url(next):
         return flask.abort(400)
 
-    return flask.redirect(next or flask.url_for('index'))
+    return flask.redirect(next or flask.url_for('user', username=registered_user.username))
 
 
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 
 @app.route('/delete/account')
@@ -149,11 +148,12 @@ def delete_memo(id):
         return 'You can only delete your own memos'
     db.session.delete(memo)
     db.session.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('user', username=current_user.username))
 
 @app.route('/delete/memo/<int:id>')
 @login_required
 def delete_recall(id):
+    # Todo: implement
     memo = models.MemoData.query.get(id)
     if memo is None:
         return 'Can\'t delete memo, not found in database'
@@ -174,7 +174,7 @@ def toggle_key_state(key):
     elif key_state.state == models.State.public:
         key_state.state = models.State.private
     db.session.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('user', username=current_user.username))
 
 
 

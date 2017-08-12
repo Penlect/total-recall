@@ -15,9 +15,12 @@
 </div>
 {% endmacro %}
 
-{% extends "base.html" %}
+{% extends "base_navigation.html" %}
 
 {% block body %}
+
+<!-- Navbar and flashed messages -->
+{{ super() }}
 
     {% set left_column_width = 8 %}
     {% set right_column_width = 4 %}

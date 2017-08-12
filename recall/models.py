@@ -58,12 +58,15 @@ class User(db.Model):
         }
 
     # https://flask-login.readthedocs.io/en/latest/#your-user-class
+    @property
     def is_authenticated(self):
         return True
 
+    @property
     def is_active(self):
         return True
 
+    @property
     def is_anonymous(self):
         return False
 
