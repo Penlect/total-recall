@@ -81,7 +81,7 @@ def index():
 @login_manager.user_loader
 def load_user(username):
     username = username.strip().lower()
-    return models.User.query.filter_by(username=username).one()
+    return models.User.query.filter_by(username=username).first()
 login_manager.login_view = 'login'
 login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info'
@@ -366,11 +366,6 @@ def user(username):
     except sqlalchemy.orm.exc.NoResultFound:
         return f'No such user "{username}"'
 
-    if user.id != current_user.id:
-        return render_template('user.html', user=user, users_home_page=False,
-                           memos=user.memos.paginate(int(memo_page), 10, False),
-                           recalls=user.recalls.paginate(int(recall_page), 10, False))
-
     if request.method == 'POST':
         settings = dict(current_user.settings)  # Must have new id
         # Verify patterns
@@ -387,14 +382,10 @@ def user(username):
             db.session.commit()
             flash('Settings successfully updated', 'success')
 
-    # Others_recalls: Take all recalls ever and remove them not having memo
-    # I've created
-    #q = models.RecallData.query.join(models.MemoData, models.RecallData.user_id=models.MemoData)
-    #return str(q) + '<br>' + str(q.all())
-
-    return render_template('user.html', user=current_user, users_home_page=True,
-                           memos=current_user.memos.paginate(int(memo_page), 10, False),
-                           recalls=current_user.recalls.paginate(int(recall_page), 10, False))
+    r = models.RecallData.query.join(models.RecallData.memo).filter(models.MemoData.user_id==user.id)
+    return render_template('user.html', user=user, users_home_page=(user.id == current_user.id),
+                           memos=user.memos.paginate(int(memo_page), 20, False),
+                           recalls=r.paginate(int(recall_page), 20, False))
                            #others_recalls=models.RecallData.query.filter_by(memo=current_user.id))
 
 

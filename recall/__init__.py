@@ -14,3 +14,5 @@ login_manager.init_app(app)
 
 import recall.views  # Has to be here
 import recall.models
+
+db.create_all()

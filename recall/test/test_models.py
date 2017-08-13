@@ -9,8 +9,8 @@ import random
 
 db.create_all()
 
-u1 = User('penlect', 'asdf', 'DanielA', 'Swe')
-u2 = User('daniel', 'afdgf', 'James', 'Den')
+u1 = User('sm2017', 'asdf', 'Idriz Z', 'Sweden')
+u2 = User('daniel', 'afdgf', 'Daniel', 'Sweden')
 l1 = Language('swedish')
 l2 = Language('english')
 db.session.add(u1)
@@ -56,6 +56,10 @@ def rand_data(discipline):
         raise ValueError('Unknown discipline: ' + discipline)
 
 
+def rand_state():
+    return random.choice(list(State))
+
+
 def rand_memo(user):
     d = rand_disip()
     mt, rt = rand_time(d)
@@ -67,7 +71,8 @@ def rand_memo(user):
         recall_time=rt,
         language=rand_lang(),
         data=data,
-        generated=True
+        generated=True,
+        state=rand_state()
     )
     m.user = user
     return m
@@ -83,7 +88,7 @@ def rand_recall(user, memo):
     return r
 
 
-for i in range(4):
+for i in range(10):
 
     m1 = rand_memo(u1)
     m2 = rand_memo(u2)
