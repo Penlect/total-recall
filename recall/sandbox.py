@@ -1,12 +1,12 @@
 import os
-os.remove('test.db')
+
+if os.path.isfile('test.db'):
+    os.remove('test.db')
 
 from recall import db
-from recall.models import User, Language, MemoData, XlsDoc, KeyState, RecallData, Word, WordClass, Discipline
-
+from recall.models import *
 import random
 
-print(os.getcwd())
 db.create_all()
 
 u1 = User('penlect', 'asdf', 'DanielA', 'Swe')

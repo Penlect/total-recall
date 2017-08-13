@@ -4,7 +4,8 @@ from datetime import datetime
 import re
 
 import os
-#os.remove('test.db')
+
+# os.remove('test.db')
 
 from recall import db
 
@@ -36,11 +37,12 @@ class User(db.Model):
     real_name = db.Column(db.String(120))
     country = db.Column(db.String(120))
     settings = db.Column(db.PickleType)
+    blocked = db.Column(db.Boolean)
 
-    memos = db.relationship('MemoData', back_populates="user",
+    memos = db.relationship('MemoData', backref="user",
                             cascade="save-update, merge, delete",
                             lazy='dynamic')
-    recalls = db.relationship('RecallData', back_populates="user",
+    recalls = db.relationship('RecallData', backref="user",
                               cascade="save-update, merge, delete",
                               lazy='dynamic')
 
@@ -56,6 +58,7 @@ class User(db.Model):
             'pattern_words': '',
             'pattern_dates': ''
         }
+        self.blocked = False
 
     # https://flask-login.readthedocs.io/en/latest/#your-user-class
     @property
@@ -64,7 +67,7 @@ class User(db.Model):
 
     @property
     def is_active(self):
-        return True
+        return not self.blocked
 
     @property
     def is_anonymous(self):
@@ -78,39 +81,35 @@ class User(db.Model):
 
 
 class MemoData(db.Model):
+
+    # Fields
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)
     ip = db.Column(db.String(40), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship('User', back_populates="memos")
-
-    key = db.Column(db.String(6), unique=True, nullable=False)
-    key_state = db.relationship('KeyState', back_populates='memo',
-                              uselist=False,
-                              cascade="save-update, merge, delete")
-    xls_doc = db.relationship('XlsDoc', back_populates='memo',
-                              cascade="save-update, merge, delete")
-    recalls = db.relationship('RecallData', back_populates='memo',
-                              cascade="save-update, merge, delete")
-
     discipline = db.Column(db.Enum(Discipline), nullable=False)
-    # The unit will be seconds
-    memo_time = db.Column(db.Integer, nullable=False)
-    recall_time = db.Column(db.Integer, nullable=False)
-
+    memo_time = db.Column(db.Integer, nullable=False)  # Seconds
+    recall_time = db.Column(db.Integer, nullable=False)  # Seconds
     language = db.Column(db.String(40))
     data = db.Column(db.PickleType, nullable=False)
     generated = db.Column(db.Boolean, nullable=False)
+    state = db.Column(db.Enum(State), nullable=False)
 
-    def __init__(self, ip, user_id, key,
+    # ForeignKeys
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    # Relationships
+    xls_doc = db.relationship('XlsDoc', backref='memo',
+                              cascade="save-update, merge, delete")
+    recalls = db.relationship('RecallData', backref='memo',
+                              cascade="save-update, merge, delete")
+
+    def __init__(self, ip,
                  discipline, memo_time, recall_time,
                  language, data,
-                 generated):
+                 generated, state=State.private):
 
         self.datetime = datetime.utcnow()
         self.ip = ip
-        self.user_id = user_id
-        self.key = key
 
         self.discipline = discipline
         if memo_time < 0:
@@ -119,7 +118,8 @@ class MemoData(db.Model):
         if recall_time < 0:
             raise ValueError(f'recall_time cannot be negative: {recall_time}')
         self.recall_time = recall_time
-
+        # Language must be provided if words and dates,
+        # set it to None for other disciplines.
         if discipline == Discipline.words or \
                         discipline == Discipline.dates:
             if not language:
@@ -130,76 +130,59 @@ class MemoData(db.Model):
             self.language = None
         self.data = data
         self.generated = generated
-
-    def __repr__(self):
-        return f'<MemoData {self.key}>'
-
-
-class KeyState(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    key = db.Column(db.String(6), db.ForeignKey('memo_data.key'), unique=True)
-    state = db.Column(db.Enum(State), nullable=False)
-
-    memo = db.relationship('MemoData', back_populates='key_state')
-
-    def __init__(self, key, state=State.private):
-        self.key = key
         self.state = state
 
     def __repr__(self):
-        return f'<KeyState {self.key}:public={self.state}>'
+        return f'<MemoData {self.id}>'
 
 
 class XlsDoc(db.Model):
+
+    # Fields
     id = db.Column(db.Integer, primary_key=True)
-    key = db.Column(db.String(6), db.ForeignKey('memo_data.key'))
     pattern = db.Column(db.String(120))
     data = db.Column(db.PickleType, nullable=False)
 
-    memo = db.relationship('MemoData', back_populates='xls_doc')
+    # ForeignKeys
+    memo_id = db.Column(db.Integer, db.ForeignKey('memo_data.id'))
 
-    def __init__(self, key, pattern, data):
-        self.key = key
+    def __init__(self, pattern, data):
         self.pattern = pattern
         self.data = data
 
     def __repr__(self):
-        return f'<XlsDoc {self.key}; p={self.pattern}; {len(self.data)} bytes>'
+        return f'<XlsDoc {self.memo_id}; p={self.pattern}; {len(self.data)} bytes>'
 
 
 class RecallData(db.Model):
+
+    # Fields
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)
     ip = db.Column(db.String(40), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', back_populates="recalls")
-
-    key = db.Column(db.String(6), db.ForeignKey('memo_data.key'), nullable=False)
-    memo = db.relationship('MemoData', back_populates='recalls')
-
     data = db.Column(db.PickleType, nullable=False)
     time_remaining = db.Column(db.Float, nullable=False)
+
+    # ForeignKeys
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    memo_id = db.Column(db.Integer, db.ForeignKey('memo_data.id'), nullable=False)
     #__table_args__ = (db.UniqueConstraint('account_id', 'name', name='_account_branch_uc'), )
 
-    def __init__(self, ip, user_id, key,
-                 data, time_remaining):
+    def __init__(self, ip, data, time_remaining: float):
 
         self.datetime = datetime.utcnow()
         self.ip = ip
-        self.user_id = user_id
-        self.key = key
-
         self.data = data
         self.time_remaining = time_remaining
 
     def __repr__(self):
-        return f'<RecallData {self.key}>'
+        return f'<RecallData {self.memo_id}>'
 
 
 class Language(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     language = db.Column(db.String(80), unique=True, nullable=False)
-    words = db.relationship('Word', back_populates="language", lazy='dynamic')
+    words = db.relationship('Word', backref="language", lazy='dynamic')
 
     def __init__(self, language):
         self.language = language
@@ -213,23 +196,18 @@ class Word(db.Model):
     datetime = db.Column(db.DateTime, nullable=False)
     ip = db.Column(db.String(40), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
     user = db.relationship('User')
 
     word = db.Column(db.String(80), nullable=False)
     word_class = db.Column(db.Enum(WordClass), nullable=False)
-    language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
-    language = db.relationship('Language', back_populates="words")
 
-    def __init__(self, ip, user_id,
-                 word, word_class, language):
+    def __init__(self, ip, word, word_class):
 
         self.datetime = datetime.utcnow()
         self.ip = ip
-        self.user_id = user_id
-
         self.word = word
         self.word_class = word_class
-        self.language_id = language
 
     def __repr__(self):
         return f'<Word {self.word}>'

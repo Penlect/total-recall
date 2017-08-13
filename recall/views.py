@@ -81,7 +81,7 @@ def index():
 @login_manager.user_loader
 def load_user(username):
     username = username.strip().lower()
-    return models.User.query.filter_by(username=username).first()
+    return models.User.query.filter_by(username=username).one()
 login_manager.login_view = 'login'
 login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info'
@@ -109,7 +109,7 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')
     username = request.form['username'].strip().lower()
-    registered_user = models.User.query.filter_by(username=username).first()
+    registered_user = models.User.query.filter_by(username=username).one()
     if registered_user is None:
         flash('Username or Password is invalid', 'danger')
         return redirect(url_for('login'))
@@ -166,7 +166,7 @@ def delete_recall(id):
 @app.route('/togglekey/<string:key>')
 @login_required
 def toggle_key_state(key):
-    key_state = models.KeyState.query.filter_by(key=key).first()
+    key_state = models.MemoData.query.filter_by(id=key).one()
     if key_state.state == models.State.private:
         key_state.state = models.State.competition
     elif key_state.state == models.State.competition:
@@ -177,13 +177,9 @@ def toggle_key_state(key):
     return redirect(url_for('user', username=current_user.username))
 
 
-
 def memo_from_request(request):
     form = request.form
     ip = request.remote_addr
-
-    user_id = current_user.id
-    key = sha(str(form))
 
     d = form['discipline'].strip().lower()
     if d == 'binary':
@@ -195,7 +191,7 @@ def memo_from_request(request):
     elif d == 'dates':
         discipline = models.Discipline.dates
     else:
-        raise ValueError(f'Invalid discipline form form: "{discipline}"')
+        raise ValueError(f'Invalid discipline form form: "{d}"')
 
     memo_time, recall_time = form['time'].strip().lower().split(',')
     memo_time, recall_time = int(memo_time), int(recall_time)
@@ -263,17 +259,18 @@ def memo_from_request(request):
                             f'"{discipline}" not implemented.')
         generated = False
 
-    return models.MemoData(
+    m = models.MemoData(
         ip=ip,
-        user_id=user_id,
-        key=key,
         discipline=discipline,
         memo_time=memo_time,
         recall_time=recall_time,
         language=language,
         data=data,
-        generated=generated
+        generated=generated,
+        state=models.State.private
     )
+    m.user = current_user
+    return m
 
 
 def alert(message):
@@ -456,7 +453,7 @@ def memo_to_table(memo, pattern):
     header = recall.xls.Header(
         title='Svenska Minnesförbundet',
         description=description,
-        recall_key=memo.key,
+        recall_key=memo.id,
         memo_time=memo.memo_time,
         recall_time=memo.recall_time
     )
@@ -479,18 +476,11 @@ def make_discipline():
         except Exception as e:
             return alert(f'Failed to create MemoData from form fields: {e}')
 
-        # ADD ENTRY TO KEY_STATUS TABLE
-        try:
-            key_status = models.KeyState(key=memo.key)
-            db.session.add(key_status)
-        except Exception as e:
-            return alert(f'Failed to create KeyState: {e}')
-
         db.session.commit()
 
         return render_template(
             'make_links_memo_and_recall.html',
-            key=memo.key,
+            key=memo.id,
         )
 
 @app.route('/download/xls/<string:key>', methods=['GET'])
@@ -501,11 +491,11 @@ def download_xls(key):
         pattern = recall.xls.verify_and_clean_pattern(pattern)
     # pattern will now be either None or a nice string
     try:
-        xls_doc = models.XlsDoc.query.filter_by(key=key, pattern=pattern).one()
+        xls_doc = models.XlsDoc.query.filter_by(memo_id=key, pattern=pattern).one()
     except sqlalchemy.orm.exc.NoResultFound:
 
         try:
-            memo = models.MemoData.query.filter_by(key=key).one()
+            memo = models.MemoData.query.filter_by(id=key).one()
         except sqlalchemy.orm.exc.NoResultFound:
             return f'Could not find memo for key={key}'
 
@@ -520,7 +510,8 @@ def download_xls(key):
             filedata = io.BytesIO()
             table.save(filedata)
             filedata.seek(0)
-            xls_doc = models.XlsDoc(memo.key, pattern, filedata)
+            xls_doc = models.XlsDoc(pattern, filedata)
+            xls_doc.memo = memo
             db.session.add(xls_doc)
             db.session.commit()
         except Exception as e:
@@ -537,7 +528,7 @@ def download_xls(key):
 @app.route('/recall/<string:key>')
 @login_required
 def recall_(key):
-    memo = models.MemoData.query.filter_by(key=key).one()
+    memo = models.MemoData.query.filter_by(id=key).one()
     if memo is None:
         return f'Key "{key}" does not exists or is private'
     nr_items = len(memo.data)
@@ -572,9 +563,8 @@ def recall_from_request(request):
 
     form = request.form
     ip = request.remote_addr
-    user_id = current_user.id
     key = form['key'].strip().lower()
-    memo = models.MemoData.query.filter_by(key=key).one()
+    memo = models.MemoData.query.filter_by(id=key).one()
     time_remaining = float(form['seconds_remaining'])
 
     data = list()
@@ -584,13 +574,14 @@ def recall_from_request(request):
         except KeyError:
             break
 
-    return models.RecallData(
+    r = models.RecallData(
         ip=ip,
-        user_id=user_id,
-        key=memo.key,
         data=data,
         time_remaining=time_remaining
     )
+    r.user = current_user
+    r.memo = memo
+    return r
 
 
 def start_of_emptiness_before(data, index):
@@ -615,7 +606,7 @@ class Arbeiter:
     def correct(self, recall):
         """Correct client_data (user's recall data)"""
         self.recall = recall
-        self.memo = models.MemoData.query.filter_by(key=recall.key).one()
+        self.memo = models.MemoData.query.filter_by(id=recall.key).one()
 
         cell_by_cell_result = self._correct_cells()
         count = dict(collections.Counter(cell_by_cell_result))
