@@ -2,12 +2,22 @@
 import enum
 from datetime import datetime
 import re
-
+import io
 import os
+import random
+from collections import namedtuple
 
 # os.remove('test.db')
 
-from recall import db
+from recall import db, app
+import recall.xls
+
+
+# Todo: Move random data creation to classes here
+DATABASE_WORDS = os.path.join(app.root_path, 'db_words.txt')
+DATABASE_STORIES = os.path.join(app.root_path, 'db_stories.txt')
+WordEntry = namedtuple('WordEntry', 'language value name date word_class')
+StoryEntry = namedtuple('StoryEntry', 'language value name date')
 
 
 class Discipline(enum.Enum):
@@ -27,6 +37,134 @@ class WordClass(enum.Enum):
     concrete_noun = "Concrete Noun"
     abstract_noun = "Abstract Noun"
     infinitive_verb = "Infinitive Verb"
+
+
+def load_database(db_file, entry):
+    """Load database entries"""
+    with open(db_file, 'r', encoding='utf-8') as db_file:
+        entries = set()
+        for line in db_file:
+            if line.strip():
+                row_data = [x.strip() for x in line.split(';')]
+                entries.add(entry(*row_data))
+        return list(sorted(entries))
+
+
+def save_database(db_file, entries):
+    """Save database entries"""
+    with open(db_file, 'w', encoding='utf-8') as db_file:
+        lines = (';'.join(entry) for entry in sorted(entries))
+        db_file.write('\n'.join(lines))
+
+
+def unique_lines_in_textarea(data: str, lower=False):
+    """Get unique nonempty lines in textarea"""
+    if lower:
+        data = data.lower()
+    return {line.strip() for line in data.split('\n') if line.strip()}
+
+
+class DisciplineData:
+
+    def __init__(self, data):
+        self._data = tuple(data)
+
+    def __len__(self):
+        return len(self._data)
+
+    @property
+    def data(self):
+        return self._data
+
+
+class Base2Data(DisciplineData):
+    enum = Discipline.base2
+
+    def __init__(self, data):
+        super().__init__(data)
+
+    @classmethod
+    def random(cls, nr_items, *args):
+        return cls(random.randint(0, 1) for _ in range(nr_items))
+
+    @classmethod
+    def from_text(cls, text):
+        return cls(int(digit) for digit in re.findall('[01]', text))
+
+
+class Base10Data(DisciplineData):
+    enum = Discipline.base10
+
+    def __init__(self, data):
+        super().__init__(data)
+
+    @classmethod
+    def random(cls, nr_items, *args):
+        return cls(random.randint(0, 9) for _ in range(nr_items))
+
+    @classmethod
+    def from_text(cls, text):
+        return cls(int(digit) for digit in re.findall('\d', text))
+
+
+class WordsData(DisciplineData):
+    enum = Discipline.words
+
+    def __init__(self, data):
+        super().__init__(data)
+
+    @classmethod
+    def random(cls, nr_items, language):
+        language = language.strip().lower()
+        words = [word.value for word in
+                 load_database(DATABASE_WORDS, WordEntry)
+                 if word.language == language]
+        random.shuffle(words)
+        data = tuple(words[0:nr_items])
+        return cls(data)
+
+    @classmethod
+    def from_text(cls, text):
+        return cls(unique_lines_in_textarea(text, lower=True))
+
+
+class DatesData(DisciplineData):
+    enum = Discipline.dates
+
+    def __init__(self, data):
+        super().__init__(data)
+
+    @classmethod
+    def random(cls, nr_items, language):
+        language = language.strip().lower()
+        stories = [story.value for story in
+                   load_database(DATABASE_STORIES, StoryEntry)
+                   if story.language == language]
+        random.shuffle(stories)
+        stories = stories[0:nr_items]
+        dates = [random.randint(1000, 2099) for _ in stories]
+        recall_order = list(range(nr_items))
+        random.shuffle(recall_order)
+        data = list(zip(dates, stories, recall_order))
+        random.shuffle(data)
+        return cls(data)
+
+    @classmethod
+    def from_text(cls, text):
+        lines = unique_lines_in_textarea(text, lower=False)
+        stories = list()
+        dates = list()
+        for line in lines:
+            date, story = line.split(maxsplit=1)
+            if not (1000 <= int(date) <= 2099):
+                raise ValueError(f'Date out of range: 1000 <= {date} <= 2099')
+            stories.append(story.strip())
+            dates.append(int(date))
+        recall_order = list(range(len(stories)))
+        random.shuffle(recall_order)
+        data = list(zip(dates, stories, recall_order))
+        random.shuffle(data)
+        return cls(data)
 
 
 class User(db.Model):
@@ -59,6 +197,16 @@ class User(db.Model):
             'pattern_dates': ''
         }
         self.blocked = False
+
+    @classmethod
+    def from_request(cls, request):
+        return cls(
+            # Todo: restrict username characters and length
+            username=request.form['username'].strip().lower(),
+            email=request.form['email'],
+            real_name=request.form['real_name'],
+            country=request.form['country']
+        )
 
     # https://flask-login.readthedocs.io/en/latest/#your-user-class
     @property
@@ -98,10 +246,13 @@ class MemoData(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     # Relationships
+    # Todo: make plural
     xls_doc = db.relationship('XlsDoc', backref='memo',
-                              cascade="save-update, merge, delete")
+                              cascade="save-update, merge, delete",
+                              lazy='dynamic')
     recalls = db.relationship('RecallData', backref='memo',
-                              cascade="save-update, merge, delete")
+                              cascade="save-update, merge, delete",
+                              lazy='dynamic')
 
     def __init__(self, ip,
                  discipline, memo_time, recall_time,
@@ -132,6 +283,54 @@ class MemoData(db.Model):
         self.generated = generated
         self.state = state
 
+    @classmethod
+    def from_request(cls, request, user):
+        form = request.form
+        ip = request.remote_addr
+
+        d = form['discipline'].strip().lower()
+        if d == 'binary':
+            maker = Base2Data
+        elif d == 'decimals':
+            maker = Base10Data
+        elif d == 'words':
+            maker = WordsData
+        elif d == 'dates':
+            maker = DatesData
+        else:
+            raise ValueError(f'Invalid discipline form form: "{d}"')
+
+        memo_time, recall_time = form['time'].strip().lower().split(',')
+        memo_time, recall_time = int(memo_time), int(recall_time)
+
+        language = form.get('language')
+        data = form.get('data')
+        nr_items = form.get('nr_items')
+        assert data or nr_items, "data or nr_items must be provided!"
+
+        generated = data is None
+        if generated:
+            # If data was not provided, we must generate it ourselves.
+            # In order to do so we need to know how many items to
+            # generate, + language if words or dates.
+            discipline_data = maker.random(int(nr_items), language)
+        else:
+            # Parse text data user provided
+            discipline_data = maker.from_text(data)
+
+        m = cls(
+            ip=ip,
+            discipline=discipline_data.enum,
+            memo_time=memo_time,
+            recall_time=recall_time,
+            language=language,
+            data=discipline_data.data,
+            generated=generated,
+            state=State.private
+        )
+        m.user = user
+        return m
+
     def __repr__(self):
         return f'<MemoData {self.id}>'
 
@@ -149,6 +348,64 @@ class XlsDoc(db.Model):
     def __init__(self, pattern, data):
         self.pattern = pattern
         self.data = data
+
+    @classmethod
+    def from_memo(cls, memo, pattern):
+        """Take relevant data of memo and create table
+
+        The table can later be saved to disk as .xls file
+        with the .save() function.
+        """
+
+        # Depending on which discipline we have, we'll need discipline
+        # specific table and description
+        if memo.discipline == Discipline.base2:
+            table = recall.xls.get_binary_table
+        elif memo.discipline == Discipline.base10:
+            table = recall.xls.get_decimal_table
+        elif memo.discipline == Discipline.words:
+            table = recall.xls.get_words_table
+        elif memo.discipline == Discipline.dates:
+            table = recall.xls.get_dates_table
+        else:
+            raise ValueError(
+                f'Invalid discipline: "{memo.discipline}"'
+            )
+        # The description include language if available
+        nr_items = len(memo.data)
+        if memo.language:
+            description = f'{memo.discipline.value}, {memo.language.title()}, {nr_items} st.'
+        else:
+            description = f'{memo.discipline.value}, {nr_items} st.'
+        # Create header
+        header = recall.xls.Header(
+            title='Svenska Minnesförbundet',
+            description=description,
+            recall_key=memo.id,
+            memo_time=memo.memo_time,
+            recall_time=memo.recall_time
+        )
+        # Create table
+        t = table(header=header, pattern=pattern)
+        # Update the table with data
+        for n in memo.data:
+            t.add_item(n)
+        # Write xls file to file object
+        filedata = io.BytesIO()
+        t.save(filedata)
+        filedata.seek(0)
+        # Create instance and attach memo reference
+        xls_doc = cls(pattern, filedata)
+        xls_doc.memo = memo
+        return xls_doc
+
+    @property
+    def filename(self):
+        """Create xls filename containing blob data"""
+        # Todo: Think about this
+        XLS_FILENAME_FMT = '{discipline}_{nr}st_{language}_{memo_time}-{recall_time}min_p{pattern_str}_{correction}_{recall_key}'
+        return None
+
 
     def __repr__(self):
         return f'<XlsDoc {self.memo_id}; p={self.pattern}; {len(self.data)} bytes>'
@@ -174,6 +431,31 @@ class RecallData(db.Model):
         self.ip = ip
         self.data = data
         self.time_remaining = time_remaining
+
+    @classmethod
+    def from_request(cls, request, user):
+        form = request.form
+        ip = request.remote_addr
+        key = form['key'].strip().lower()
+        memo = MemoData.query.filter_by(id=key).one()
+        time_remaining = float(form['seconds_remaining'])
+
+        data = list()
+        for i in range(len(form)):
+            try:
+                data.append(form[f'recall_cell_{i}'])
+            except KeyError:
+                break
+
+        r = RecallData(
+            ip=ip,
+            data=data,
+            time_remaining=time_remaining
+        )
+        r.user = user
+        r.memo = memo
+        return r
+
 
     def __repr__(self):
         return f'<RecallData {self.memo_id}>'

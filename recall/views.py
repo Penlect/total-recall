@@ -1,21 +1,14 @@
 
 import os
-import re
-import flask
 from flask import (render_template, request, jsonify, send_file, url_for,
                    flash, redirect)
 from flask_login import login_user , logout_user , current_user , login_required
 import random
 import time
 import math
-from pprint import pprint
-import json
 import hashlib
-from collections import namedtuple
 import pickle
-import functools
 import collections
-import io
 
 import sqlalchemy.orm
 
@@ -38,39 +31,6 @@ def sha(string):
     return h.hexdigest()[0:6]
 
 
-DATABASE_WORDS = os.path.join(app.root_path, 'db_words.txt')
-DATABASE_STORIES = os.path.join(app.root_path, 'db_stories.txt')
-WordEntry = namedtuple('WordEntry', 'language value name date word_class')
-StoryEntry = namedtuple('StoryEntry', 'language value name date')
-
-
-def load_database(db_file, entry):
-    """Load database entries"""
-    with open(db_file, 'r', encoding='utf-8') as db_file:
-        entries = set()
-        for line in db_file:
-            if line.strip():
-                row_data = [x.strip() for x in line.split(';')]
-                entries.add(entry(*row_data))
-        return list(sorted(entries))
-
-
-def save_database(db_file, entries):
-    """Save database entries"""
-    with open(db_file, 'w', encoding='utf-8') as db_file:
-        lines = (';'.join(entry) for entry in sorted(entries))
-        db_file.write('\n'.join(lines))
-
-
-def unique_lines_in_textarea(data: str, lower=False):
-    """Get unique nonempty lines in textarea"""
-    if lower:
-        data = data.lower()
-    return {line.strip() for line in data.split('\n') if line.strip()}
-
-
-
-
 @app.route('/', methods=['GET'])
 @app.route('/index', methods=['GET'])
 def index():
@@ -91,13 +51,8 @@ login_manager.login_message_category = 'info'
 def register():
     if request.method == 'GET':
         return render_template('register.html')
-    user = models.User(
-        # Todo: restrict username characters
-        username=request.form['username'].strip().lower(),
-        email=request.form['email'],
-        real_name=request.form['real_name'],
-        country=request.form['country']
-    )
+    # POST: create user -> insert in db -> redirect to login
+    user = models.User.from_request(request)
     db.session.add(user)
     db.session.commit()
     flash('User successfully registered', 'success')
@@ -109,19 +64,16 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')
     username = request.form['username'].strip().lower()
-    registered_user = models.User.query.filter_by(username=username).one()
-    if registered_user is None:
+    user = models.User.query.filter_by(username=username).first()
+    if user is None:
         flash('Username or Password is invalid', 'danger')
         return redirect(url_for('login'))
-    login_user(registered_user)
+    login_user(user)
     flash('Logged in successfully', 'success')
-    next = request.args.get('next')
+    # Todo: investigate below
     # is_safe_url should check if the url is safe for redirects.
     # See http://flask.pocoo.org/snippets/62/ for an example.
-    if not True: #is_safe_url(next):
-        return flask.abort(400)
-
-    return flask.redirect(next or flask.url_for('user', username=registered_user.username))
+    return redirect(url_for('user', username=user.username))
 
 
 @app.route('/logout')
@@ -133,40 +85,50 @@ def logout():
 @app.route('/delete/account')
 @login_required
 def delete_account():
+    # Todo: figure out the correct order of doing things
     db.session.delete(current_user)
     db.session.commit()
     logout_user()
     return 'Account deleted.'
 
-@app.route('/delete/memo/<int:id>')
+
+@app.route('/delete/memo/<int:memo_id>')
 @login_required
-def delete_memo(id):
-    memo = models.MemoData.query.get(id)
+def delete_memo(memo_id):
+    memo = models.MemoData.query.get(memo_id)
     if memo is None:
-        return 'Can\'t delete memo, not found in database'
-    if memo.user.id != current_user.id:
-        return 'You can only delete your own memos'
-    db.session.delete(memo)
-    db.session.commit()
+        flash('Can\'t delete memo, not found in database', 'danger')
+    elif memo.user.id != current_user.id:
+        flash('You can only delete your own memos', 'danger')
+    else:
+        flash(f'Deleted memo {memo_id}', 'success')
+        db.session.delete(memo)
+        db.session.commit()
     return redirect(url_for('user', username=current_user.username))
 
-@app.route('/delete/memo/<int:id>')
-@login_required
-def delete_recall(id):
-    # Todo: implement
-    memo = models.MemoData.query.get(id)
-    if memo is None:
-        return 'Can\'t delete memo, not found in database'
-    if memo.user.id != current_user.id:
-        return 'You can only delete your own memos'
-    db.session.delete(memo)
-    db.session.commit()
-    return redirect(url_for('index'))
 
-@app.route('/togglekey/<string:key>')
+@app.route('/delete/recall/<int:recall_id>')
 @login_required
-def toggle_key_state(key):
-    key_state = models.MemoData.query.filter_by(id=key).one()
+def delete_recall(recall_id):
+    # Todo: implement
+    recall = models.RecallData.query.get(recall_id)
+    if recall is None:
+        flash('Can\'t delete recall, not found in database', 'danger')
+    elif recall.memo.user.id != current_user.id:
+        flash('You can only delete recalls for which you own the memorization',
+              'danger')
+    else:
+        flash(f'Deleted recall {recall_id}', 'success')
+        db.session.delete(recall)
+        db.session.commit()
+    return redirect(url_for('user', username=current_user.username))
+
+
+@app.route('/togglekey/<string:memo_id>')
+@login_required
+def toggle_key_state(memo_id):
+    # Todo: Improve this
+    key_state = models.MemoData.query.filter_by(id=memo_id).one()
     if key_state.state == models.State.private:
         key_state.state = models.State.competition
     elif key_state.state == models.State.competition:
@@ -177,190 +139,17 @@ def toggle_key_state(key):
     return redirect(url_for('user', username=current_user.username))
 
 
-def memo_from_request(request):
-    form = request.form
-    ip = request.remote_addr
-
-    d = form['discipline'].strip().lower()
-    if d == 'binary':
-        discipline = models.Discipline.base2
-    elif d == 'decimals':
-        discipline = models.Discipline.base10
-    elif d == 'words':
-        discipline = models.Discipline.words
-    elif d == 'dates':
-        discipline = models.Discipline.dates
-    else:
-        raise ValueError(f'Invalid discipline form form: "{d}"')
-
-    memo_time, recall_time = form['time'].strip().lower().split(',')
-    memo_time, recall_time = int(memo_time), int(recall_time)
-
-    language = form.get('language')
-
-    data = form.get('data')
-    nr_items = form.get('nr_items')
-    assert data or nr_items, "data or nr_items must be provided!"
-
-    if data is None:
-        # If data was not provided, we must generate it ourselves.
-        # In order to do so we need to know how many items to
-        # generate, + language if words or dates.
-        nr_items = int(nr_items)
-
-        if d == 'binary':
-            data = tuple(random.randint(0, 1) for _ in range(nr_items))
-        elif d == 'decimals':
-            data = tuple(random.randint(0, 9) for _ in range(nr_items))
-        elif d == 'words':
-            words = [word.value for word in
-                     load_database(DATABASE_WORDS, WordEntry)
-                     if word.language == language]
-            random.shuffle(words)
-            data = tuple(words[0:nr_items])
-        elif d == 'dates':
-            stories = [story.value for story in
-                       load_database(DATABASE_STORIES, StoryEntry)
-                       if story.language == language]
-            random.shuffle(stories)
-            stories = stories[0:nr_items]
-            dates = [random.randint(1000, 2099) for _ in stories]
-            data = tuple(zip(dates, stories))
-            recall_data = list(data)
-            random.shuffle(recall_data)
-            _recall_data = tuple(recall_data)
-        else:
-            raise Exception('Data generation for discipline '
-                            f'"{discipline}" not implemented.')
-        generated = True
-    else:
-        # If data is provided, it's just a matter of parsing the data
-        # from the string
-        if d == 'binary':
-            data = tuple(int(digit) for digit in re.findall('[01]', data))
-        elif d == 'decimal':
-            data = tuple(int(digit) for digit in re.findall('\d', data))
-        elif d == 'words':
-            data = tuple(unique_lines_in_textarea(data, lower=True))
-        elif d == 'dates':
-            lines = unique_lines_in_textarea(data, lower=False)
-            historical_dates = []
-            for line in lines:
-                date, story = line.split(maxsplit=1)
-                if not (1000 <= int(date) <= 2099):
-                    raise ValueError(f'Date out of range: 1000 <= {date} <= 2099')
-                historical_dates.append((date.strip(), story.strip()))
-            data = tuple(historical_dates)
-            recall_data = list(data)
-            random.shuffle(recall_data)
-            _recall_data = tuple(recall_data)
-        else:
-            raise Exception('Data creation for discipline '
-                            f'"{discipline}" not implemented.')
-        generated = False
-
-    m = models.MemoData(
-        ip=ip,
-        discipline=discipline,
-        memo_time=memo_time,
-        recall_time=recall_time,
-        language=language,
-        data=data,
-        generated=generated,
-        state=models.State.private
-    )
-    m.user = current_user
-    return m
-
-
-def alert(message):
-    return f'<div class="alert alert-danger">{message}</div>'
-
-
-@app.route('/database/words', methods=['GET', 'POST'])
-def manage_words_database():
-    """Words database dashboard"""
-    if request.method == 'GET':
-        return render_template('db_words.html')
-
-
-@app.route('/database/words/content', methods=['GET'])
-def database_words_content():
-    """View whole word database in one big table"""
-    db_words = load_database(DATABASE_WORDS, WordEntry)
-    return render_template('db_words_content.html', words=db_words)
-
-
-@app.route('/database/words/modify', methods=['POST'])
-def database_words_modify():
-    """ Update word database and respond modifications table summary """
-    modification_time = time.strftime('%Y-%m-%d %H:%M:%S')
-    db_words = load_database(DATABASE_WORDS, WordEntry)
-    if request.method == 'POST':
-        form = request.form
-
-        if form['pwd'].lower().strip() != 'minnsej':
-            return 'Wrong password!'
-
-        if not form['added_by'].strip():
-            return 'Your name is mandatory!'
-
-        if not form['data'].strip():
-            return 'No words were added since Words input was empty!'
-
-        # We can't check words in database only on the word value,
-        # the language is needed as well. Two words might exists
-        # with the same word value but different meaning in two
-        # languages.
-        db_lang_word = {f'{w.language};{w.value}':w for w in db_words}
-
-        status = dict()
-        data = unique_lines_in_textarea(form['data'], lower=True)
-        for word in data:
-            delete_me = word.startswith('delete:')
-            w = WordEntry(
-                language=form['language'].lower(),
-                value=word.replace('delete:', ''),
-                name=form['added_by'],
-                date=modification_time,
-                word_class=form['word_class'].lower()
-            )
-            lw = f'{w.language};{w.value}'
-            if delete_me:
-                if lw in db_lang_word:
-                    status[db_lang_word[lw]] = 'deleted'
-                    del db_lang_word[lw]
-                else:
-                    status[w] = 'failed_delete'
-            elif lw in db_lang_word:
-                if db_lang_word[lw].word_class != w.word_class:
-                    db_lang_word[lw] = w
-                    status[w] = 'updated'
-                else:
-                    status[db_lang_word[lw]] = 'already_exists'
-            else:
-                db_lang_word[lw] = w
-                status[w] = 'added'
-
-        new_words = list(sorted(set(db_lang_word.values())))
-        save_database(DATABASE_WORDS, new_words)
-        return render_template(
-            'db_words_modification.html', words=new_words, status=status,
-            modification_time=modification_time
-        )
-
 @app.route('/users')
 @login_required
 def users():
     users = models.User.query.all()
     return render_template('users.html', users=users)
 
+
 @app.route('/user/<string:username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
     username = username.strip().lower()
-    memo_page = request.args.get('memo_page', 1)
-    recall_page = request.args.get('recall_page', 1)
     try:
         user = models.User.query.filter_by(username=username).one()
     except sqlalchemy.orm.exc.NoResultFound:
@@ -382,11 +171,12 @@ def user(username):
             db.session.commit()
             flash('Settings successfully updated', 'success')
 
-    r = models.RecallData.query.join(models.RecallData.memo).filter(models.MemoData.user_id==user.id)
-    return render_template('user.html', user=user, users_home_page=(user.id == current_user.id),
-                           memos=user.memos.paginate(int(memo_page), 20, False),
-                           recalls=r.paginate(int(recall_page), 20, False))
-                           #others_recalls=models.RecallData.query.filter_by(memo=current_user.id))
+    # Todo, remove pagination
+    r = models.RecallData.query.join(models.RecallData.memo).filter(
+        models.MemoData.user_id==user.id)
+    return render_template('user.html', user=user,
+                           users_home_page=(user.id == current_user.id),
+                           recalls=r)
 
 
 @app.route('/generate')
@@ -401,125 +191,62 @@ def create():
     return render_template('make_create.html')
 
 
-def blob_to_xls_filename(blob):
-    """Create xls filename containing blob data"""
-    XLS_FILENAME_FMT = '{discipline}_{nr}st_{language}_{memo_time}-{recall_time}min_p{pattern_str}_{correction}_{recall_key}'
-    b = dict(blob)  # So we can unpack below
-    xls_filename = XLS_FILENAME_FMT.format(
-        nr=len(blob.data),
-        pattern_str=','.join(str(p) for p in blob.pattern),
-        **b
-    ) + '.xls'
-    return xls_filename
-
-
-def memo_to_table(memo, pattern):
-    """Take relevant data of blob and create table
-
-    The table can later be saved to disk as .xls file.
-    """
-
-    # Depending on which discipline we have, we'll need discipline
-    # specific table and description
-    if memo.discipline == models.Discipline.base2:
-        table = recall.xls.get_binary_table
-    elif memo.discipline == models.Discipline.base10:
-        table = recall.xls.get_decimal_table
-    elif memo.discipline == models.Discipline.words:
-        table = recall.xls.get_words_table
-    elif memo.discipline == models.Discipline.dates:
-        table = recall.xls.get_dates_table
-    else:
-        raise ValueError(
-            f'Invalid discipline: "{memo.discipline}"'
-        )
-
-    nr_items = len(memo.data)
-    if memo.language:
-        description = f'{memo.discipline.value}, {memo.language.title()}, {nr_items} st.'
-    else:
-        description = f'{memo.discipline.value}, {nr_items} st.'
-
-    # Create header
-    header = recall.xls.Header(
-        title='Svenska Minnesförbundet',
-        description=description,
-        recall_key=memo.id,
-        memo_time=memo.memo_time,
-        recall_time=memo.recall_time
-    )
-    # Create table
-    t = table(header=header, pattern=pattern)
-    # Update the table with data
-    for n in memo.data:
-        t.add_item(n)
-    return t
-
-
 @app.route('/make', methods=['POST'])
+@login_required
 def make_discipline():
-    """Convert request form to blob, create xls file, return links"""
+    """Convert request form to memo"""
     if request.method == 'POST':
-        # ADD MEMO DATA TO MEMO_DATA TABLE
-        try:
-            memo = memo_from_request(request)
-            db.session.add(memo)
-        except Exception as e:
-            return alert(f'Failed to create MemoData from form fields: {e}')
-
+        memo = models.MemoData.from_request(request, current_user)
+        db.session.add(memo)
         db.session.commit()
-
         return render_template(
             'make_links_memo_and_recall.html',
-            key=memo.id,
+            memo_id=memo.id
         )
 
-@app.route('/download/xls/<string:key>', methods=['GET'])
-def download_xls(key):
-    key = key.lower()
+@app.route('/download/xls/<int:memo_id>', methods=['GET'])
+@login_required
+def download_xls(memo_id: int):
     pattern = request.args.get('pattern')
     if pattern:
         pattern = recall.xls.verify_and_clean_pattern(pattern)
     # pattern will now be either None or a nice string
     try:
-        xls_doc = models.XlsDoc.query.filter_by(memo_id=key, pattern=pattern).one()
+        memo = models.MemoData.query.filter_by(id=memo_id).one()
     except sqlalchemy.orm.exc.NoResultFound:
+        return f'Could not find memo for key={memo_id}'
 
-        try:
-            memo = models.MemoData.query.filter_by(id=key).one()
-        except sqlalchemy.orm.exc.NoResultFound:
-            return f'Could not find memo for key={key}'
+    # If the current user doesn't own the memorization,
+    # he/she is only allowed to download xls if it is
+    # public.
+    if memo.user.id != current_user.id:
+        if memo.state != models.State.public:
+            return 'Download not allowed.'
 
-        # CREATE XLS DOCUMENT
+    try:
+        xls_doc = models.XlsDoc.query.filter_by(memo_id=memo.id, pattern=pattern).one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        # Failed to find already-created xls, create it:
         try:
-            table = memo_to_table(memo, pattern=pattern)
+            xls_doc = models.XlsDoc.from_memo(memo, pattern)
         except Exception as e:
-            return alert(f'Failed to create table object of blob: {e}')
-
-        # ADD XLS DOCUMENT TO XLS_DOC TABLE
-        try:
-            filedata = io.BytesIO()
-            table.save(filedata)
-            filedata.seek(0)
-            xls_doc = models.XlsDoc(pattern, filedata)
-            xls_doc.memo = memo
+            return f'Failed to create xls document: {e}'
+        else:
             db.session.add(xls_doc)
             db.session.commit()
-        except Exception as e:
-            return alert(f'Failed to save xls file data to XlsDoc: {e}')
 
     # Todo: download only if public
     return send_file(xls_doc.data,
-                     attachment_filename=f'{key}.xls',
+                     attachment_filename=f'{memo_id}.xls',
                      as_attachment=True,
                      mimetype='application/vnd.ms-excel'
                      )
 
 
-@app.route('/recall/<string:key>')
+@app.route('/recall/<string:memo_id>')
 @login_required
-def recall_(key):
-    memo = models.MemoData.query.filter_by(id=key).one()
+def recall_(memo_id):
+    memo = models.MemoData.query.filter_by(id=memo_id).one()
     if memo is None:
         return f'Key "{key}" does not exists or is private'
     nr_items = len(memo.data)
@@ -546,34 +273,6 @@ def recall_(key):
         return 'Recall not implemented yet: ' + memo.discipline
 
 
-def _arbeiter(key, dictionary):
-    pass
-
-
-def recall_from_request(request):
-
-    form = request.form
-    ip = request.remote_addr
-    key = form['key'].strip().lower()
-    memo = models.MemoData.query.filter_by(id=key).one()
-    time_remaining = float(form['seconds_remaining'])
-
-    data = list()
-    for i in range(len(form)):
-        try:
-            data.append(form[f'recall_cell_{i}'])
-        except KeyError:
-            break
-
-    r = models.RecallData(
-        ip=ip,
-        data=data,
-        time_remaining=time_remaining
-    )
-    r.user = current_user
-    r.memo = memo
-    return r
-
 
 def start_of_emptiness_before(data, index):
     index_of_empty_cell = index
@@ -597,7 +296,7 @@ class Arbeiter:
     def correct(self, recall):
         """Correct client_data (user's recall data)"""
         self.recall = recall
-        self.memo = models.MemoData.query.filter_by(id=recall.key).one()
+        self.memo = recall.memo
 
         cell_by_cell_result = self._correct_cells()
         count = dict(collections.Counter(cell_by_cell_result))
@@ -692,7 +391,8 @@ def arbeiter():
     if request.method == 'POST':
         try:
             app.logger.info(str(request.form))
-            recall = recall_from_request(request)
+            recall = models.RecallData.from_request(request, current_user)
+            # Todo: Backup solution if commit fails
             db.session.add(recall)
             db.session.commit()
 
@@ -703,8 +403,6 @@ def arbeiter():
             return jsonify({'error': str(e)})
 
         return jsonify(recall_correction)
-    else:
-        print('Wrong method!')
 
 
 @app.route('/results/view', methods=['GET'])
@@ -741,17 +439,76 @@ def view_recall():
     else:
         raise Exception(f'Blob contain invalid discipline: {d}')
 
-@app.route('/results')
-def list_results():
-    root = os.path.join(app.root_path, f'recalldata')
-    files = os.listdir(root)
-    pickle_files = list()
-    for file in files:
-        if file.lower().endswith('.pickle'):
-            timestamp, username = file.split('_', 1)
-            local_time = time.localtime(float(timestamp))
-            time_str = time.strftime('%Y-%m-%d %H:%M:%S', local_time)
-            username = os.path.splitext(username)[0]
-            pickle_files.append((file, time_str, username))
-    pickle_files.sort(reverse=True)
-    return render_template('results.html', results=pickle_files)
+
+
+@app.route('/database/words', methods=['GET', 'POST'])
+def manage_words_database():
+    """Words database dashboard"""
+    if request.method == 'GET':
+        return render_template('db_words.html')
+
+
+@app.route('/database/words/content', methods=['GET'])
+def database_words_content():
+    """View whole word database in one big table"""
+    db_words = load_database(DATABASE_WORDS, WordEntry)
+    return render_template('db_words_content.html', words=db_words)
+
+
+@app.route('/database/words/modify', methods=['POST'])
+def database_words_modify():
+    """ Update word database and respond modifications table summary """
+    modification_time = time.strftime('%Y-%m-%d %H:%M:%S')
+    db_words = load_database(DATABASE_WORDS, WordEntry)
+    if request.method == 'POST':
+        form = request.form
+
+        if form['pwd'].lower().strip() != 'minnsej':
+            return 'Wrong password!'
+
+        if not form['added_by'].strip():
+            return 'Your name is mandatory!'
+
+        if not form['data'].strip():
+            return 'No words were added since Words input was empty!'
+
+        # We can't check words in database only on the word value,
+        # the language is needed as well. Two words might exists
+        # with the same word value but different meaning in two
+        # languages.
+        db_lang_word = {f'{w.language};{w.value}':w for w in db_words}
+
+        status = dict()
+        data = unique_lines_in_textarea(form['data'], lower=True)
+        for word in data:
+            delete_me = word.startswith('delete:')
+            w = WordEntry(
+                language=form['language'].lower(),
+                value=word.replace('delete:', ''),
+                name=form['added_by'],
+                date=modification_time,
+                word_class=form['word_class'].lower()
+            )
+            lw = f'{w.language};{w.value}'
+            if delete_me:
+                if lw in db_lang_word:
+                    status[db_lang_word[lw]] = 'deleted'
+                    del db_lang_word[lw]
+                else:
+                    status[w] = 'failed_delete'
+            elif lw in db_lang_word:
+                if db_lang_word[lw].word_class != w.word_class:
+                    db_lang_word[lw] = w
+                    status[w] = 'updated'
+                else:
+                    status[db_lang_word[lw]] = 'already_exists'
+            else:
+                db_lang_word[lw] = w
+                status[w] = 'added'
+
+        new_words = list(sorted(set(db_lang_word.values())))
+        save_database(DATABASE_WORDS, new_words)
+        return render_template(
+            'db_words_modification.html', words=new_words, status=status,
+            modification_time=modification_time
+        )

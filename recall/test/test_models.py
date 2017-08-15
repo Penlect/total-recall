@@ -81,7 +81,7 @@ def rand_recall(user, memo):
     r = RecallData(
         ip=rand_ip(),
         data=rand_data(memo.discipline),
-        time_remaining=12.543*random.random()
+        time_remaining=round(12.543*random.random(), 1)
     )
     r.user = user
     r.memo = memo

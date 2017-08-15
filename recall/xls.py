@@ -384,7 +384,7 @@ class DatesTable(Table):
         self.set_column_widths([1.5, 3, 0.4, 10, 4])
 
     def add_item(self, item):
-        date, story = item
+        date, story, *_ = item
 
         # Check for newline action
         if self.new_row is True:
