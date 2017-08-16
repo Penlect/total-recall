@@ -5,6 +5,7 @@ import re
 import io
 import os
 import random
+import collections
 from collections import namedtuple
 
 # os.remove('test.db')
@@ -13,7 +14,6 @@ from recall import db, app
 import recall.xls
 
 
-# Todo: Move random data creation to classes here
 DATABASE_WORDS = os.path.join(app.root_path, 'db_words.txt')
 DATABASE_STORIES = os.path.join(app.root_path, 'db_stories.txt')
 WordEntry = namedtuple('WordEntry', 'language value name date word_class')
@@ -25,6 +25,15 @@ class Discipline(enum.Enum):
     base10 = 'Decimal Numbers'
     words = 'Words'
     dates = 'Historical Dates'
+
+
+class Item(enum.Enum):
+    off_limits = 0
+    gap = 1
+    not_reached = 2
+    correct = 3
+    wrong = 4
+    almost_correct = 5
 
 
 class State(enum.Enum):
@@ -61,7 +70,12 @@ def unique_lines_in_textarea(data: str, lower=False):
     """Get unique nonempty lines in textarea"""
     if lower:
         data = data.lower()
-    return {line.strip() for line in data.split('\n') if line.strip()}
+    lines = list()
+    for line in data.split('\n'):
+        line = line.strip()
+        if line and line not in lines:
+            lines.append(line)
+    return lines
 
 
 class DisciplineData:
@@ -91,6 +105,12 @@ class Base2Data(DisciplineData):
     def from_text(cls, text):
         return cls(int(digit) for digit in re.findall('[01]', text))
 
+    def compare(self, guess: int, index: int):
+        if int(guess) == self._data[index]:
+            return Item.correct
+        else:
+            return Item.wrong
+
 
 class Base10Data(DisciplineData):
     enum = Discipline.base10
@@ -105,6 +125,12 @@ class Base10Data(DisciplineData):
     @classmethod
     def from_text(cls, text):
         return cls(int(digit) for digit in re.findall('\d', text))
+
+    def compare(self, guess: int, index: int):
+        if int(guess) == self._data[index]:
+            return Item.correct
+        else:
+            return Item.wrong
 
 
 class WordsData(DisciplineData):
@@ -127,12 +153,26 @@ class WordsData(DisciplineData):
     def from_text(cls, text):
         return cls(unique_lines_in_textarea(text, lower=True))
 
+    def compare(self, guess: str, index: int):
+        guess = str(guess)
+        if guess == self._data[index]:
+            return Item.correct
+        elif self._word_almost_correct(guess, index):
+            return Item.almost_correct
+        else:
+            return Item.wrong
+
+    def _word_almost_correct(self, guess: str, index: int):
+        return False
+
 
 class DatesData(DisciplineData):
     enum = Discipline.dates
 
     def __init__(self, data):
         super().__init__(data)
+        self._lookup = {recall_order: date for date, story, recall_order
+                        in data.items()}
 
     @classmethod
     def random(cls, nr_items, language):
@@ -163,8 +203,13 @@ class DatesData(DisciplineData):
         recall_order = list(range(len(stories)))
         random.shuffle(recall_order)
         data = list(zip(dates, stories, recall_order))
-        random.shuffle(data)
         return cls(data)
+
+    def compare(self, guess: int, index: int):
+        if int(guess) == self._lookup[index]:
+            return Item.correct
+        else:
+            return Item.wrong
 
 
 class User(db.Model):
@@ -237,6 +282,7 @@ class MemoData(db.Model):
     discipline = db.Column(db.Enum(Discipline), nullable=False)
     memo_time = db.Column(db.Integer, nullable=False)  # Seconds
     recall_time = db.Column(db.Integer, nullable=False)  # Seconds
+    # Todo: change language to foreign key
     language = db.Column(db.String(40))
     data = db.Column(db.PickleType, nullable=False)
     generated = db.Column(db.Boolean, nullable=False)
@@ -330,6 +376,12 @@ class MemoData(db.Model):
         )
         m.user = user
         return m
+
+    def get_data_handler(self):
+        for cls in (Base2Data, Base10Data, WordsData, DatesData):
+            if self.memo.discipline == cls.enum:
+                return cls(self.data)
+        raise AssertionError(f'Now Data class for {self.memo.discipline}.')
 
     def __repr__(self):
         return f'<MemoData {self.id}>'
@@ -461,6 +513,104 @@ class RecallData(db.Model):
         return f'<RecallData {self.memo_id}>'
 
 
+def start_of_emptiness_before(data, index):
+    index_of_empty_cell = index
+    for i in reversed(range(index)):
+        if data[i].strip():
+            break
+        else:
+            index_of_empty_cell = i
+    return index_of_empty_cell
+
+
+class Arbeiter:
+    """Correct user's recall data
+
+    The Arbeiter is used to correct the user's recall.
+    The user's recall is compared to the blob answer.
+    """
+    def __init__(self):
+        pass
+
+    def correct(self, recall):
+        """Correct client_data (user's recall data)"""
+        self.recall = recall
+        self.memo = recall.memo
+
+        # Create Correction entry if not exists - update if exists
+
+        cell_by_cell_result = self._correct_cells()
+        count = dict(collections.Counter(cell_by_cell_result))
+        raw_score = self._raw_score(cell_by_cell_result)
+        points = self._points(raw_score)
+
+        return {
+            'cell_by_cell_result': tuple(cell_by_cell_result),
+            'count': count,
+            'raw_score': raw_score,
+            'points': points
+        }
+
+    def _correct_cells(self):
+        handler = self.memo.get_data_handler()
+        nr_items = len(handler)
+        start_of_emptiness = start_of_emptiness_before(self.recall.data,
+                                                       nr_items)
+        result = [None]*len(self.recall.data)
+        for i, user_value in enumerate(self.recall.data, start=0):
+            if i >= nr_items:
+                result[i] = Item.off_limits
+            else:
+                if not user_value.strip():
+                    # Empty cell
+                    if i < start_of_emptiness:
+                        result[i] = Item.gap
+                    else:
+                        result[i] = Item.not_reached
+                else:
+                    result[i] = handler.compare(user_value, i)
+        return result
+
+    def _raw_score(self, cell_by_cell_result):
+        # Will depend on correction method
+        return 123
+
+    def _points(self, raw_score):
+        return 3.14
+
+
+class Correction(db.Models):
+    id = db.Column(db.Integer, primary_key=True)
+
+    off_limits = db.Column(db.Integer, nullable=False)
+    gap = db.Column(db.Integer, nullable=False)
+    not_reached = db.Column(db.Integer, nullable=False)
+    correct = db.Column(db.Integer, nullable=False)
+    wrong = db.Column(db.Integer, nullable=False)
+    almost_correct = db.Column(db.Integer, nullable=False)
+
+    raw_score = db.Column(db.Float, nullable=False)
+    points = db.Column(db.Float, nullable=False)
+    cell_by_cell = db.Column(db.PickleType)
+
+    # ForeignKeys
+    recall_id = db.Column(db.Integer, db.ForeignKey('recall.id'))
+
+    def __init__(self, raw_score, points, cell_by_cell):  # update with __init__
+        c = collections.Counter(cell_by_cell)
+
+        self.off_limits = c[Item.off_limits]
+        self.gap = c[Item.gap]
+        self.not_reached = c[Item.not_reached]
+        self.correct = c[Item.correct]
+        self.wrong = c[Item.wrong]
+        self.almost_correct = c[Item.almost_correct]
+
+        self.raw_score = raw_score
+        self.points = points
+        self.cell_by_cell = cell_by_cell
+
+
 class Language(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     language = db.Column(db.String(80), unique=True, nullable=False)
@@ -473,19 +623,18 @@ class Language(db.Model):
         return f'<Language {self.language}>'
 
 
+# Todo: Database of almost correct words during competition
 class Word(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)
     ip = db.Column(db.String(40), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
-    user = db.relationship('User')
+    username = db.Column(db.String(40), nullable=False)
 
     word = db.Column(db.String(80), nullable=False)
     word_class = db.Column(db.Enum(WordClass), nullable=False)
 
     def __init__(self, ip, word, word_class):
-
         self.datetime = datetime.utcnow()
         self.ip = ip
         self.word = word
@@ -493,3 +642,21 @@ class Word(db.Model):
 
     def __repr__(self):
         return f'<Word {self.word}>'
+
+
+class AlmostCorrectWord(db.Models):
+    id = db.Column(db.Integer, primary_key=True)
+    datetime = db.Column(db.DateTime, nullable=False)
+    ip = db.Column(db.String(40), nullable=False)
+    word = db.Column(db.String(80), nullable=False)
+    almost_correct = db.Column(db.String(80), nullable=False)
+
+    # ForeignKeys
+    language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __init__(self, ip, word, almost_correct):
+        self.datetime = datetime.utcnow()
+        self.ip = ip
+        self.word = word
+        self.almost_correct = almost_correct

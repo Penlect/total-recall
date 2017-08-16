@@ -110,7 +110,6 @@ def delete_memo(memo_id):
 @app.route('/delete/recall/<int:recall_id>')
 @login_required
 def delete_recall(recall_id):
-    # Todo: implement
     recall = models.RecallData.query.get(recall_id)
     if recall is None:
         flash('Can\'t delete recall, not found in database', 'danger')
@@ -171,7 +170,6 @@ def user(username):
             db.session.commit()
             flash('Settings successfully updated', 'success')
 
-    # Todo, remove pagination
     r = models.RecallData.query.join(models.RecallData.memo).filter(
         models.MemoData.user_id==user.id)
     return render_template('user.html', user=user,
@@ -235,7 +233,6 @@ def download_xls(memo_id: int):
             db.session.add(xls_doc)
             db.session.commit()
 
-    # Todo: download only if public
     return send_file(xls_doc.data,
                      attachment_filename=f'{memo_id}.xls',
                      as_attachment=True,
@@ -273,118 +270,6 @@ def recall_(memo_id):
         return 'Recall not implemented yet: ' + memo.discipline
 
 
-
-def start_of_emptiness_before(data, index):
-    index_of_empty_cell = index
-    for i in reversed(range(index)):
-        if data[i].strip():
-            break
-        else:
-            index_of_empty_cell = i
-    return index_of_empty_cell
-
-
-class Arbeiter:
-    """Correct user's recall data
-
-    The Arbeiter is used to correct the user's recall.
-    The user's recall is compared to the blob answer.
-    """
-    def __init__(self):
-        pass
-
-    def correct(self, recall):
-        """Correct client_data (user's recall data)"""
-        self.recall = recall
-        self.memo = recall.memo
-
-        cell_by_cell_result = self._correct_cells()
-        count = dict(collections.Counter(cell_by_cell_result))
-        raw_score = self._raw_score(cell_by_cell_result)
-        points = self._points(raw_score)
-
-        return {
-            'cell_by_cell_result': tuple(cell_by_cell_result),
-            'count': count,
-            'raw_score': raw_score,
-            'points': points
-        }
-
-    def _correct_cells(self):
-        d = self.memo.discipline
-        if d == models.Discipline.base2:
-            correcter = self._correct_binary
-        elif d == models.Discipline.base10:
-            correcter = self._correct_decimals
-        elif d == models.Discipline.words:
-            correcter = self._correct_words
-        elif d == models.Discipline.dates:
-            correcter = self._correct_dates
-        else:
-            raise Exception(f'Blob contain invalid discipline: {d}')
-
-        start_of_emptiness = start_of_emptiness_before(
-            self.recall.data,
-            len(self.memo.data))
-        result = [None]*len(self.recall.data)
-        # Todo: won't work for historical dates
-        for i, user_value in enumerate(self.recall.data, start=0):
-            try:
-                correct_value = self.memo.data[i]
-            except IndexError:
-                result[i] = 'off_limits'
-            else:
-                if not user_value.strip():
-                    # Empty cell
-                    if i < start_of_emptiness:
-                        result[i] = 'gap'
-                    else:
-                        result[i] = 'not_reached'
-                else:
-                    result[i] = correcter(user_value, correct_value)
-        return result
-
-    @staticmethod
-    def _correct_binary(user_value: str, correct_value: int):
-        if user_value == str(correct_value):
-            return 'correct'
-        else:
-            return 'wrong'
-
-    @staticmethod
-    def _correct_decimals(user_value: str, correct_value: int):
-        if user_value == str(correct_value):
-            return 'correct'
-        else:
-            return 'wrong'
-
-    def _correct_words(self, user_value: str, correct_value: str):
-        if user_value.strip().lower() == correct_value.strip().lower():
-            return 'correct'
-        elif self._word_almost_correct(user_value, correct_value):
-            return 'almost_correct'
-        else:
-            return 'wrong'
-
-    @staticmethod
-    def _correct_dates(user_value: str, correct_value: int):
-        if user_value == str(correct_value):
-            return 'correct'
-        else:
-            return 'wrong'
-
-    @staticmethod
-    def _word_almost_correct(user_value, correct_value):
-        return False
-
-    def _raw_score(self, cell_by_cell_result):
-        # Will depend on correction method
-        return 123
-
-    def _points(self, raw_score):
-        return 3.14
-
-
 @app.route('/arbeiter', methods=['POST'])
 def arbeiter():
     app.logger.info(f'Arbeiter got data from {request.remote_addr}')
@@ -396,13 +281,13 @@ def arbeiter():
             db.session.add(recall)
             db.session.commit()
 
-            recall_correction = Arbeiter().correct(recall)
+            recall_correction = models.Arbeiter().correct(recall)
             app.logger.info(f'Arbeiter has corrected {request.remote_addr}')
         except Exception as e:
             app.logger.error(str(e))
             return jsonify({'error': str(e)})
 
-        return jsonify(recall_correction)
+        return jsonify([c.name for c in recall_correction])
 
 
 @app.route('/results/view', methods=['GET'])
