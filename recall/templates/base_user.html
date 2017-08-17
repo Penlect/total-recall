@@ -165,9 +165,10 @@
                     <th>Min</th>
                     <th>Language</th>
 
+                    <th>Nr Correct</th>
                     <th>Raw Score</th>
                     <th>Points</th>
-                    <th>Time remaining</th>
+                    <th>Time rem.</th>
                     <th>View</th>
                       {% if users_home_page %}
                     <th>Delete</th>
@@ -190,9 +191,10 @@
                         <td>-</td>
                           {% endif %}
 
-                        <td>321</td>
-                        <td>754</td>
-                        <td>{{ recall.time_remaining }}</td>
+                        <td>{{ recall.correction.correct }}</td>
+                        <td>{{ recall.correction.raw_score }}</td>
+                        <td>{{ recall.correction.points }}</td>
+                        <td>{{ recall.time_remaining|round(1) }}</td>
 
                           <!-- View -->
                           {% if users_home_page or (not users_home_page and recall.memo.state.value == 'Public') %}

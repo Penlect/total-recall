@@ -10,22 +10,17 @@
 {% block body %}
 
     <div class="page-header">
-        <h1>Recall <small>(key={{ memo.key }})</small></h1>
+        <h1>Recall <small>(memo_id={{ memo.id }})</small></h1>
     </div>
     {% block subheader %}
     <h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.recall_time }} min Recall</h3>
     {% endblock %}
 
+    <button id="start_recall" class="btn btn-success" type="button">Start Recall</button>
+
     <form action="{{ url_for('arbeiter') }}" method="post">
 
         <fieldset>
-        <div class="input-group" style="width:300px;">
-          <input id="username" name="username" type="text" class="form-control" placeholder="Unique name" autocomplete="off">
-          <span class="input-group-btn">
-            <button id="start_recall" class="btn btn-success" type="button">Start Recall</button>
-          </span>
-        </div>
-
         <div id="recallsheet" style="display:none;">
 
         <p>Seconds remaining: <span id="seconds_remaining">{% block seconds_remaining %}30{% endblock %}</span></p>
@@ -35,7 +30,7 @@
           </div>
         </div>
 
-        <input name="key" type="hidden" value="{{ memo.key }}">
+        <input name="memo_id" type="hidden" value="{{ memo.id }}">
         <input id="seconds_remaining_field" name="seconds_remaining" type="hidden">
 
         {% block table_logic %}
@@ -85,16 +80,16 @@ $(document).ready(function(){
         console.log(result);
         console.log(status);
 
-        var arrayLength = result.cell_by_cell_result.length;
+        var arrayLength = result.cell_by_cell.length;
         for (var i = 0; i < arrayLength; i++){
-            recallResultColor('recall_cell_' + i, result.cell_by_cell_result[i]);
+            recallResultColor('recall_cell_' + i, result.cell_by_cell[i]);
         }
         $("#recall_submit_button").css("display", "none");
         $("#raw_score").text(result.raw_score);
-        $("#count_correct").text(result.count.correct);
-        $("#count_wrong").text(result.count.wrong);
-        $("#count_gap").text(result.count.gap);
-        $("#count_unreached").text(result.count.not_reached);
+        $("#count_correct").text(result.correct);
+        $("#count_wrong").text(result.wrong);
+        $("#count_gap").text(result.gap);
+        $("#count_unreached").text(result.not_reached);
         $('#score_table').css("display", "block");
     }
 

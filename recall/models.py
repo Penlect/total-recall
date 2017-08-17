@@ -172,7 +172,7 @@ class DatesData(DisciplineData):
     def __init__(self, data):
         super().__init__(data)
         self._lookup = {recall_order: date for date, story, recall_order
-                        in data.items()}
+                        in data}
 
     @classmethod
     def random(cls, nr_items, language):
@@ -379,7 +379,7 @@ class MemoData(db.Model):
 
     def get_data_handler(self):
         for cls in (Base2Data, Base10Data, WordsData, DatesData):
-            if self.memo.discipline == cls.enum:
+            if self.discipline == cls.enum:
                 return cls(self.data)
         raise AssertionError(f'Now Data class for {self.memo.discipline}.')
 
@@ -475,7 +475,11 @@ class RecallData(db.Model):
     # ForeignKeys
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     memo_id = db.Column(db.Integer, db.ForeignKey('memo_data.id'), nullable=False)
-    #__table_args__ = (db.UniqueConstraint('account_id', 'name', name='_account_branch_uc'), )
+
+    # Relationships
+    correction = db.relationship('Correction', backref='recall',
+                                 cascade="save-update, merge, delete",
+                                 uselist=False)
 
     def __init__(self, ip, data, time_remaining: float):
 
@@ -488,8 +492,8 @@ class RecallData(db.Model):
     def from_request(cls, request, user):
         form = request.form
         ip = request.remote_addr
-        key = form['key'].strip().lower()
-        memo = MemoData.query.filter_by(id=key).one()
+        memo_id = form['memo_id'].strip().lower()
+        memo = MemoData.query.filter_by(id=memo_id).one()
         time_remaining = float(form['seconds_remaining'])
 
         data = list()
@@ -507,7 +511,6 @@ class RecallData(db.Model):
         r.user = user
         r.memo = memo
         return r
-
 
     def __repr__(self):
         return f'<RecallData {self.memo_id}>'
@@ -540,16 +543,10 @@ class Arbeiter:
         # Create Correction entry if not exists - update if exists
 
         cell_by_cell_result = self._correct_cells()
-        count = dict(collections.Counter(cell_by_cell_result))
         raw_score = self._raw_score(cell_by_cell_result)
         points = self._points(raw_score)
 
-        return {
-            'cell_by_cell_result': tuple(cell_by_cell_result),
-            'count': count,
-            'raw_score': raw_score,
-            'points': points
-        }
+        return raw_score, points, cell_by_cell_result
 
     def _correct_cells(self):
         handler = self.memo.get_data_handler()
@@ -579,7 +576,7 @@ class Arbeiter:
         return 3.14
 
 
-class Correction(db.Models):
+class Correction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     off_limits = db.Column(db.Integer, nullable=False)
@@ -594,7 +591,7 @@ class Correction(db.Models):
     cell_by_cell = db.Column(db.PickleType)
 
     # ForeignKeys
-    recall_id = db.Column(db.Integer, db.ForeignKey('recall.id'))
+    recall_id = db.Column(db.Integer, db.ForeignKey('recall_data.id'))
 
     def __init__(self, raw_score, points, cell_by_cell):  # update with __init__
         c = collections.Counter(cell_by_cell)
@@ -609,6 +606,19 @@ class Correction(db.Models):
         self.raw_score = raw_score
         self.points = points
         self.cell_by_cell = cell_by_cell
+
+    def __iter__(self):
+        yield from (
+            ('off_limits', self.off_limits),
+            ('gap', self.gap),
+            ('not_reached', self.not_reached),
+            ('correct', self.correct),
+            ('wrong', self.wrong),
+            ('almost_correct', self.almost_correct),
+            ('raw_score', self.raw_score),
+            ('points', self.points),
+            ('cell_by_cell', [i.name for i in self.cell_by_cell])
+        )
 
 
 class Language(db.Model):
@@ -644,7 +654,7 @@ class Word(db.Model):
         return f'<Word {self.word}>'
 
 
-class AlmostCorrectWord(db.Models):
+class AlmostCorrectWord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)
     ip = db.Column(db.String(40), nullable=False)

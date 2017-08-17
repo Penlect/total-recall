@@ -265,7 +265,8 @@ def recall_(memo_id):
         return render_template('recall_words.html', memo=memo,
                                nr_cols_iter=nr_cols_iter)
     elif memo.discipline == models.Discipline.dates:
-        return render_template('recall_dates.html', memo=memo)
+        return render_template('recall_dates.html', memo=memo,
+                               data=sorted(memo.data, key=lambda x: x[2]))
     else:
         return 'Recall not implemented yet: ' + memo.discipline
 
@@ -274,20 +275,21 @@ def recall_(memo_id):
 def arbeiter():
     app.logger.info(f'Arbeiter got data from {request.remote_addr}')
     if request.method == 'POST':
-        try:
-            app.logger.info(str(request.form))
-            recall = models.RecallData.from_request(request, current_user)
-            # Todo: Backup solution if commit fails
-            db.session.add(recall)
-            db.session.commit()
+        app.logger.info(str(request.form))
+        recall = models.RecallData.from_request(request, current_user)
+        # Todo: Backup solution if commit fails
+        db.session.add(recall)
 
-            recall_correction = models.Arbeiter().correct(recall)
-            app.logger.info(f'Arbeiter has corrected {request.remote_addr}')
-        except Exception as e:
-            app.logger.error(str(e))
-            return jsonify({'error': str(e)})
+        raw_score, points, cell_by_cell = models.Arbeiter().correct(recall)
+        c = models.Correction(raw_score, points, cell_by_cell)
+        c.recall = recall
+        db.session.add(c)
 
-        return jsonify([c.name for c in recall_correction])
+        db.session.commit()
+
+        app.logger.info(f'Arbeiter has corrected {request.remote_addr}')
+        app.logger.info(dict(c))
+        return jsonify(dict(c))
 
 
 @app.route('/results/view', methods=['GET'])
