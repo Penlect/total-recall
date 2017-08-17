@@ -24,6 +24,8 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
+# Todo: how to handle empty memo and recall tables
+# Todo: bug pattern alltid = deicmal
 
 def sha(string):
     h = hashlib.sha1(string.encode())

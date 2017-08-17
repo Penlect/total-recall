@@ -1,8 +1,7 @@
 
 {% macro common_fields(item_name, button_name) %}
 <div class="form-group">
-    <label class="col-sm-3 control-label"></label>
-    <div class="col-sm-9">
+    <div class="col-sm-12">
         <button type="submit" type="button" class="btn btn-default btn-block">{{ button_name }}</button>
     </div>
 </div>
@@ -15,33 +14,21 @@
 <!-- Navbar and flashed messages -->
 {{ super() }}
 
-    {% set left_column_width = 8 %}
-    {% set right_column_width = 4 %}
+    {% set left_column_width = 6 %}
+    {% set right_column_width = 6 %}
 
     <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="jumbotron">
-                    {% block jumbotron %}{% endblock %}
-                </div>
-            </div>
-        </div>
 
 
-        <div class="row">
-            <div class="col-md-12">
-                <h1>Binary Numbers</h1>
-            </div>
-        </div>
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
+                <h1>Binary Numbers</h1>
                 <div class="well" style="background-color:#f442eb;">
                     <form id="form_binary" class="form-horizontal" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="binary">
                         {% block binary %}{% endblock %}
                         <div class="form-group">
-                            <label for="time_binary" class="col-sm-3 control-label">Time</label>
-                            <div class="col-sm-9">
+                            <div class="col-sm-12">
                                 <select name="time" class="form-control" id="time_binary">
                                   <option value="5,15">5min / 15min</option>
                                   <option value="30,60">30min / 60min</option>
@@ -54,25 +41,13 @@
                 <p id="links_binary"><p>
             </div>
             <div class="col-md-{{ right_column_width }}">
-                {% block binary_instructions %}{% endblock %}
-            </div>
-        </div>
-
-
-        <div class="row">
-            <div class="col-md-12">
                 <h1>Decimal Numbers</h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#5bc0de;">
                     <form id="form_numbers" class="form-horizontal" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="decimals">
                         {% block numbers %}{% endblock %}
                         <div class="form-group">
-                            <label for="time_numbers" class="col-sm-3 control-label">Time</label>
-                            <div class="col-sm-9">
+                            <div class="col-sm-12">
                                 <select name="time" class="form-control" id="time_numbers">
                                   <option value="5,15">5min / 15min</option>
                                   <option value="15,30">15min / 30min</option>
@@ -86,26 +61,17 @@
                 </div>
                 <p id="links_numbers"><p>
             </div>
-            <div class="col-md-{{ right_column_width }}">
-                {% block numbers_instructions %}{% endblock %}
-            </div>
         </div>
 
-
-        <div class="row">
-            <div class="col-md-12">
-                <h1>Words</h1>
-            </div>
-        </div>
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
+                <h1>Words</h1>
                 <div class="well" style="background-color:#ffff66;">
                     <form id="form_words" class="form-horizontal" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="words">
                         {% block words %}{% endblock %}
                         <div class="form-group">
-                            <label for="time_words" class="col-sm-3 control-label">Time</label>
-                            <div class="col-sm-9">
+                            <div class="col-sm-12">
                                 <select name="time" class="form-control" id="time_words">
                                   <option value="5,15">5min / 15min</option>
                                   <option value="15,30">15min / 30min</option>
@@ -118,25 +84,13 @@
                 <p id="links_words"><p>
             </div>
             <div class="col-md-{{ right_column_width }}">
-                {% block words_instructions %}{% endblock %}
-            </div>
-        </div>
-
-
-        <div class="row">
-            <div class="col-md-12">
                 <h1>Historical Dates</h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-{{ left_column_width }}">
                 <div class="well" style="background-color:#66ff99;">
                     <form id="form_dates" class="form-horizontal" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="dates">
                         {% block dates %}{% endblock %}
                         <div class="form-group">
-                            <label for="time_dates" class="col-sm-3 control-label">Time</label>
-                            <div class="col-sm-9">
+                            <div class="col-sm-12">
                                 <select name="time" class="form-control" id="time_dates">
                                   <option value="5,15">5min / 15min</option>
                                 </select>
@@ -146,9 +100,6 @@
                     </form>
                 </div>
                 <p id="links_dates"><p>
-            </div>
-            <div class="col-md-{{ right_column_width }}">
-                {% block dates_instructions %}{% endblock %}
             </div>
         </div>
 
