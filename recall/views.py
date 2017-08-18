@@ -1,5 +1,6 @@
 
 import os
+import re
 from flask import (render_template, request, jsonify, send_file, url_for,
                    flash, redirect)
 from flask_login import login_user , logout_user , current_user , login_required
@@ -49,11 +50,32 @@ login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info'
 
 
+def verify_username(username):
+    """Make sure the username is OK to use as a username"""
+    candidate = username.strip().lower()
+    MAX_LENGTH = 12
+    if len(candidate) > MAX_LENGTH:
+        raise ValueError(f'Username "{candidate}" too long! '
+                         f'Maximum {MAX_LENGTH} characters allowed.')
+    elif not re.match(r'[\w_]+$', candidate):
+        raise ValueError(f'Username "{candidate}" forbidden characters.')
+    elif models.User.query.filter_by(username=candidate).first() is not None:
+        raise ValueError(f'Username "{candidate}" is already taken.')
+    else:
+        return username
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
         return render_template('register.html')
-    # POST: create user -> insert in db -> redirect to login
+    username = request.form['username'].strip().lower()
+    try:
+        username = verify_username(username)
+    except ValueError as error:
+        flash(str(error) + ' Try again.', 'danger')
+        return redirect(url_for('register'))
+
     user = models.User.from_request(request)
     db.session.add(user)
     db.session.commit()
@@ -66,8 +88,9 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')
     username = request.form['username'].strip().lower()
-    user = models.User.query.filter_by(username=username).first()
-    if user is None:
+    try:
+        user = models.User.query.filter_by(username=username).one()
+    except sqlalchemy.orm.exc.NoResultFound:
         flash('Username or Password is invalid', 'danger')
         return redirect(url_for('login'))
     login_user(user)
@@ -91,7 +114,8 @@ def delete_account():
     db.session.delete(current_user)
     db.session.commit()
     logout_user()
-    return 'Account deleted.'
+    flash('Account "{current_user.username}" deleted.', 'danger')
+    return redirect(url_for('index'))
 
 
 @app.route('/delete/memo/<int:memo_id>')
@@ -171,6 +195,7 @@ def user(username):
             current_user.settings = settings
             db.session.commit()
             flash('Settings successfully updated', 'success')
+        return redirect(url_for('user', username=current_user.username))
 
     r = models.RecallData.query.join(models.RecallData.memo).filter(
         models.MemoData.user_id==user.id)
@@ -179,30 +204,21 @@ def user(username):
                            recalls=r)
 
 
-@app.route('/generate')
-@login_required
-def generate():
-    return render_template('make_generate.html')
-
-
-@app.route('/create')
-@login_required
-def create():
-    return render_template('make_create.html')
-
-
-@app.route('/make', methods=['POST'])
+@app.route('/make', methods=['GET', 'POST'])
 @login_required
 def make_discipline():
     """Convert request form to memo"""
-    if request.method == 'POST':
+    if request.method == 'GET':
+        return render_template('make.html')
+    elif request.method == 'POST':
         memo = models.MemoData.from_request(request, current_user)
         db.session.add(memo)
         db.session.commit()
-        return render_template(
-            'make_links_memo_and_recall.html',
-            memo_id=memo.id
-        )
+        if memo.generated is True:
+            return redirect(url_for('user', username=current_user.username))
+        else:
+            return 'Successfully created discipline'
+
 
 @app.route('/download/xls/<int:memo_id>', methods=['GET'])
 @login_required
