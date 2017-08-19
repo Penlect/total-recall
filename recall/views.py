@@ -133,6 +133,16 @@ def delete_memo(memo_id):
     return redirect(url_for('user', username=current_user.username))
 
 
+@app.route('/delete/all_memos')
+@login_required
+def delete_all_memos():
+    for memo in current_user.memos:
+        db.session.delete(memo)
+    flash(f'Deleted all memos', 'success')
+    db.session.commit()
+    return redirect(url_for('user', username=current_user.username))
+
+
 @app.route('/delete/recall/<int:recall_id>')
 @login_required
 def delete_recall(recall_id):

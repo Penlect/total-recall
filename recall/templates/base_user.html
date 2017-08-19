@@ -26,7 +26,7 @@
                 <li role="presentation"><a href="{{ url_for('delete_account') }}"
                        onclick="return confirm('Permanently delete account {{ user.username }}?')">
                     Delete account</a></li>
-                <li role="presentation"><a href="#">Delete all my Memorizations</a></li>
+                <li role="presentation"><a href="{{ url_for('delete_all_memos') }}" onclick="return confirm('Delete ALL memorizations?')">Delete all my Memorizations (and associated recalls)</a></li>
                 <li role="presentation"><a href="#"
                        onclick="return confirm('Delete recalls?')">
                     Delete all my Recalls of my Memorizations</a></li>
