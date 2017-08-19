@@ -142,19 +142,27 @@
 
                           <!-- State -->
                       {% if users_home_page %}
-                        <td><a href="{{ url_for('toggle_key_state', memo_id=memo.id) }}"
-                        onclick="return confirm('Change to next state?')">
-                            {{ memo.state.value }}</a>
-                        </td>
+                          {% if memo.state.name == 'private' %}
+                        <td><a href="{{ url_for('change_state', memo_id=memo.id, state='competition') }}" onclick="return confirm('Are you sure?');"> &lt;</a>
+                            {{ memo.state.value }}</td>
+                          {% elif memo.state.name == 'competition' %}
+                        <td><a href="{{ url_for('change_state', memo_id=memo.id, state='public') }}" onclick="return confirm('Are you sure?');"> &lt;</a>
+                            {{ memo.state.value }}
+                            <a href="{{ url_for('change_state', memo_id=memo.id, state='private') }}" onclick="return confirm('Are you sure?');"> &gt;</a></td>
+                          {% elif memo.state.name == 'public' %}
+                        <td>{{ memo.state.value }}
+                            <a href="{{ url_for('change_state', memo_id=memo.id, state='competition') }}" onclick="return confirm('Are you sure?');"> &gt;</a></td>
+                          {% else %}
+                          {% endif %}
 
                           <!-- Delete -->
-                          {% if memo.state.value == 'Competition' %}
-                            <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
-                          {% else %}
+                          {% if memo.state.name == 'private' %}
                         <td><a href="{{ url_for('delete_memo', memo_id=memo.id) }}"
                         onclick="return confirm('Permanently delete {{ memo.id }}?')">
                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
                         </td>
+                          {% else %}
+                            <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
                           {% endif %}
                       {% endif %}
                       </tr>
@@ -205,7 +213,7 @@
                         <td>{{ recall.time_remaining|round(1) }}</td>
 
                           <!-- View -->
-                          {% if users_home_page or (not users_home_page and recall.memo.state.value == 'Public') %}
+                          {% if users_home_page or (not users_home_page and (recall.memo.state.value == 'Public' or recall.user.id == current_user.id)) %}
                         <td><a href="{{ url_for('download_xls', memo_id=recall.memo.id) }}">{{ recall.memo.id }}.xls</a></td>
                         {% else %}
                          <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>

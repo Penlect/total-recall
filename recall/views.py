@@ -149,19 +149,20 @@ def delete_recall(recall_id):
     return redirect(url_for('user', username=current_user.username))
 
 
-@app.route('/togglekey/<string:memo_id>')
+@app.route('/changestate/<string:memo_id>/<string:state>')
 @login_required
-def toggle_key_state(memo_id):
-    # Todo: Improve this
-    key_state = models.MemoData.query.filter_by(id=memo_id).one()
-    if key_state.state == models.State.private:
-        key_state.state = models.State.competition
-    elif key_state.state == models.State.competition:
-        key_state.state = models.State.public
-    elif key_state.state == models.State.public:
-        key_state.state = models.State.private
-    db.session.commit()
-    return redirect(url_for('user', username=current_user.username))
+def change_state(memo_id, state):
+    memo = models.MemoData.query.filter_by(id=memo_id).one()
+    if memo.user.id != current_user.id:
+        return 'Not authorized.'
+    state = state.strip().lower()
+    for s in models.State:
+        if s.name == state:
+            memo.state = s
+            db.session.commit()
+            return redirect(url_for('user', username=current_user.username))
+    else:
+        return f'Unknown state {state}'
 
 
 @app.route('/users')
