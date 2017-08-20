@@ -27,12 +27,15 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="word_class" class="col-sm-2 control-label">Class</label>
+                            <label class="col-sm-2 control-label">Class</label>
                             <div class="col-sm-10">
-                                <select class="form-control" name="word_class" id="word_class">
+                                <select class="form-control" name="word_class" id="word_class_selection">
+                                    <option value="" selected disabled>Choose word class ... </option>
+    <optgroup label="Word class">
                                   <option value="concrete_noun">Concrete Noun</option>
                                   <option value="abstract_noun">Abstract Noun</option>
                                   <option value="infinitive_verb">Infinitive Verb</option>
+    </optgroup>
                                 </select>
                             </div>
                         </div>
@@ -120,9 +123,16 @@ $(document).ready(function(){
 
      $(':input[type="submit"]').prop('disabled', true);
      $('#language_selection').change(function() {
-        $(':input[type="submit"]').prop('disabled', false);
+        var lang = $('#language_selection').val();
+        var cls = $('#word_class_selection').val();
+        $(':input[type="submit"]').prop('disabled', lang == null || cls == null);
          var lang = this.value; // value of the select element
          update_table(lang);
+     });
+     $('#word_class_selection').change(function() {
+        var lang = $('#language_selection').val();
+        var cls = $('#word_class_selection').val();
+        $(':input[type="submit"]').prop('disabled', lang == null || cls == null);
      });
 
    $('form').submit(function(event){
