@@ -159,6 +159,21 @@ def delete_recall(recall_id):
     return redirect(url_for('user', username=current_user.username))
 
 
+@app.route('/delete/story', methods=['GET'])
+@login_required
+def delete_story():
+    story_id = int(request.args.get('story_id'))
+    story = models.Story.query.get(story_id)
+    # Todo: only admin users should be able to delete?
+    if story is None:
+        flash('Can\'t delete story, not found in database', 'danger')
+    else:
+        flash(f'Deleted story "{story.story}".', 'success')
+        db.session.delete(story)
+        db.session.commit()
+    return 'Done'
+
+
 @app.route('/changestate/<string:memo_id>/<string:state>')
 @login_required
 def change_state(memo_id, state):
@@ -355,6 +370,70 @@ def view_recall():
     else:
         raise Exception(f'Blob contain invalid discipline: {d}')
 
+
+@app.route('/database/stories', methods=['GET', 'POST'])
+@login_required
+def db_stories():
+    """Words database dashboard"""
+    if request.method == 'GET':
+        return render_template('db_stories.html')
+
+
+@app.route('/database/stories/table', methods=['GET', 'POST'])
+@login_required
+def table_stories():
+    """Words database dashboard"""
+    if request.method == 'GET':
+        language = request.args.get('language')
+        if language and language.strip().lower() != 'all':
+            try:
+                language = models.Language.query.filter_by(
+                    language=language.strip().lower()).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                stories = list()
+            else:
+                stories = language.stories
+        else:
+            stories = models.Story.query.all()
+        return render_template('table_stories.html', stories=stories)
+
+    elif request.method == 'POST':
+        language = request.form['language'].strip().lower()
+        try:
+            language = models.Language.query.filter_by(language=language).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            language = models.Language(language=language)
+            db.session.add(language)
+            db.session.commit()
+        text_area = request.form['data']
+        nr_success = 0
+        for line in text_area.split('\n'):
+            line = line.strip()
+            if line:
+                if language.stories.filter(models.Story.story == line).first():
+                    flash(f'Story "{line}" already exists in database.',
+                          'warning')
+                    continue
+                try:
+                    s = models.Story(
+                        ip=request.remote_addr,
+                        username=current_user.username,
+                        story=line
+                    )
+                    s.language = language
+                except ValueError as error:
+                    flash(str(error), 'danger')
+                else:
+                    db.session.add(s)
+                    nr_success += 1
+        db.session.commit()
+        if nr_success == 1:
+            flash(f'Story successfully added to the database.',
+                  'success')
+        elif nr_success > 1:
+            flash(f'{nr_success} stories successfully added to the database.',
+                  'success')
+        return 'Done'
 
 
 @app.route('/database/words', methods=['GET', 'POST'])

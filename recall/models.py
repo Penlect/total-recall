@@ -621,10 +621,34 @@ class Correction(db.Model):
         )
 
 
+class AlmostCorrectWord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    datetime = db.Column(db.DateTime, nullable=False)
+    ip = db.Column(db.String(40), nullable=False)
+
+    word = db.Column(db.String(80), nullable=False)
+    almost_correct = db.Column(db.String(80), nullable=False)
+
+    # ForeignKeys
+    language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __init__(self, ip, word, almost_correct):
+        self.datetime = datetime.utcnow()
+        self.ip = ip
+        self.word = word
+        self.almost_correct = almost_correct
+
+
 class Language(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     language = db.Column(db.String(80), unique=True, nullable=False)
+
+    # Relationships
     words = db.relationship('Word', backref="language", lazy='dynamic')
+    stories = db.relationship('Story', backref="language", lazy='dynamic')
+    almost_correct_words = db.relationship('AlmostCorrectWord',
+                                           backref="language", lazy='dynamic')
 
     def __init__(self, language):
         self.language = language
@@ -638,11 +662,15 @@ class Word(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)
     ip = db.Column(db.String(40), nullable=False)
-    language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
+    # The username is not a ForeignKey since we don't want the
+    # word to be deleted if the user deletes his/her account
     username = db.Column(db.String(40), nullable=False)
 
     word = db.Column(db.String(80), nullable=False)
     word_class = db.Column(db.Enum(WordClass), nullable=False)
+
+    # ForeignKeys
+    language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
 
     def __init__(self, ip, word, word_class):
         self.datetime = datetime.utcnow()
@@ -654,19 +682,29 @@ class Word(db.Model):
         return f'<Word {self.word}>'
 
 
-class AlmostCorrectWord(db.Model):
+class Story(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)
     ip = db.Column(db.String(40), nullable=False)
-    word = db.Column(db.String(80), nullable=False)
-    almost_correct = db.Column(db.String(80), nullable=False)
+    # The username is not a ForeignKey since we don't want the
+    # story to be deleted if the user deletes his/her account
+    username = db.Column(db.String(40), nullable=False)
+
+    story = db.Column(db.String(100), nullable=False)
 
     # ForeignKeys
     language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    def __init__(self, ip, word, almost_correct):
+    def __init__(self, ip, username, story):
         self.datetime = datetime.utcnow()
         self.ip = ip
-        self.word = word
-        self.almost_correct = almost_correct
+        self.username = username
+        story = story.strip()
+        nr_words = len(story.split())
+        if nr_words > 6:
+            raise ValueError('Maximum 6 words allowed in a story. '
+                             f'{nr_words} words found in "{story}".')
+        self.story = story
+
+    def __repr__(self):
+        return f'<Story "{self.story}">'

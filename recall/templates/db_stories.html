@@ -1,0 +1,134 @@
+{% extends "base_navigation.html" %}
+
+{% from 'languages.html' import languages %}
+
+{% block body %}
+
+<!-- Navbar and flash messages -->
+{{ super() }}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Database: Historical Dates</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+                <div class="well" style="background-color:#ffff66;">
+                    <form class="form-horizontal" action="" method="post">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Language</label>
+                            <div class="col-sm-10">
+                                {{ languages() }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="word_input" class="col-sm-2 control-label">Stories</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" required name="data" rows="10" id="word_input"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-10">
+                                <button type="submit" type="button" class="btn btn-default btn-block">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+        </div>
+        <div class="col-md-7">
+            <p>Please select a language and write one or more stories in the text area. Submit when you are done.
+                <ul>
+            <li>Write the stories in the same language as you selected.</li>
+            <li>The length of the story must be between one and six words.</li>
+            <li>All stories must be fictitious or general and non-culturally specific (e.g. Peace Treaty signed).</li>
+                </ul>
+            </p>
+            <p><strong>Syntax:</strong> Type one story per line. Empty lines will be ignored. For example, adding four stories:
+                <div class="well" >
+            <em>Politiker fuskar i val</em><br>
+            <em>Prinsessa visar sig vara prins</em><br>
+            <em>Snövit blir förkyld</em><br>
+            <em>Solen lyser dubbelt så starkt</em><br>
+            </div>
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12" id="db_stories_content">
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+function update_table(language) {
+    console.log('Update-table Language: ' + language);
+    $.ajax({
+          url: "{{ url_for('table_stories') }}",
+          type: "get", //send it through get method
+          data: {
+            language: language
+          },
+          success: function(response) {
+            $('#db_stories_content').html(response);
+          },
+          error: function(xhr) {
+            $('#db_stories_content').html('Error. Failed to get data from server.');
+          }
+    });
+}
+
+function send_delete(id) {
+    if(!confirm("Are you sure you want to delete this story?")){
+        return false;
+    }
+    $.ajax({
+      url: "{{ url_for('delete_story') }}",
+      type: "get",
+      data: {story_id: id},
+      success: function(response) {
+           update_table($('#language_selection').val());
+      },
+      error: function(xhr) {
+        $('#db_stories_content').html('Error. Failed to delete story.');
+      }
+    });
+}
+
+ $(function() {
+     $(':input[type="submit"]').prop('disabled', true);
+     $('#language_selection').change(function() {
+        $(':input[type="submit"]').prop('disabled', false);
+         var lang = this.value; // value of the select element
+         update_table(lang);
+     });
+
+     $('form').submit(function(event){
+          event.preventDefault();
+          console.log("Sending data to server");
+          $.ajax({
+              url: "{{ url_for('table_stories') }}",
+              type: "post",
+              data: $(this).serialize(),
+              success: function(response) {
+                   update_table($('#language_selection').val());
+              },
+              error: function(xhr) {
+                $('#db_stories_content').html('Error. Failed to submit data to server.');
+              }
+          });
+	 });
+
+  });
+</script>
+{% endblock %}
