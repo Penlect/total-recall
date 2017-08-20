@@ -168,8 +168,23 @@ def delete_story():
     if story is None:
         flash('Can\'t delete story, not found in database', 'danger')
     else:
-        flash(f'Deleted story "{story.story}".', 'success')
+        flash(f'Deleted story "{story.story}".', 'danger')
         db.session.delete(story)
+        db.session.commit()
+    return 'Done'
+
+
+@app.route('/delete/word', methods=['GET'])
+@login_required
+def delete_word():
+    story_id = int(request.args.get('word_id'))
+    word = models.Word.query.get(story_id)
+    # Todo: only admin users should be able to delete?
+    if word is None:
+        flash('Can\'t delete word, not found in database', 'danger')
+    else:
+        flash(f'Deleted word "{word.word}".', 'danger')
+        db.session.delete(word)
         db.session.commit()
     return 'Done'
 
@@ -437,73 +452,80 @@ def table_stories():
 
 
 @app.route('/database/words', methods=['GET', 'POST'])
-def manage_words_database():
+@login_required
+def db_words():
     """Words database dashboard"""
     if request.method == 'GET':
         return render_template('db_words.html')
 
 
-@app.route('/database/words/content', methods=['GET'])
-def database_words_content():
-    """View whole word database in one big table"""
-    db_words = load_database(DATABASE_WORDS, WordEntry)
-    return render_template('db_words_content.html', words=db_words)
-
-
-@app.route('/database/words/modify', methods=['POST'])
-def database_words_modify():
-    """ Update word database and respond modifications table summary """
-    modification_time = time.strftime('%Y-%m-%d %H:%M:%S')
-    db_words = load_database(DATABASE_WORDS, WordEntry)
-    if request.method == 'POST':
-        form = request.form
-
-        if form['pwd'].lower().strip() != 'minnsej':
-            return 'Wrong password!'
-
-        if not form['added_by'].strip():
-            return 'Your name is mandatory!'
-
-        if not form['data'].strip():
-            return 'No words were added since Words input was empty!'
-
-        # We can't check words in database only on the word value,
-        # the language is needed as well. Two words might exists
-        # with the same word value but different meaning in two
-        # languages.
-        db_lang_word = {f'{w.language};{w.value}':w for w in db_words}
-
-        status = dict()
-        data = unique_lines_in_textarea(form['data'], lower=True)
-        for word in data:
-            delete_me = word.startswith('delete:')
-            w = WordEntry(
-                language=form['language'].lower(),
-                value=word.replace('delete:', ''),
-                name=form['added_by'],
-                date=modification_time,
-                word_class=form['word_class'].lower()
-            )
-            lw = f'{w.language};{w.value}'
-            if delete_me:
-                if lw in db_lang_word:
-                    status[db_lang_word[lw]] = 'deleted'
-                    del db_lang_word[lw]
-                else:
-                    status[w] = 'failed_delete'
-            elif lw in db_lang_word:
-                if db_lang_word[lw].word_class != w.word_class:
-                    db_lang_word[lw] = w
-                    status[w] = 'updated'
-                else:
-                    status[db_lang_word[lw]] = 'already_exists'
+@app.route('/database/words/table', methods=['GET', 'POST'])
+@login_required
+def table_words():
+    """Words database dashboard"""
+    if request.method == 'GET':
+        language = request.args.get('language')
+        if language and language.strip().lower() != 'all':
+            try:
+                language = models.Language.query.filter_by(
+                    language=language.strip().lower()).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                words = list()
             else:
-                db_lang_word[lw] = w
-                status[w] = 'added'
+                words = language.words
+        else:
+            words = models.Word.query.all()
+        return render_template('table_words.html', words=words)
 
-        new_words = list(sorted(set(db_lang_word.values())))
-        save_database(DATABASE_WORDS, new_words)
-        return render_template(
-            'db_words_modification.html', words=new_words, status=status,
-            modification_time=modification_time
-        )
+    elif request.method == 'POST':
+        language = request.form['language'].strip().lower()
+        word_class = request.form['word_class'].strip().lower()
+        try:
+            language = models.Language.query.filter_by(language=language).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            language = models.Language(language=language)
+            db.session.add(language)
+            db.session.commit()
+        text_area = request.form['data']
+        nr_exist = 0
+        nr_added = 0
+        nr_updated = 0
+        for line in text_area.split('\n'):
+            line = line.strip().lower()
+            if line:
+                db_word = language.words.filter(models.Word.word == line).first()
+                if db_word:
+                    if db_word.word_class.name == word_class:
+                        nr_exist += 1
+                    else:
+                        for wc in models.WordClass:
+                            if wc.name == word_class:
+                                db_word.word_class = wc
+                                nr_updated += 1
+                                break
+                    continue
+                try:
+                    w = models.Word(
+                        ip=request.remote_addr,
+                        username=current_user.username,
+                        word=line,
+                        word_class=word_class
+                    )
+                    w.language = language
+                except ValueError as error:
+                    flash(str(error), 'danger')
+                else:
+                    db.session.add(w)
+                    nr_added += 1
+        db.session.commit()
+        if nr_exist > 0:
+            plural = 's' if nr_exist > 1 else ''
+            flash(f'{nr_exist} word{plural} already exist in database. Not added',
+                  'warning')
+        if nr_updated > 0:
+            plural = 's' if nr_exist > 1 else ''
+            flash(f'{nr_updated} word{plural} updated in database.', 'success')
+        if nr_added > 0:
+            plural = 's' if nr_exist > 1 else ''
+            flash(f'{nr_added} word{plural} added to the database.', 'success')
+        return 'Done'

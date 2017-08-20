@@ -672,9 +672,10 @@ class Word(db.Model):
     # ForeignKeys
     language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
 
-    def __init__(self, ip, word, word_class):
+    def __init__(self, ip, username, word, word_class):
         self.datetime = datetime.utcnow()
         self.ip = ip
+        self.username = username
         self.word = word
         self.word_class = word_class
 

@@ -1,35 +1,28 @@
-{% extends "base.html" %}
+{% extends "base_navigation.html" %}
+
+{% from 'languages.html' import languages %}
 
 {% block body %}
+
+<!-- Navbar and flash messages -->
+{{ super() }}
 
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <div class="jumbotron">
                 <h1>Database: Words</h1>
-            </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-5">
                 <div class="well" style="background-color:#ffff66;">
 
-                    <form class="form-horizontal" action="{{ url_for('database_words_modify') }}" method="post">
+                    <form class="form-horizontal" action="" method="post">
 
                         <div class="form-group">
-                            <label for="added_by" class="col-sm-2 control-label">You</label>
+                            <label class="col-sm-2 control-label">Language</label>
                             <div class="col-sm-10">
-                                <input name="added_by" type="string" required class="form-control" id="added_by" placeholder="Firstname Lastname" autocomplete="off">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="language" class="col-sm-2 control-label">Language</label>
-                            <div class="col-sm-10">
-                                <select class="form-control" name="language" id="language">
-                                  <option>Swedish</option>
-                                  <option>English</option>
-                                </select>
+                                {{ languages() }}
                             </div>
                         </div>
 
@@ -37,9 +30,9 @@
                             <label for="word_class" class="col-sm-2 control-label">Class</label>
                             <div class="col-sm-10">
                                 <select class="form-control" name="word_class" id="word_class">
-                                  <option>Concrete Noun</option>
-                                  <option>Abstract Noun</option>
-                                  <option>Infinitive Verb</option>
+                                  <option value="concrete_noun">Concrete Noun</option>
+                                  <option value="abstract_noun">Abstract Noun</option>
+                                  <option value="infinitive_verb">Infinitive Verb</option>
                                 </select>
                             </div>
                         </div>
@@ -47,14 +40,7 @@
                         <div class="form-group">
                             <label for="word_input" class="col-sm-2 control-label">Words</label>
                             <div class="col-sm-10">
-                                <textarea class="form-control" required name="data" rows="20" id="word_input"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="pwd" class="col-sm-2 control-label">Password</label>
-                            <div class="col-sm-10">
-                                <input name="pwd" type="string" required class="form-control" id="pwd" autocomplete="off">
+                                <textarea class="form-control" required name="data" rows="10" id="word_input"></textarea>
                             </div>
                         </div>
 
@@ -68,9 +54,7 @@
                 </div>
         </div>
         <div class="col-md-7">
-            <h2>Modify the Database for Words</h2>
             <p>Please enter values in the form to the left in order to add/modify/delete words in the database.</p>
-            <p>You must provide a name, password and write at least one word in the text area to be able submit the form.</p>
             <p>After a successful submit the database table at the bottom of this page will immediately update to reflect the changes.
                 An extra table with a summary of your modifications will also be printed below
                 (and will disappear when you refresh the page). There is no undo-button. If you make a mistake, simply delete the word or re-add it manually.</p>
@@ -79,24 +63,12 @@
                 <em>sjöhäst</em><br>
                 <em>kortlek</em><br>
             </div>
-            To delete a word prepend "delete:" to the word. Example, adding one word, deleting two:<br>
-                <div class="well" ><em>pizza</em><br>
-                <em>delete:sjöhäst</em><br>
-                <em>delete:kortlek</em><br>
-            </div>
             </p>
-            <p><strong>Conflicts:</strong> If you try to delete a word that does not exist in the database - nothing will happen.
+            <p><strong>Conflicts:</strong>
             If you add a word that already exists - nothing will happen - unless the word class is different. If the
             word class is different the word will be updated to have the new word class.</p>
         </div>
     </div>
-
-
-    <div class="row">
-        <div class="col-md-12" id="db_words_modifications">
-        </div>
-    </div>
-
 
     <div class="row">
         <div class="col-md-12" id="db_words_content">
@@ -110,19 +82,65 @@
 {% block javascript %}
 <script>
 
+function update_table(language) {
+    console.log('Update-table words, Language: ' + language);
+    $.ajax({
+          url: "{{ url_for('table_words') }}",
+          type: "get",
+          data: {
+            language: language
+          },
+          success: function(response) {
+            $('#db_words_content').html(response);
+          },
+          error: function(xhr) {
+            $('#db_words_content').html('Error. Failed to get data from server.');
+          }
+    });
+}
+
+function send_delete(id) {
+    if(!confirm("Are you sure you want to delete this word?")){
+        return false;
+    }
+    $.ajax({
+      url: "{{ url_for('delete_word') }}",
+      type: "get",
+      data: {word_id: id},
+      success: function(response) {
+           update_table($('#language_selection').val());
+      },
+      error: function(xhr) {
+        $('#db_stories_content').html('Error. Failed to delete word.');
+      }
+    });
+}
+
 $(document).ready(function(){
 
-    $('#db_words_content').load("{{ url_for('database_words_content') }}")
+     $(':input[type="submit"]').prop('disabled', true);
+     $('#language_selection').change(function() {
+        $(':input[type="submit"]').prop('disabled', false);
+         var lang = this.value; // value of the select element
+         update_table(lang);
+     });
 
    $('form').submit(function(event){
-	  event.preventDefault();
-      $.post($(this).attr('action'), $(this).serialize(), function(data){
-        $('#db_words_modifications').prepend(data)
-        $('#db_words_content').load("{{ url_for('database_words_content') }}")
-      });
+          event.preventDefault();
+          console.log("Sending data to server");
+          $.ajax({
+              url: "{{ url_for('table_words') }}",
+              type: "post",
+              data: $(this).serialize(),
+              success: function(response) {
+                   update_table($('#language_selection').val());
+              },
+              error: function(xhr) {
+                $('#db_words_content').html('Error. Failed to submit data to server.');
+              }
+          });
+	 });
 
-      return false;
-   });
 });
 
 </script>
