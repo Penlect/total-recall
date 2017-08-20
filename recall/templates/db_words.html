@@ -20,15 +20,13 @@
                     <form class="form-horizontal" action="" method="post">
 
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">Language</label>
-                            <div class="col-sm-10">
+                            <div class="col-sm-12">
                                 {{ languages() }}
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">Class</label>
-                            <div class="col-sm-10">
+                            <div class="col-sm-12">
                                 <select class="form-control" name="word_class" id="word_class_selection">
                                     <option value="" selected disabled>Choose word class ... </option>
     <optgroup label="Word class">
@@ -41,15 +39,13 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="word_input" class="col-sm-2 control-label">Words</label>
-                            <div class="col-sm-10">
+                            <div class="col-sm-12">
                                 <textarea class="form-control" required name="data" rows="10" id="word_input"></textarea>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"></label>
-                            <div class="col-sm-10">
+                            <div class="col-sm-12">
                                 <button type="submit" type="button" class="btn btn-default btn-block">Submit</button>
                             </div>
                         </div>
@@ -57,10 +53,12 @@
                 </div>
         </div>
         <div class="col-md-7">
-            <p>Please enter values in the form to the left in order to add/modify/delete words in the database.</p>
-            <p>After a successful submit the database table at the bottom of this page will immediately update to reflect the changes.
-                An extra table with a summary of your modifications will also be printed below
-                (and will disappear when you refresh the page). There is no undo-button. If you make a mistake, simply delete the word or re-add it manually.</p>
+            <p>Please enter values in the form to the left in order to add/modify words in the database.</p>
+            <p><ul>
+            <li>Write the words in the same language as you selected.</li>
+            <li>The words should be sourced from an internationally recognised dictionary.</li>
+            <li>Approximately 80% concrete nouns, 10% abstract nouns and 10% infinitive verbs is the desired word distribution.</li>
+                </ul>
             <p><strong>Syntax:</strong> Type one word per line. Empty lines will be ignored. Everything will be converted to lower case. Example, adding three words:
                 <div class="well" ><em>pizza</em><br>
                 <em>sjöhäst</em><br>
