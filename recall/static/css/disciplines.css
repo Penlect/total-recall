@@ -14,3 +14,23 @@
 .dates {
     background-color:#66ff99;
 }
+
+.base2-text {
+    color:#f442eb;
+    font-weight: bold;
+}
+
+.base10-text {
+    color:#383ae0;
+    font-weight: bold;
+}
+
+.words-text {
+    color:#9fb20c;
+    font-weight: bold;
+}
+
+.dates-text {
+    color:#12a835;
+    font-weight: bold;
+}

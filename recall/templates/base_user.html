@@ -197,7 +197,9 @@
                         <td>{{ recall.user.username }}</td>
                         <td>{{ recall.memo.id }}</td>
                         <td>{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        <td>{{ recall.memo.discipline.value }}</td>
+                        <td>
+                            {{ recall.memo.discipline.value }}
+                        </td>
                         <td>{{ recall.memo.memo_time }} / {{recall.memo.recall_time }}</td>
 
                           <!-- Language -->

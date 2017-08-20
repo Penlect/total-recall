@@ -7,7 +7,7 @@ import os
 import random
 import collections
 from collections import namedtuple
-
+import sqlalchemy.orm
 # os.remove('test.db')
 
 from recall import db, app
@@ -46,24 +46,6 @@ class WordClass(enum.Enum):
     concrete_noun = "Concrete Noun"
     abstract_noun = "Abstract Noun"
     infinitive_verb = "Infinitive Verb"
-
-
-def load_database(db_file, entry):
-    """Load database entries"""
-    with open(db_file, 'r', encoding='utf-8') as db_file:
-        entries = set()
-        for line in db_file:
-            if line.strip():
-                row_data = [x.strip() for x in line.split(';')]
-                entries.add(entry(*row_data))
-        return list(sorted(entries))
-
-
-def save_database(db_file, entries):
-    """Save database entries"""
-    with open(db_file, 'w', encoding='utf-8') as db_file:
-        lines = (';'.join(entry) for entry in sorted(entries))
-        db_file.write('\n'.join(lines))
 
 
 def unique_lines_in_textarea(data: str, lower=False):
@@ -142,9 +124,13 @@ class WordsData(DisciplineData):
     @classmethod
     def random(cls, nr_items, language):
         language = language.strip().lower()
-        words = [word.value for word in
-                 load_database(DATABASE_WORDS, WordEntry)
-                 if word.language == language]
+        try:
+            language = Language.query.filter_by(language=language).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            words = list()
+        else:
+            words = language.words
+        words = [w.word for w in words]
         random.shuffle(words)
         data = tuple(words[0:nr_items])
         return cls(data)
@@ -177,9 +163,13 @@ class DatesData(DisciplineData):
     @classmethod
     def random(cls, nr_items, language):
         language = language.strip().lower()
-        stories = [story.value for story in
-                   load_database(DATABASE_STORIES, StoryEntry)
-                   if story.language == language]
+        try:
+            language = Language.query.filter_by(language=language).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            stories = list()
+        else:
+            stories = language.stories
+        stories = [s.story for s in stories]
         random.shuffle(stories)
         stories = stories[0:nr_items]
         dates = [random.randint(1000, 2099) for _ in stories]
