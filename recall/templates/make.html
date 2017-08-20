@@ -40,7 +40,7 @@
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <h1>Binary Numbers</h1>
-                <div class="well" style="background-color:#f442eb;">
+                <div class="well binary">
                     <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="binary">
                         {{ nr_items(max=20000) }}
@@ -58,7 +58,7 @@
             </div>
             <div class="col-md-{{ right_column_width }}">
                 <h1>Decimal Numbers</h1>
-                <div class="well" style="background-color:#5bc0de;">
+                <div class="well decimals">
                     <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="decimals">
                         {{ nr_items(max=10000) }}
@@ -81,7 +81,7 @@
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <h1>Words</h1>
-                <div class="well" style="background-color:#ffff66;">
+                <div class="well words">
                     <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="words">
                         {{ nr_items(max=500) }}
@@ -100,7 +100,7 @@
             </div>
             <div class="col-md-{{ right_column_width }}">
                 <h1>Historical Dates</h1>
-                <div class="well" style="background-color:#66ff99;">
+                <div class="well dates">
                     <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="dates">
                         {{ nr_items(max=500) }}
@@ -123,7 +123,7 @@
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <h1>Binary Numbers</h1>
-                <div class="well" style="background-color:#f442eb;">
+                <div class="well binary">
                     <form class="form-horizontal create" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="binary">
                           <div class="form-group">
@@ -145,7 +145,7 @@
             </div>
             <div class="col-md-{{ right_column_width }}">
                 <h1>Decimal Numbers</h1>
-                <div class="well" style="background-color:#5bc0de;">
+                <div class="well decimals">
                     <form class="form-horizontal create" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="decimals">
                           <div class="form-group">
@@ -172,7 +172,7 @@
         <div class="row">
             <div class="col-md-{{ left_column_width }}">
                 <h1>Words</h1>
-                <div class="well" style="background-color:#ffff66;">
+                <div class="well words">
                     <form class="form-horizontal create" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="words">
                           <div class="form-group">
@@ -195,7 +195,7 @@
             </div>
             <div class="col-md-{{ right_column_width }}">
                 <h1>Historical Dates</h1>
-                <div class="well" style="background-color:#66ff99;">
+                <div class="well dates">
                     <form class="form-horizontal create" action="{{ url_for('make_discipline') }}" method="post">
                         <input name="discipline" type="hidden" value="dates">
                           <div class="form-group">
