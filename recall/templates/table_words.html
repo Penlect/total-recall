@@ -5,6 +5,21 @@
   </div>
 {%- endfor %}
 
+{% if nr_words > 0 %}
+<div class="progress">
+  <div class="progress-bar progress-bar-primary" style="width: {{ 100*distribution['Concrete Noun']/nr_words }}%">
+    ({{ distribution['Concrete Noun'] }}) {{ (100*distribution['Concrete Noun']/nr_words)|round|int }}%
+  </div>
+  <div class="progress-bar progress-bar-warning" style="width: {{ 100*distribution['Abstract Noun']/nr_words }}%">
+    ({{ distribution['Abstract Noun'] }}) {{ (100*distribution['Abstract Noun']/nr_words)|round|int }}%
+  </div>
+  <div class="progress-bar progress-bar-success" style="width: {{ 100*distribution['Infinitive Verb']/nr_words }}%">
+    ({{ distribution['Infinitive Verb'] }}) {{ (100*distribution['Infinitive Verb']/nr_words)|round|int }}%
+  </div>
+</div>
+{% endif %}
+
+
 <table class="table table-condensed">
 <thead>
   <tr>

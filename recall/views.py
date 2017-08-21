@@ -472,10 +472,12 @@ def table_words():
             except sqlalchemy.orm.exc.NoResultFound:
                 words = list()
             else:
-                words = language.words
+                words = language.words.all()
         else:
             words = models.Word.query.all()
-        return render_template('table_words.html', words=words)
+        distribution = collections.Counter(w.word_class.value for w in words)
+        return render_template('table_words.html', words=words,
+                               distribution=distribution, nr_words=len(words))
 
     elif request.method == 'POST':
         language = request.form['language'].strip().lower()
