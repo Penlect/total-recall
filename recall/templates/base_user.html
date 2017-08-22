@@ -1,5 +1,6 @@
 {% extends "base_navigation.html" %}
 
+
 {% block body %}
 
 <!-- Navbar and flash messages -->
@@ -87,7 +88,6 @@
                 <thead>
                   <tr>
                     <th>Memo id</th>
-                    <th>Created</th>
                     <th>Discipline</th>
                     <th>Min</th>
                     <th>Language</th>
@@ -97,6 +97,7 @@
                     <th>Recall</th>
                       {% if users_home_page %}
                     <th>State</th>
+                    <th>Created</th>
                     <th>Delete</th>
                       {% endif %}
                   </tr>
@@ -105,7 +106,6 @@
                 {% for memo in user.memos %}
                       <tr>
                         <td>{{ memo.id }}</td>
-                        <td>{{ memo.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                         <td>{{ memo.discipline.value }}</td>
                         <td>{{ memo.memo_time }} / {{memo.recall_time }}</td>
                           <!-- Language -->
@@ -155,6 +155,7 @@
                           {% else %}
                           {% endif %}
 
+                        <td>{{ memo.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                           <!-- Delete -->
                           {% if memo.state.name == 'private' %}
                         <td><a href="{{ url_for('delete_memo', memo_id=memo.id) }}"
@@ -174,18 +175,18 @@
             <table class="table table-condensed table-bordered">
                 <thead>
                   <tr>
-                    <th>User</th>
                     <th>Memo id</th>
-                    <th>Recalled</th>
                     <th>Discipline</th>
                     <th>Min</th>
                     <th>Language</th>
+                    <th>User</th>
 
                     <th>Nr Correct</th>
                     <th>Raw Score</th>
                     <th>Points</th>
                     <th>Time rem.</th>
                     <th>View</th>
+                    <th>Recalled</th>
                       {% if users_home_page %}
                     <th>Delete</th>
                       {% endif %}
@@ -194,12 +195,8 @@
                 <tbody>
                 {% for recall in recalls %}
                       <tr>
-                        <td>{{ recall.user.username }}</td>
                         <td>{{ recall.memo.id }}</td>
-                        <td>{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        <td>
-                            {{ recall.memo.discipline.value }}
-                        </td>
+                        <td>{{ recall.memo.discipline.value }}</td>
                         <td>{{ recall.memo.memo_time }} / {{recall.memo.recall_time }}</td>
 
                           <!-- Language -->
@@ -209,6 +206,7 @@
                         <td>-</td>
                           {% endif %}
 
+                        <td><a href="{{ url_for('user', username=recall.user.username) }}">{{ recall.user.username }}</a></td>
                         <td>{{ recall.correction.correct }}</td>
                         <td>{{ recall.correction.raw_score }}</td>
                         <td>{{ recall.correction.points }}</td>
@@ -221,6 +219,8 @@
                          <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
                         {% endif %}
 
+
+                        <td>{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                           <!-- Delete -->
                       {% if users_home_page %}
                           {% if recall.memo.user_id == user.id %}
@@ -245,4 +245,15 @@
 {% endblock %}
 
 {% block javascript %}
+<script>
+$( document ).ready(function() {
+    $('td, th').addClass('text-center')
+
+     /*$(':input[type="submit"]').prop('disabled', true);
+     $('#language_selection').change(function() {
+        $(':input[type="submit"]').prop('disabled', false);
+     });*/
+
+});
+</script>
 {% endblock %}

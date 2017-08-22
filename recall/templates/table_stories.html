@@ -9,9 +9,9 @@
 <thead>
   <tr>
     <th>Nr</th>
-    <th>Added</th>
-    <th>Language</th>
     <th>Story</th>
+    <th>Language</th>
+    <th>Added</th>
     <th>Delete</th>
   </tr>
 </thead>
@@ -19,9 +19,9 @@
 {% for story in stories %}
   <tr>
     <td>{{ loop.index }}</td>
-    <td>{{ story.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-    <td>{{ story.language.language|title }}</td>
     <td>{{ story.story }}</td>
+    <td>{{ story.language.language|title }}</td>
+    <td>{{ story.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
     <td><button type="button" class="btn btn-danger btn-xs" onclick="send_delete({{ story.id }});">X</button></td>
   </tr>
 {% endfor %}

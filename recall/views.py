@@ -407,9 +407,9 @@ def table_stories():
             except sqlalchemy.orm.exc.NoResultFound:
                 stories = list()
             else:
-                stories = language.stories
+                stories = language.stories.order_by(models.Story.story).all()
         else:
-            stories = models.Story.query.all()
+            stories = models.Story.query.order_by(models.Story.story).all()
         return render_template('table_stories.html', stories=stories)
 
     elif request.method == 'POST':
@@ -472,9 +472,9 @@ def table_words():
             except sqlalchemy.orm.exc.NoResultFound:
                 words = list()
             else:
-                words = language.words.all()
+                words = language.words.order_by(models.Word.word).all()
         else:
-            words = models.Word.query.all()
+            words = models.Word.query.order_by(models.Word.word).all()
         distribution = collections.Counter(w.word_class.value for w in words)
         return render_template('table_words.html', words=words,
                                distribution=distribution, nr_words=len(words))

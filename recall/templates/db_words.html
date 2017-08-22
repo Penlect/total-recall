@@ -27,7 +27,7 @@
 
                         <div class="form-group">
                             <div class="col-sm-12">
-                                <select class="form-control" name="word_class" id="word_class_selection">
+                                <select class="form-control" name="word_class" id="word_class_selection" required>
                                     <option value="" selected disabled>Choose word class ... </option>
     <optgroup label="Word class">
                                   <option value="concrete_noun">Concrete Noun</option>
@@ -122,18 +122,9 @@ function send_delete(id) {
 
 $(document).ready(function(){
 
-     $(':input[type="submit"]').prop('disabled', true);
      $('#language_selection').change(function() {
-        var lang = $('#language_selection').val();
-        var cls = $('#word_class_selection').val();
-        $(':input[type="submit"]').prop('disabled', lang == null || cls == null);
          var lang = this.value; // value of the select element
          update_table(lang);
-     });
-     $('#word_class_selection').change(function() {
-        var lang = $('#language_selection').val();
-        var cls = $('#word_class_selection').val();
-        $(':input[type="submit"]').prop('disabled', lang == null || cls == null);
      });
 
    $('form').submit(function(event){

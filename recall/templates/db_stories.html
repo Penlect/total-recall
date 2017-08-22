@@ -103,9 +103,7 @@ function send_delete(id) {
 }
 
  $(function() {
-     $(':input[type="submit"]').prop('disabled', true);
      $('#language_selection').change(function() {
-        $(':input[type="submit"]').prop('disabled', false);
          var lang = this.value; // value of the select element
          update_table(lang);
      });

@@ -24,10 +24,10 @@
 <thead>
   <tr>
     <th>Nr</th>
-    <th>Added</th>
-    <th>Language</th>
-    <th>Class</th>
     <th>Word</th>
+    <th>Class</th>
+    <th>Language</th>
+    <th>Added</th>
     <th>Delete</th>
   </tr>
 </thead>
@@ -35,10 +35,10 @@
 {% for word in words %}
   <tr>
     <td>{{ loop.index }}</td>
-    <td>{{ word.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-    <td>{{ word.language.language|title }}</td>
     <td>{{ word.word }}</td>
     <td>{{ word.word_class.value|title }}</td>
+    <td>{{ word.language.language|title }}</td>
+    <td>{{ word.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
     <td><button type="button" class="btn btn-danger btn-xs" onclick="send_delete({{ word.id }});">X</button></td>
   </tr>
 {% endfor %}
