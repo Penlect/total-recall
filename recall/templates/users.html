@@ -21,7 +21,7 @@
               {% for user in users %}
               <tr>
                 <td>{{ user.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                <td>{{ user.username }}</td>
+                <td><a href="{{ url_for('user', username=user.username) }}">{{ user.username }}</a></td>
                 <td>{{ user.real_name }}</td>
                 <td>{{ user.country }}</td>
               </tr>
