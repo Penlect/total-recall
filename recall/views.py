@@ -212,9 +212,7 @@ def users():
     return render_template('users.html', users=users)
 
 
-@app.route('/user/<string:username>', methods=['GET', 'POST'])
-@login_required
-def user(username):
+def _user(username, delete_column=False):
     username = username.strip().lower()
     try:
         user = models.User.query.filter_by(username=username).one()
@@ -242,7 +240,19 @@ def user(username):
         models.MemoData.user_id==user.id)
     return render_template('user.html', user=user,
                            users_home_page=(user.id == current_user.id),
-                           recalls=r)
+                           recalls=r, delete_column=delete_column)
+
+
+@app.route('/user/<string:username>', methods=['GET', 'POST'])
+@login_required
+def user(username):
+    return _user(username, delete_column=False)
+
+
+@app.route('/user/<string:username>/delete', methods=['GET', 'POST'])
+@login_required
+def user_delete_column(username):
+    return _user(username, delete_column=True)
 
 
 @app.route('/make', methods=['GET', 'POST'])
