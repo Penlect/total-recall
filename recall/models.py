@@ -125,7 +125,6 @@ class WordsData(DisciplineData):
         else:
             words = language.words
         words = [w.word for w in words]
-        nr_items = len(words)  # Important if database doesn't have nr_items
         random.shuffle(words)
         data = tuple(words[0:nr_items])
         return cls(data)
@@ -165,7 +164,8 @@ class DatesData(DisciplineData):
         else:
             stories = language.stories
         stories = [s.story for s in stories]
-        nr_items = len(stories)  # Important if database doesn't have nr_items
+        if len(stories) < nr_items:
+            nr_items = len(stories)
         random.shuffle(stories)
         stories = stories[0:nr_items]
         dates = [random.randint(1000, 2099) for _ in stories]
