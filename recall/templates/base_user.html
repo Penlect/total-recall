@@ -82,7 +82,7 @@
             </div>
 
             {% endblock configure_user %}
-
+            {% if user.memos.all()|length > 0 %}
             <h3>Memorizations</h3>
             <table class="table table-condensed table-bordered">
                 <thead>
@@ -170,7 +170,9 @@
                 {% endfor %}
                 </tbody>
               </table>
+            {% endif %}
 
+            {% if recalls.all()|length > 0 %}
             <h3>Recalls</h3>
             <table class="table table-condensed table-bordered">
                 <thead>
@@ -236,6 +238,7 @@
                 {% endfor %}
                 </tbody>
               </table>
+            {% endif %}
         </div>
     </div>
 

@@ -14,12 +14,6 @@ from recall import db, app
 import recall.xls
 
 
-DATABASE_WORDS = os.path.join(app.root_path, 'db_words.txt')
-DATABASE_STORIES = os.path.join(app.root_path, 'db_stories.txt')
-WordEntry = namedtuple('WordEntry', 'language value name date word_class')
-StoryEntry = namedtuple('StoryEntry', 'language value name date')
-
-
 class Discipline(enum.Enum):
     base2 = 'Binary Numbers'
     base10 = 'Decimal Numbers'
@@ -221,9 +215,10 @@ class User(db.Model):
                               cascade="save-update, merge, delete",
                               lazy='dynamic')
 
-    def __init__(self, username, email, real_name, country):
+    def __init__(self, username, password, email, real_name, country):
         self.datetime = datetime.utcnow()
         self.username = username
+        self.password = password
         self.email = email
         self.real_name = real_name
         self.country = country
@@ -240,6 +235,7 @@ class User(db.Model):
         return cls(
             # Todo: restrict username characters and length
             username=request.form['username'].strip().lower(),
+            password=request.form['password'],
             email=request.form['email'],
             real_name=request.form['real_name'],
             country=request.form['country']
