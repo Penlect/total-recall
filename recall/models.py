@@ -326,7 +326,7 @@ class DatesData(DisciplineData):
 
     @property
     def points(self):
-        return math.ceil(self.raw_score*100/125)
+        return math.ceil(self.raw_score*1000/125)
 
 
 class User(db.Model):
