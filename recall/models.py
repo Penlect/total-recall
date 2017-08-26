@@ -57,10 +57,8 @@ def unique_lines_in_textarea(data: str, lower=False):
 
 class DisciplineData:
 
-    def __init__(self, memo):
-        self._data = tuple(memo.data)
-        self.memo_time = memo.memo_time
-        self.recall_time = memo.recall_time
+    def __init__(self, data):
+        self._data = tuple(data)
         self.cell_by_cell_result = None
         self._raw_score = None
 
@@ -122,8 +120,8 @@ class DisciplineData:
 class Base2Data(DisciplineData):
     enum = Discipline.base2
 
-    def __init__(self, memo):
-        super().__init__(memo)
+    def __init__(self, data):
+        super().__init__(data)
 
     @classmethod
     def random(cls, nr_items, *args):
@@ -155,8 +153,8 @@ class Base2Data(DisciplineData):
 class Base10Data(DisciplineData):
     enum = Discipline.base10
 
-    def __init__(self, memo):
-        super().__init__(memo)
+    def __init__(self, data):
+        super().__init__(data)
 
     @classmethod
     def random(cls, nr_items, *args):
@@ -193,8 +191,10 @@ class Base10Data(DisciplineData):
 class WordsData(DisciplineData):
     enum = Discipline.words
 
-    def __init__(self, memo):
-        super().__init__(memo)
+    def __init__(self, data, memo_time, recall_time):
+        super().__init__(data)
+        self.memo_time = memo_time
+        self.recall_time = recall_time
 
     @classmethod
     def random(cls, nr_items, language):
@@ -258,10 +258,12 @@ class WordsData(DisciplineData):
 class DatesData(DisciplineData):
     enum = Discipline.dates
 
-    def __init__(self, memo):
-        super().__init__(memo)
+    def __init__(self, data, memo_time, recall_time):
+        super().__init__(data)
+        self.memo_time = memo_time
+        self.recall_time = recall_time
         self._lookup = {recall_order: date for date, story, recall_order
-                        in self._data}
+                        in data}
 
     @classmethod
     def random(cls, nr_items, language):
@@ -491,9 +493,12 @@ class MemoData(db.Model):
         return m
 
     def get_data_handler(self):
-        for cls in (Base2Data, Base10Data, WordsData, DatesData):
+        for cls in (Base2Data, Base10Data):
             if self.discipline == cls.enum:
-                return cls(self)
+                return cls(self.data)
+        for cls in (WordsData, DatesData):
+            if self.discipline == cls.enum:
+                return cls(self.data, self.memo_time, self.recall_time)
         raise AssertionError(f'Now Data class for {self.memo.discipline}.')
 
     def __repr__(self):
