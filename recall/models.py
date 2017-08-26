@@ -120,8 +120,10 @@ class DisciplineData:
 class Base2Data(DisciplineData):
     enum = Discipline.base2
 
-    def __init__(self, data):
+    def __init__(self, data, memo_time=-1, recall_time=-1):
         super().__init__(data)
+        self.memo_time = memo_time
+        self.recall_time = recall_time
 
     @classmethod
     def random(cls, nr_items, *args):
@@ -153,8 +155,10 @@ class Base2Data(DisciplineData):
 class Base10Data(DisciplineData):
     enum = Discipline.base10
 
-    def __init__(self, data):
+    def __init__(self, data, memo_time=-1, recall_time=-1):
         super().__init__(data)
+        self.memo_time = memo_time
+        self.recall_time = recall_time
 
     @classmethod
     def random(cls, nr_items, *args):
