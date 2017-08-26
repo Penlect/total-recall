@@ -226,7 +226,7 @@
 
 $(document).ready(function(){
 
-   $('.create').submit(function(event){
+   $('form').submit(function(event){
 	  event.preventDefault();
       $.post($(this).attr('action'), $(this).serialize(), function(data){
         //$('#links_numbers').prepend(data)

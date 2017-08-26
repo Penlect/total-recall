@@ -15,17 +15,20 @@ login_manager.init_app(app)
 import recall.views  # Has to be here
 import recall.models
 
-db.metadata.drop_all(db.engine, tables=[
-    models.MemoData.__table__,
-    models.RecallData.__table__,
-    models.Correction.__table__,
-    models.User.__table__,
-    models.XlsDoc.__table__,
-    models.AlmostCorrectWord.__table__,
-])
+restart = False
+if restart:
+    db.metadata.drop_all(db.engine, tables=[
+        models.MemoData.__table__,
+        models.RecallData.__table__,
+        models.Correction.__table__,
+        models.User.__table__,
+        models.XlsDoc.__table__,
+        models.AlmostCorrectWord.__table__,
+    ])
 db.create_all()
-u1 = models.User('sm2017', 'secret', 'hej@email.se', 'Daniel Andersson', 'Sweden')
-u2 = models.User('penlect', '123abc', 'email@email.com', 'Kalle Anka', 'Sweden')
-db.session.add(u1)
-db.session.add(u2)
-db.session.commit()
+if restart:
+    u1 = models.User('sm2017', 'secret', 'hej@email.se', 'Daniel Andersson', 'Sweden')
+    u2 = models.User('penlect', '123abc', 'email@email.com', 'Kalle Anka', 'Sweden')
+    db.session.add(u1)
+    db.session.add(u2)
+    db.session.commit()

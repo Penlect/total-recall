@@ -94,7 +94,7 @@ def login():
         flash('Username or Password is invalid', 'danger')
         return redirect(url_for('login'))
     login_user(user)
-    flash('Logged in successfully', 'success')
+    flash(f'Logged in user "{username}" successfully', 'success')
     # Todo: investigate below
     # is_safe_url should check if the url is safe for redirects.
     # See http://flask.pocoo.org/snippets/62/ for an example.
@@ -103,7 +103,9 @@ def login():
 
 @app.route('/logout')
 def logout():
+    username = current_user.username
     logout_user()
+    flash(f'Logged out user "{username}" successfully', 'success')
     return redirect(url_for('login'))
 
 
@@ -265,10 +267,9 @@ def make_discipline():
         memo = models.MemoData.from_request(request, current_user)
         db.session.add(memo)
         db.session.commit()
-        if memo.generated is True:
-            return redirect(url_for('user', username=current_user.username))
-        else:
-            return 'Successfully created discipline'
+        app.logger.info(
+            f'User {current_user.username} created memorization {memo.id}')
+        return 'Successfully created discipline'
 
 
 @app.route('/download/xls/<int:memo_id>', methods=['GET'])
@@ -312,11 +313,30 @@ def download_xls(memo_id: int):
 @app.route('/recall/<string:memo_id>')
 @login_required
 def recall_(memo_id):
-    memo = models.MemoData.query.filter_by(id=memo_id).one()
-    if memo is None:
-        return f'Key "{key}" does not exists or is private'
-    nr_items = len(memo.data)
+    """Send the user to the recall page of memorization provided id
 
+    The following rules apply:
+    * Any user can always do recall on the memorizations he/she
+      created. Any number of times.
+    * A user can do recall of another users memorization only
+      if that memorization is in Competition state. And he/she
+      can only do it once
+    """
+    try:
+        memo = models.MemoData.query.filter_by(id=memo_id).one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        return f'Does not exists'
+    if memo.user.id != current_user.id:
+        if memo.state != models.State.competition:
+            return 'This memorization is not in Competition-state'
+        elif memo.recalls.filter_by(user_id=current_user.id).first():
+            return 'This user has already done recall for this memorization'
+
+    # If we reach here, the user is allowed to do recall
+    app.logger.info(
+        f'User {current_user.username} request recall page of memo {memo.id}')
+
+    nr_items = len(memo.data)
     if memo.discipline == models.Discipline.base2:
         nr_rows = math.ceil(nr_items/30)
         return render_template('recall_numbers.html', memo=memo,
