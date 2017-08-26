@@ -191,7 +191,7 @@ class Base10Data(DisciplineData):
 class WordsData(DisciplineData):
     enum = Discipline.words
 
-    def __init__(self, data, memo_time, recall_time):
+    def __init__(self, data, memo_time=-1, recall_time=-1):
         super().__init__(data)
         self.memo_time = memo_time
         self.recall_time = recall_time
@@ -258,7 +258,7 @@ class WordsData(DisciplineData):
 class DatesData(DisciplineData):
     enum = Discipline.dates
 
-    def __init__(self, data, memo_time, recall_time):
+    def __init__(self, data, memo_time=-1, recall_time=-1):
         super().__init__(data)
         self.memo_time = memo_time
         self.recall_time = recall_time
