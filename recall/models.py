@@ -199,6 +199,7 @@ class WordsData(DisciplineData):
         super().__init__(data)
         self.memo_time = memo_time
         self.recall_time = recall_time
+        self._almost_correct_word_lookup = None
 
     @classmethod
     def random(cls, nr_items, language):
@@ -228,6 +229,13 @@ class WordsData(DisciplineData):
             return Item.wrong
 
     def _word_almost_correct(self, guess: str, index: int):
+        if self._almost_correct_word_lookup is None:
+            mappings = self.user.almost_correct_words.all()
+            self._almost_correct_word_lookup = mappings
+        for m in self._almost_correct_word_lookup:
+            if m.word == self._data[index] and m.language.language == self.language:
+                if m.almost_correct == guess:
+                    return True
         return False
 
     @property
@@ -700,6 +708,9 @@ class AlmostCorrectWord(db.Model):
         self.ip = ip
         self.word = word
         self.almost_correct = almost_correct
+
+    def __repr__(self):
+        return f'<{self.word} ~= {self.almost_correct}>'
 
 
 class Language(db.Model):

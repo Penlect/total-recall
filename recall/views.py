@@ -398,6 +398,8 @@ def arbeiter():
         db.session.add(recall)
 
         handler = recall.memo.get_data_handler()
+        handler.user = current_user  # Ugly
+        handler.language = recall.memo.language  # Ugly
         handler.correct(recall.data)
         c = models.Correction(handler.raw_score, handler.points, handler.cell_by_cell_result)
         c.recall = recall
