@@ -497,10 +497,7 @@ class MemoData(db.Model):
         return m
 
     def get_data_handler(self):
-        for cls in (Base2Data, Base10Data):
-            if self.discipline == cls.enum:
-                return cls(self.data)
-        for cls in (WordsData, DatesData):
+        for cls in (Base2Data, Base10Data, WordsData, DatesData):
             if self.discipline == cls.enum:
                 return cls(self.data, self.memo_time, self.recall_time)
         raise AssertionError(f'Now Data class for {self.memo.discipline}.')
