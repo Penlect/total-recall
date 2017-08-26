@@ -16,11 +16,19 @@
 {% for row_i in range(nr_rows) %}
     <tr class="recall_row">
         {% for col_i in range(nr_cols) %}
-            <td><input class="recall_cell" id="recall_cell_{{ row_i*nr_cols + col_i }}" name="recall_cell_{{ row_i*nr_cols + col_i }}" type="text" maxlength="1" size="1" autocomplete="off"></td>
+            <td>
+                <input class="recall_cell"
+                       id="recall_cell_{{ row_i*nr_cols + col_i }}"
+                       name="recall_cell_{{ row_i*nr_cols + col_i }}"
+                       type="text"
+                       maxlength="1"
+                       size="1"
+                       autocomplete="off">
+            </td>
         {% endfor %}
         <td class="row_enumeration">Row {{ row_i + 1 }}</td>
     </tr>
-{% if (row_i + 1)%25 == 0%}
+{% if (row_i + 1)%nr_digits_in_column == 0%}
     </table>
 <table border="1px" class="recall_table">
 {% endif %}

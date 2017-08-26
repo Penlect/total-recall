@@ -10,33 +10,26 @@
 {% block body %}
 
     <div class="page-header">
-        <h1>Recall <small>(memo_id={{ memo.id }})</small></h1>
+        <h1>{{ current_user.username }}: Recall of id={{ memo.id }}</h1>
     </div>
     {% block subheader %}
     <h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.recall_time }} min Recall</h3>
     {% endblock %}
 
-    <button id="start_recall" class="btn btn-success" type="button">Start Recall</button>
+    <button id="start_recall" class="btn btn-danger btn-lg" type="button">Start Recall</button>
 
     <form action="{{ url_for('arbeiter') }}" method="post">
-
         <fieldset>
         <div id="recallsheet" style="display:none;">
+            <p>Seconds remaining: <span id="seconds_remaining">{% block seconds_remaining %}30{% endblock %}</span></p>
 
-        <p>Seconds remaining: <span id="seconds_remaining">{% block seconds_remaining %}30{% endblock %}</span></p>
+            <input name="memo_id" type="hidden" value="{{ memo.id }}">
+            <input id="seconds_remaining_field" name="seconds_remaining" type="hidden">
 
-        <div class="progress" style="width:300px;">
-          <div id="progressbar" class="progress-bar" role="progressbar" style="width:0%">
-          </div>
-        </div>
+            {% block table_logic %}
+            {% endblock %}
 
-        <input name="memo_id" type="hidden" value="{{ memo.id }}">
-        <input id="seconds_remaining_field" name="seconds_remaining" type="hidden">
-
-        {% block table_logic %}
-        {% endblock %}
-
-        <button id="recall_submit_button" type="submit" class="btn btn-danger">Submit Recall</button>
+            <button id="recall_submit_button" type="submit" class="btn btn-danger">Submit Recall</button>
         </div>
         </fieldset>
     </form>
@@ -45,24 +38,16 @@
         <h3>Score table</h3>
         <table>
             <tr>
+                <td>Nr correct</td>
+                <td id="correct">{{ correct }}</td>
+            </tr>
+            <tr>
                 <td>Raw score</td>
-                <td id="raw_score"></td>
+                <td id="raw_score">{{ raw_score }}</td>
             </tr>
             <tr>
-                <td>Nr correct digits</td>
-                <td id="count_correct"></td>
-            </tr>
-            <tr>
-                <td>Nr wrong digits</td>
-                <td id="count_wrong"></td>
-            </tr>
-            <tr>
-                <td>Nr gap digits</td>
-                <td id="count_gap"></td>
-            </tr>
-            <tr>
-                <td>Nr unreached digits</td>
-                <td id="count_unreached"></td>
+                <td>Points</td>
+                <td id="points">{{ points }}</td>
             </tr>
         </table>
     </div>
@@ -80,24 +65,22 @@ $(document).ready(function(){
         console.log(result);
         console.log(status);
 
+        $("#recall_submit_button").remove();
         var arrayLength = result.cell_by_cell.length;
         for (var i = 0; i < arrayLength; i++){
             recallResultColor('recall_cell_' + i, result.cell_by_cell[i]);
         }
-        $("#recall_submit_button").css("display", "none");
+        $("#correct").text(result.correct);
         $("#raw_score").text(result.raw_score);
-        $("#count_correct").text(result.correct);
-        $("#count_wrong").text(result.wrong);
-        $("#count_gap").text(result.gap);
-        $("#count_unreached").text(result.not_reached);
-        $('#score_table').css("display", "block");
+        $("#points").text(result.raw_score);
+        $("#score_table").css("display", "block");
     }
 
     // The timer is started when the Start-Recall button is clicked
    $('#start_recall').on('click', function(event){
-        $(this).prop('disabled', true);
+        $(this).remove();
         $('#recallsheet').css("display", "block");
-        recallTimer = setTimeout(getRecallTimer($('#seconds_remaining'), $('#recall_submit_button'), $('#progressbar')), SECOND);
+        recallTimer = setTimeout(getRecallTimer($('#seconds_remaining'), $('#recall_submit_button')), SECOND);
    })
 
    var nrRows = $('.recall_table .recall_row').length;
@@ -133,6 +116,7 @@ $(document).ready(function(){
 	  clearTimeout(recallTimer);
       return false;
    });
+
 });
 </script>
 {% endblock javascript %}

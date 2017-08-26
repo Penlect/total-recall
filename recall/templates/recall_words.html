@@ -15,22 +15,27 @@
 {% block table_logic %}
 {% for nr_cols in nr_cols_iter %}
     {% set table = loop %}
-<table border="1px" class="recall_table">
-    {% for row_i in range(20) %}
-    <tr class="recall_row">
-        {% for col_i in range(nr_cols) %}
-            <td><input class="recall_cell" id="recall_cell_{{ table.index0*100 + col_i*20 + row_i }}" name="recall_cell_{{ table.index0*100 + col_i*20 + row_i }}" type="text" autocomplete="off"></td>
+    <table border="1px" class="recall_table">
+        {% for row_i in range(nr_words_in_column) %}
+        <tr class="recall_row">
+            {% for col_i in range(nr_cols) %}
+                <td><input class="recall_cell"
+                           id="recall_cell_{{ table.index0*100 + col_i*nr_words_in_column + row_i }}"
+                           name="recall_cell_{{ table.index0*100 + col_i*nr_words_in_column + row_i }}"
+                           type="text"
+                           autocomplete="off">
+                </td>
+            {% endfor %}
+            <td class="row_enumeration">Row {{ table.index0*nr_words_in_column + row_i + 1 }}</td>
+        </tr>
         {% endfor %}
-        <td class="row_enumeration">Row {{ table.index0*20 + row_i + 1 }}</td>
-    </tr>
-    {% endfor %}
-</table>
+    </table>
 {% endfor %}
 {% endblock table_logic %}
 
 <!-- This part handles what will happen when a key is pressed -->
 {% block keydown%}
-    var grid = new RecallGrid(nrCells/20, 20, $(this), false);
+    var grid = new RecallGrid(nrCells/{{ nr_words_in_column }}, {{ nr_words_in_column }}, $(this), false);
     keydownHandlerWords(event, grid);
 {% endblock keydown%}
 

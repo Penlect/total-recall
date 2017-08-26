@@ -25,8 +25,13 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
-# Todo: how to handle empty memo and recall tables
-# Todo: bug pattern alltid = deicmal
+
+NR_DIGITS_IN_ROW_BINARY = 30
+NR_DIGITS_IN_ROW_DECIMALS = 40
+NR_DIGITS_IN_COLUMN = 25
+NR_WORDS_IN_ROW = 5
+NR_WORDS_IN_COLUMN = 20
+NR_DATES_IN_COLUMN = 20
 
 def sha(string):
     h = hashlib.sha1(string.encode())
@@ -338,24 +343,33 @@ def recall_(memo_id):
 
     nr_items = len(memo.data)
     if memo.discipline == models.Discipline.base2:
-        nr_rows = math.ceil(nr_items/30)
+        nr_rows = math.ceil(nr_items/NR_DIGITS_IN_ROW_BINARY)
         return render_template('recall_numbers.html', memo=memo,
-                               nr_cols=30, nr_rows=nr_rows)
+                               nr_cols=NR_DIGITS_IN_ROW_BINARY,
+                               nr_rows=nr_rows,
+                               nr_digits_in_column=NR_DIGITS_IN_COLUMN)
     elif memo.discipline == models.Discipline.base10:
-        nr_rows = math.ceil(nr_items/40)
+        nr_rows = math.ceil(nr_items/NR_DIGITS_IN_ROW_DECIMALS)
         return render_template('recall_numbers.html', memo=memo,
-                               nr_cols=40, nr_rows=nr_rows)
+                               nr_cols=NR_DIGITS_IN_ROW_DECIMALS,
+                               nr_rows=nr_rows,
+                               nr_digits_in_column=NR_DIGITS_IN_COLUMN)
     elif memo.discipline == models.Discipline.words:
-        nr_cols = math.ceil(nr_items/20)
-        if nr_cols%5 == 0:
-            nr_cols_iter = [5]*(nr_cols//5)
+        # Compute the total nr of columns (acc over all pages)
+        nr_cols = int(math.ceil(nr_items/NR_WORDS_IN_COLUMN))
+        nr_full_tables = nr_cols//NR_WORDS_IN_ROW
+        remainder_cols = nr_cols%NR_WORDS_IN_ROW
+        if remainder_cols == 0:
+            nr_cols_iter = [NR_WORDS_IN_ROW]*nr_full_tables
         else:
-            nr_cols_iter = [5]*(nr_cols//5) + [nr_cols%5]
+            nr_cols_iter = [NR_WORDS_IN_ROW]*nr_full_tables + [remainder_cols]
         return render_template('recall_words.html', memo=memo,
-                               nr_cols_iter=nr_cols_iter)
+                               nr_cols_iter=nr_cols_iter,
+                               nr_words_in_column=NR_WORDS_IN_COLUMN)
     elif memo.discipline == models.Discipline.dates:
         return render_template('recall_dates.html', memo=memo,
-                               data=sorted(memo.data, key=lambda x: x[2]))
+                               data=sorted(memo.data, key=lambda x: x[2]),
+                               nr_dates_in_column=NR_DATES_IN_COLUMN)
     else:
         return 'Recall not implemented yet: ' + memo.discipline
 

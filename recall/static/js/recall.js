@@ -213,6 +213,18 @@ function keydownHandlerWords(event, grid){
 
 function keydownHandlerDates(event, grid){
 	switch(event.which) {
+		case 48: // 0
+		case 49:
+		case 50:
+		case 51:
+		case 52:
+		case 53:
+		case 54:
+		case 55:
+		case 56:
+		case 57: // 9
+            console.log("NUMERIC KEY: " + event.which);
+            break;
 		case 37: // Left Arrow
 		case 38: // Up Arrow
 			console.log("UP ARROW KEY: " + event.which);
@@ -235,7 +247,7 @@ function keydownHandlerDates(event, grid){
 
 var SECOND = 1000 // milliseconds
 
-function getRecallTimer(sec_remaining_element, submit_element, progressbar){
+function getRecallTimer(sec_remaining_element, submit_element){
     var total_time = Number(sec_remaining_element.text());
 	var secondsRemaining = total_time;
 	var interval = SECOND; // ms
@@ -243,8 +255,6 @@ function getRecallTimer(sec_remaining_element, submit_element, progressbar){
 	function step() {
 		secondsRemaining--;
 		sec_remaining_element.text(secondsRemaining);
-		progressbar.css("width", (100 - 100*secondsRemaining/total_time) + '%');
-		console.log(secondsRemaining/total_time);
 		if(secondsRemaining <= 0){
 			console.log('Recall timeout -> Submit');
 			submit_element.submit();
