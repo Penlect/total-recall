@@ -345,6 +345,9 @@ class User(db.Model):
     recalls = db.relationship('RecallData', backref="user",
                               cascade="save-update, merge, delete",
                               lazy='dynamic')
+    almost_correct_words = db.relationship('AlmostCorrectWord', backref="user",
+                              cascade="save-update, merge, delete",
+                              lazy='dynamic')
 
     def __init__(self, username, password, email, real_name, country):
         self.datetime = datetime.utcnow()

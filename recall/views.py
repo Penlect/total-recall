@@ -196,6 +196,20 @@ def delete_word():
     return 'Done'
 
 
+@app.route('/delete/almostcorrectword', methods=['GET'])
+@login_required
+def delete_almost_correct_word():
+    story_id = int(request.args.get('mapping_id'))
+    mapping = models.AlmostCorrectWord.query.get(story_id)
+    if mapping is None:
+        flash('Can\'t delete almost-correct-word, not found in database', 'danger')
+    else:
+        flash(f'Deleted almost-correct-word "{mapping.almost_correct}".', 'danger')
+        db.session.delete(mapping)
+        db.session.commit()
+    return 'Done'
+
+
 @app.route('/changestate/<string:memo_id>/<string:state>')
 @login_required
 def change_state(memo_id, state):
@@ -575,4 +589,50 @@ def table_words():
         if nr_added > 0:
             plural = 's' if nr_exist > 1 else ''
             flash(f'{nr_added} word{plural} added to the database.', 'success')
+        return 'Done'
+
+
+@app.route('/database/almostcorrectwords', methods=['GET', 'POST'])
+@login_required
+def db_almost_correct_words():
+    """Words database dashboard"""
+    if request.method == 'GET':
+        return render_template('db_almost_correct_words.html')
+
+@app.route('/database/almostcorrectwords/table', methods=['GET', 'POST'])
+@login_required
+def table_almost_correct_words():
+    """Words database dashboard"""
+    if request.method == 'GET':
+        language = request.args.get('language')
+        if language and language.strip().lower() != 'all':
+            try:
+                language = models.Language.query.filter_by(
+                    language=language.strip().lower()).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                mappings = list()
+            else:
+                mappings = language.almost_correct_words.order_by(models.AlmostCorrectWord.word).all()
+        else:
+            mappings = models.AlmostCorrectWord.query.order_by(models.AlmostCorrectWord.word).all()
+        return render_template('table_almost_correct_words.html', mappings=mappings)
+
+    elif request.method == 'POST':
+        language = request.form['language'].strip().lower()
+        word = request.form['word'].strip().lower()
+        almost_correct = request.form['almost_correct'].strip().lower()
+        try:
+            language = models.Language.query.filter_by(language=language).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            language = models.Language(language=language)
+            db.session.add(language)
+            db.session.commit()
+        m = models.AlmostCorrectWord(
+            ip=request.remote_addr,
+            word=word,
+            almost_correct=almost_correct
+        )
+        m.language = language
+        m.user = current_user
+        db.session.commit()
         return 'Done'

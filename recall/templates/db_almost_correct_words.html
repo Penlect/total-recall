@@ -10,7 +10,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-                <h1>Database: Words</h1>
+                <h1>Database: Almost correct Words</h1>
         </div>
     </div>
     <div class="row">
@@ -27,20 +27,23 @@
 
                         <div class="form-group">
                             <div class="col-sm-12">
-                                <select class="form-control" name="word_class" id="word_class_selection" required>
-                                    <option value="" selected disabled>Choose word class ... </option>
-    <optgroup label="Word class">
-                                  <option value="concrete_noun">Concrete Noun</option>
-                                  <option value="abstract_noun">Abstract Noun</option>
-                                  <option value="infinitive_verb">Infinitive Verb</option>
-    </optgroup>
-                                </select>
+                                <input class="form-control"
+                                       required
+                                       name="word"
+                                       id="word"
+                                       autocomplete="off"
+                                       placeholder="Word">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <div class="col-sm-12">
-                                <textarea class="form-control" required name="data" rows="10" id="word_input"></textarea>
+                                <input class="form-control"
+                                       required
+                                       name="almost_correct"
+                                       id="almost_correct"
+                                       autocomplete="off"
+                                       placeholder="Almost correct word">
                             </div>
                         </div>
 
@@ -53,7 +56,7 @@
                 </div>
         </div>
         <div class="col-md-7">
-            <p>Please enter values in the form to the left in order to add/modify words in the database.</p>
+            <p>Please enter values in the form to the left in order to add/modify the Almost Correct Words database.</p>
             <p><ul>
             <li>Write the words in the same language as you selected.</li>
             <li>The words should be sourced from an internationally recognised dictionary.</li>
@@ -62,11 +65,6 @@
                 <span class="label label-warning">10% abstract nouns</span> and
                 <span class="label label-success">10% infinitive verbs</span> is the desired word distribution.</li>
                 </ul>
-            <p><strong>Syntax:</strong> Type one word per line. Empty lines will be ignored. Everything will be converted to lower case. Example, adding three words:
-                <div class="well" ><em>pizza</em><br>
-                <em>sjöhäst</em><br>
-                <em>kortlek</em><br>
-            </div>
             </p>
             <p><strong>Conflicts:</strong>
             If you add a word that already exists - nothing will happen - unless the word class is different. If the
@@ -75,7 +73,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-12" id="db_words_content">
+        <div class="col-md-12" id="db_almost_correct_words_content">
         </div>
     </div>
 
@@ -87,35 +85,35 @@
 <script>
 
 function update_table(language) {
-    console.log('Update-table words, Language: ' + language);
+    console.log('Update-table almost-correct-words, Language: ' + language);
     $.ajax({
-          url: "{{ url_for('table_words') }}",
+          url: "{{ url_for('table_almost_correct_words') }}",
           type: "get",
           data: {
             language: language
           },
           success: function(response) {
-            $('#db_words_content').html(response);
+            $('#db_almost_correct_words_content').html(response);
           },
           error: function(xhr) {
-            $('#db_words_content').html('Error. Failed to get data from server.');
+            $('#db_almost_correct_words_content').html('Error. Failed to get data from server.');
           }
     });
 }
 
 function send_delete(id) {
-    if(!confirm("Are you sure you want to delete this word?")){
+    if(!confirm("Are you sure you want to delete this Almost-Correct-Word?")){
         return false;
     }
     $.ajax({
-      url: "{{ url_for('delete_word') }}",
+      url: "{{ url_for('delete_almost_correct_word') }}",
       type: "get",
-      data: {word_id: id},
+      data: {mapping_id: id},
       success: function(response) {
            update_table($('#language_selection').val());
       },
       error: function(xhr) {
-        $('#db_words_content').html('Error. Failed to delete word.');
+        $('#db_almost_correct_words_content').html('Error. Failed to delete almost-correct-word.');
       }
     });
 }
@@ -131,14 +129,14 @@ $(document).ready(function(){
           event.preventDefault();
           console.log("Sending data to server");
           $.ajax({
-              url: "{{ url_for('table_words') }}",
+              url: "{{ url_for('table_almost_correct_words') }}",
               type: "post",
               data: $(this).serialize(),
               success: function(response) {
                    update_table($('#language_selection').val());
               },
               error: function(xhr) {
-                $('#db_words_content').html('Error. Failed to submit data to server.');
+                $('#db_almost_correct_words_content').html('Error. Failed to submit data to server.');
               }
           });
 	 });
