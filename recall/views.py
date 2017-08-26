@@ -383,8 +383,9 @@ def arbeiter():
         # Todo: Backup solution if commit fails
         db.session.add(recall)
 
-        raw_score, points, cell_by_cell = models.Arbeiter().correct(recall)
-        c = models.Correction(raw_score, points, cell_by_cell)
+        handler = recall.memo.get_data_handler()
+        handler.correct(recall.data)
+        c = models.Correction(handler.raw_score, handler.points, handler.cell_by_cell_result)
         c.recall = recall
         db.session.add(c)
 

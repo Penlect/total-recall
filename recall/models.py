@@ -4,6 +4,7 @@ from datetime import datetime
 import re
 import io
 import os
+import math
 import random
 import collections
 from collections import namedtuple
@@ -56,8 +57,12 @@ def unique_lines_in_textarea(data: str, lower=False):
 
 class DisciplineData:
 
-    def __init__(self, data):
-        self._data = tuple(data)
+    def __init__(self, memo):
+        self._data = tuple(memo.data)
+        self.memo_time = memo.memo_time
+        self.recall_time = memo.recall_time
+        self.cell_by_cell_result = None
+        self._raw_score = None
 
     def __len__(self):
         return len(self._data)
@@ -66,12 +71,59 @@ class DisciplineData:
     def data(self):
         return self._data
 
+    def correct(self, recall_data):
+        nr_items = len(self._data)
+        start_of_emptiness = self.start_of_emptiness_before_index(recall_data,
+                                                                  nr_items)
+        result = [None]*len(recall_data)
+        for i, user_value in enumerate(recall_data, start=0):
+            if i >= nr_items:
+                result[i] = Item.off_limits
+            else:
+                if not user_value.strip():
+                    # Empty cell
+                    if i < start_of_emptiness:
+                        result[i] = Item.gap
+                    else:
+                        result[i] = Item.not_reached
+                else:
+                    result[i] = self.compare(user_value, i)
+        self.cell_by_cell_result = result
+        self.start_of_emptiness = start_of_emptiness
+
+    def compare(self, guess, index):
+        raise NotImplementedError
+
+    @staticmethod
+    def start_of_emptiness_before_index(data, index):
+        index_of_empty_cell = index
+        for i in reversed(range(index)):
+            if data[i].strip():
+                break
+            else:
+                index_of_empty_cell = i
+        return index_of_empty_cell
+
+    def _raw_score_digits(self, row_len):
+        raw_score = 0
+        cbc_r = self.cell_by_cell_result[0:self.start_of_emptiness]
+        chunks = [cbc_r[0 + i:row_len + i]
+                  for i in range(0, len(cbc_r), row_len)]
+        for i, chunk in enumerate(chunks, start=1):
+            if i == len(chunks):  # Last chunk
+                row_len = len(chunk)
+            c = collections.Counter(chunk)
+            if c[Item.correct] == row_len:
+                raw_score += c[Item.correct]
+            elif c[Item.correct] == row_len - 1:
+                raw_score += math.ceil(c[Item.correct]/2)
+        return raw_score
 
 class Base2Data(DisciplineData):
     enum = Discipline.base2
 
-    def __init__(self, data):
-        super().__init__(data)
+    def __init__(self, memo):
+        super().__init__(memo)
 
     @classmethod
     def random(cls, nr_items, *args):
@@ -87,12 +139,24 @@ class Base2Data(DisciplineData):
         else:
             return Item.wrong
 
+    @property
+    def raw_score(self):
+        return self._raw_score_digits(30)
+
+    @property
+    def points(self):
+        if (self.memo_time, self.recall_time) == (5, 15):
+            return math.ceil(self.raw_score*1000/1178)
+        elif (self.memo_time, self.recall_time) == (30, 60):
+            return math.ceil(self.raw_score*1000/4673)
+        else:
+            return -1
 
 class Base10Data(DisciplineData):
     enum = Discipline.base10
 
-    def __init__(self, data):
-        super().__init__(data)
+    def __init__(self, memo):
+        super().__init__(memo)
 
     @classmethod
     def random(cls, nr_items, *args):
@@ -108,12 +172,29 @@ class Base10Data(DisciplineData):
         else:
             return Item.wrong
 
+    @property
+    def raw_score(self):
+        return self._raw_score_digits(40)
+
+    @property
+    def points(self):
+        if (self.memo_time, self.recall_time) == (5, 15):
+            return math.ceil(self.raw_score*1000/547)
+        elif (self.memo_time, self.recall_time) == (15, 30):
+            return math.ceil(self.raw_score*1000/1112)
+        elif (self.memo_time, self.recall_time) == (30, 60):
+            return math.ceil(self.raw_score*1000/1752)
+        elif (self.memo_time, self.recall_time) == (60, 120):
+            return math.ceil(self.raw_score*1000/3234)
+        else:
+            return -1
+
 
 class WordsData(DisciplineData):
     enum = Discipline.words
 
-    def __init__(self, data):
-        super().__init__(data)
+    def __init__(self, memo):
+        super().__init__(memo)
 
     @classmethod
     def random(cls, nr_items, language):
@@ -145,14 +226,42 @@ class WordsData(DisciplineData):
     def _word_almost_correct(self, guess: str, index: int):
         return False
 
+    @property
+    def raw_score(self):
+        if self._raw_score is None:
+            column_len = 20
+            raw_score = 0
+            cbc_r = self.cell_by_cell_result[0:self.start_of_emptiness]
+            chunks = [cbc_r[0 + i:column_len + i]
+                      for i in range(0, len(cbc_r), column_len)]
+            for i, chunk in enumerate(chunks, start=1):
+                if i == len(chunks):  # last chunk
+                    column_len = len(chunk)
+                c = collections.Counter(chunk)
+                if c[Item.correct] + c[Item.almost_correct] == column_len:
+                    raw_score += c[Item.correct]
+                elif c[Item.correct] + c[Item.almost_correct] == column_len - 1:
+                    raw_score += max(0, column_len / 2 - c[Item.almost_correct])
+            self._raw_score = math.ceil(raw_score)
+        return self._raw_score
+
+    @property
+    def points(self):
+        if (self.memo_time, self.recall_time) == (5, 15):
+            return math.ceil(self.raw_score*1000/125)
+        elif (self.memo_time, self.recall_time) == (15, 30):
+            return math.ceil(self.raw_score*1000/312)
+        else:
+            return -1
+
 
 class DatesData(DisciplineData):
     enum = Discipline.dates
 
-    def __init__(self, data):
-        super().__init__(data)
+    def __init__(self, memo):
+        super().__init__(memo)
         self._lookup = {recall_order: date for date, story, recall_order
-                        in data}
+                        in self._data}
 
     @classmethod
     def random(cls, nr_items, language):
@@ -196,6 +305,22 @@ class DatesData(DisciplineData):
             return Item.correct
         else:
             return Item.wrong
+
+    @property
+    def raw_score(self):
+        if self._raw_score is None:
+            raw_score = 0
+            cbc_r = self.cell_by_cell_result[0:self.start_of_emptiness]
+            c = collections.Counter(cbc_r)
+            raw_score += c[Item.correct]
+            raw_score -= c[Item.wrong]/2
+            raw_score = max(0, raw_score)
+            self._raw_score = math.ceil(raw_score)
+        return self._raw_score
+
+    @property
+    def points(self):
+        return math.ceil(self.raw_score*100/125)
 
 
 class User(db.Model):
@@ -368,7 +493,7 @@ class MemoData(db.Model):
     def get_data_handler(self):
         for cls in (Base2Data, Base10Data, WordsData, DatesData):
             if self.discipline == cls.enum:
-                return cls(self.data)
+                return cls(self)
         raise AssertionError(f'Now Data class for {self.memo.discipline}.')
 
     def __repr__(self):
@@ -502,66 +627,6 @@ class RecallData(db.Model):
 
     def __repr__(self):
         return f'<RecallData {self.memo_id}>'
-
-
-def start_of_emptiness_before(data, index):
-    index_of_empty_cell = index
-    for i in reversed(range(index)):
-        if data[i].strip():
-            break
-        else:
-            index_of_empty_cell = i
-    return index_of_empty_cell
-
-
-class Arbeiter:
-    """Correct user's recall data
-
-    The Arbeiter is used to correct the user's recall.
-    The user's recall is compared to the blob answer.
-    """
-    def __init__(self):
-        pass
-
-    def correct(self, recall):
-        """Correct client_data (user's recall data)"""
-        self.recall = recall
-        self.memo = recall.memo
-
-        # Create Correction entry if not exists - update if exists
-
-        cell_by_cell_result = self._correct_cells()
-        raw_score = self._raw_score(cell_by_cell_result)
-        points = self._points(raw_score)
-
-        return raw_score, points, cell_by_cell_result
-
-    def _correct_cells(self):
-        handler = self.memo.get_data_handler()
-        nr_items = len(handler)
-        start_of_emptiness = start_of_emptiness_before(self.recall.data,
-                                                       nr_items)
-        result = [None]*len(self.recall.data)
-        for i, user_value in enumerate(self.recall.data, start=0):
-            if i >= nr_items:
-                result[i] = Item.off_limits
-            else:
-                if not user_value.strip():
-                    # Empty cell
-                    if i < start_of_emptiness:
-                        result[i] = Item.gap
-                    else:
-                        result[i] = Item.not_reached
-                else:
-                    result[i] = handler.compare(user_value, i)
-        return result
-
-    def _raw_score(self, cell_by_cell_result):
-        # Will depend on correction method
-        return 123
-
-    def _points(self, raw_score):
-        return 3.14
 
 
 class Correction(db.Model):
