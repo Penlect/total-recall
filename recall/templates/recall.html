@@ -21,7 +21,7 @@
     <form action="{{ url_for('arbeiter') }}" method="post">
         <fieldset>
         <div id="recallsheet" style="display:none;">
-            <p>Seconds remaining: <span id="seconds_remaining">{% block seconds_remaining %}30{% endblock %}</span></p>
+            <p>Seconds remaining: <span id="seconds_remaining">{{ seconds_remaining }}</span></p>
 
             <input name="memo_id" type="hidden" value="{{ memo.id }}">
             <input id="seconds_remaining_field" name="seconds_remaining" type="hidden">
@@ -37,6 +37,10 @@
 	<div id="score_table" style="display:none;width=300px;">
         <h3>Score table</h3>
         <table>
+            <tr>
+                <td>Nr consecutive</td>
+                <td id="consecutive">{{ consecutive }}</td>
+            </tr>
             <tr>
                 <td>Nr correct</td>
                 <td id="correct">{{ correct }}</td>
@@ -70,6 +74,7 @@ $(document).ready(function(){
         for (var i = 0; i < arrayLength; i++){
             recallResultColor('recall_cell_' + i, result.cell_by_cell[i]);
         }
+        $("#consecutive").text(result.consecutive);
         $("#correct").text(result.correct);
         $("#raw_score").text(result.raw_score);
         $("#points").text(result.points);

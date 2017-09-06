@@ -3,7 +3,7 @@ import os
 import re
 from flask import (render_template, request, jsonify, send_file, url_for,
                    flash, redirect)
-from flask_login import login_user , logout_user , current_user , login_required
+from flask_login import login_user, logout_user, current_user, login_required
 import random
 import time
 import math
@@ -32,11 +32,6 @@ NR_DIGITS_IN_COLUMN = 25
 NR_WORDS_IN_ROW = 5
 NR_WORDS_IN_COLUMN = 20
 NR_DATES_IN_COLUMN = 20
-
-def sha(string):
-    h = hashlib.sha1(string.encode())
-    h.update(str(random.random()).encode())
-    return h.hexdigest()[0:6]
 
 
 @app.route('/', methods=['GET'])
@@ -311,7 +306,8 @@ def download_xls(memo_id: int):
             return 'Download not allowed.'
 
     try:
-        xls_doc = models.XlsDoc.query.filter_by(memo_id=memo.id, pattern=pattern).one()
+        xls_doc = models.XlsDoc.query.filter_by(memo_id=memo.id,
+                                                pattern=pattern).one()
     except sqlalchemy.orm.exc.NoResultFound:
         # Failed to find already-created xls, create it:
         try:
@@ -356,18 +352,21 @@ def recall_(memo_id):
         f'User {current_user.username} request recall page of memo {memo.id}')
 
     nr_items = len(memo.data)
+    seconds_remaining = memo.recall_time*60
     if memo.discipline == models.Discipline.base2:
         nr_rows = math.ceil(nr_items/NR_DIGITS_IN_ROW_BINARY)
         return render_template('recall_numbers.html', memo=memo,
                                nr_cols=NR_DIGITS_IN_ROW_BINARY,
                                nr_rows=nr_rows,
-                               nr_digits_in_column=NR_DIGITS_IN_COLUMN)
+                               nr_digits_in_column=NR_DIGITS_IN_COLUMN,
+                               seconds_remaining=seconds_remaining)
     elif memo.discipline == models.Discipline.base10:
         nr_rows = math.ceil(nr_items/NR_DIGITS_IN_ROW_DECIMALS)
         return render_template('recall_numbers.html', memo=memo,
                                nr_cols=NR_DIGITS_IN_ROW_DECIMALS,
                                nr_rows=nr_rows,
-                               nr_digits_in_column=NR_DIGITS_IN_COLUMN)
+                               nr_digits_in_column=NR_DIGITS_IN_COLUMN,
+                               seconds_remaining=seconds_remaining)
     elif memo.discipline == models.Discipline.words:
         # Compute the total nr of columns (acc over all pages)
         nr_cols = int(math.ceil(nr_items/NR_WORDS_IN_COLUMN))
@@ -379,11 +378,13 @@ def recall_(memo_id):
             nr_cols_iter = [NR_WORDS_IN_ROW]*nr_full_tables + [remainder_cols]
         return render_template('recall_words.html', memo=memo,
                                nr_cols_iter=nr_cols_iter,
-                               nr_words_in_column=NR_WORDS_IN_COLUMN)
+                               nr_words_in_column=NR_WORDS_IN_COLUMN,
+                               seconds_remaining=seconds_remaining)
     elif memo.discipline == models.Discipline.dates:
         return render_template('recall_dates.html', memo=memo,
                                data=sorted(memo.data, key=lambda x: x[2]),
-                               nr_dates_in_column=NR_DATES_IN_COLUMN)
+                               nr_dates_in_column=NR_DATES_IN_COLUMN,
+                               seconds_remaining=seconds_remaining)
     else:
         return 'Recall not implemented yet: ' + memo.discipline
 
@@ -396,20 +397,16 @@ def arbeiter():
         recall = models.RecallData.from_request(request, current_user)
         # Todo: Backup solution if commit fails
         db.session.add(recall)
-
-        handler = recall.memo.get_data_handler()
-        handler.user = current_user  # Ugly
-        handler.language = recall.memo.language  # Ugly
-        handler.correct(recall.data)
-        c = models.Correction(handler.raw_score, handler.points, handler.cell_by_cell_result)
-        c.recall = recall
-        db.session.add(c)
-
         db.session.commit()
 
-        app.logger.info(f'Arbeiter has corrected {request.remote_addr}')
-        app.logger.info(dict(c))
-        return jsonify(dict(c))
+        correction = recall.correct()
+        db.session.add(correction)
+        db.session.commit()
+
+        app.logger.info(f'Arbeiter has corrected {recall.user.username}\'s '
+                        f'recall of memo {recall.memo.id}')
+        app.logger.info(dict(correction))
+        return jsonify(dict(correction))
 
 
 @app.route('/results/view', methods=['GET'])

@@ -9,7 +9,6 @@ import random
 import collections
 from collections import namedtuple
 import sqlalchemy.orm
-# os.remove('test.db')
 
 from recall import db, app
 import recall.xls
@@ -55,288 +54,6 @@ def unique_lines_in_textarea(data: str, lower=False):
     return lines
 
 
-class DisciplineData:
-
-    def __init__(self, data):
-        self._data = tuple(data)
-        self.cell_by_cell_result = None
-        self._raw_score = None
-
-    def __len__(self):
-        return len(self._data)
-
-    @property
-    def data(self):
-        return self._data
-
-    def correct(self, recall_data):
-        nr_items = len(self._data)
-        start_of_emptiness = self.start_of_emptiness_before_index(recall_data,
-                                                                  nr_items)
-        result = [None]*len(recall_data)
-        for i, user_value in enumerate(recall_data, start=0):
-            if i >= nr_items:
-                result[i] = Item.off_limits
-            else:
-                if not user_value.strip():
-                    # Empty cell
-                    if i < start_of_emptiness:
-                        result[i] = Item.gap
-                    else:
-                        result[i] = Item.not_reached
-                else:
-                    result[i] = self.compare(user_value, i)
-        self.cell_by_cell_result = result
-        self.start_of_emptiness = start_of_emptiness
-
-    def compare(self, guess, index):
-        raise NotImplementedError
-
-    @staticmethod
-    def start_of_emptiness_before_index(data, index):
-        index_of_empty_cell = index
-        for i in reversed(range(index)):
-            if data[i].strip():
-                break
-            else:
-                index_of_empty_cell = i
-        return index_of_empty_cell
-
-    def _raw_score_digits(self, row_len):
-        raw_score = 0
-        cbc_r = self.cell_by_cell_result[0:self.start_of_emptiness]
-        chunks = [cbc_r[0 + i:row_len + i]
-                  for i in range(0, len(cbc_r), row_len)]
-        for i, chunk in enumerate(chunks, start=1):
-            if i == len(chunks):  # Last chunk
-                row_len = len(chunk)
-            c = collections.Counter(chunk)
-            if c[Item.correct] == row_len:
-                raw_score += c[Item.correct]
-            elif c[Item.correct] == row_len - 1:
-                raw_score += math.ceil(c[Item.correct]/2)
-        return raw_score
-
-class Base2Data(DisciplineData):
-    enum = Discipline.base2
-
-    def __init__(self, data, memo_time=-1, recall_time=-1):
-        super().__init__(data)
-        self.memo_time = memo_time
-        self.recall_time = recall_time
-
-    @classmethod
-    def random(cls, nr_items, *args):
-        return cls(random.randint(0, 1) for _ in range(nr_items))
-
-    @classmethod
-    def from_text(cls, text):
-        return cls(int(digit) for digit in re.findall('[01]', text))
-
-    def compare(self, guess: int, index: int):
-        if int(guess) == self._data[index]:
-            return Item.correct
-        else:
-            return Item.wrong
-
-    @property
-    def raw_score(self):
-        return self._raw_score_digits(30)
-
-    @property
-    def points(self):
-        if (self.memo_time, self.recall_time) == (5, 15):
-            return math.ceil(self.raw_score*1000/1178)
-        elif (self.memo_time, self.recall_time) == (30, 60):
-            return math.ceil(self.raw_score*1000/4673)
-        else:
-            return -1
-
-class Base10Data(DisciplineData):
-    enum = Discipline.base10
-
-    def __init__(self, data, memo_time=-1, recall_time=-1):
-        super().__init__(data)
-        self.memo_time = memo_time
-        self.recall_time = recall_time
-
-    @classmethod
-    def random(cls, nr_items, *args):
-        return cls(random.randint(0, 9) for _ in range(nr_items))
-
-    @classmethod
-    def from_text(cls, text):
-        return cls(int(digit) for digit in re.findall('\d', text))
-
-    def compare(self, guess: int, index: int):
-        if int(guess) == self._data[index]:
-            return Item.correct
-        else:
-            return Item.wrong
-
-    @property
-    def raw_score(self):
-        return self._raw_score_digits(40)
-
-    @property
-    def points(self):
-        if (self.memo_time, self.recall_time) == (5, 15):
-            return math.ceil(self.raw_score*1000/547)
-        elif (self.memo_time, self.recall_time) == (15, 30):
-            return math.ceil(self.raw_score*1000/1112)
-        elif (self.memo_time, self.recall_time) == (30, 60):
-            return math.ceil(self.raw_score*1000/1752)
-        elif (self.memo_time, self.recall_time) == (60, 120):
-            return math.ceil(self.raw_score*1000/3234)
-        else:
-            return -1
-
-
-class WordsData(DisciplineData):
-    enum = Discipline.words
-
-    def __init__(self, data, memo_time=-1, recall_time=-1):
-        super().__init__(data)
-        self.memo_time = memo_time
-        self.recall_time = recall_time
-        self._almost_correct_word_lookup = None
-
-    @classmethod
-    def random(cls, nr_items, language):
-        language = language.strip().lower()
-        try:
-            language = Language.query.filter_by(language=language).one()
-        except sqlalchemy.orm.exc.NoResultFound:
-            words = list()
-        else:
-            words = language.words
-        words = [w.word for w in words]
-        random.shuffle(words)
-        data = tuple(words[0:nr_items])
-        return cls(data)
-
-    @classmethod
-    def from_text(cls, text):
-        return cls(unique_lines_in_textarea(text, lower=True))
-
-    def compare(self, guess: str, index: int):
-        guess = str(guess)
-        if guess == self._data[index]:
-            return Item.correct
-        elif self._word_almost_correct(guess, index):
-            return Item.almost_correct
-        else:
-            return Item.wrong
-
-    def _word_almost_correct(self, guess: str, index: int):
-        if self._almost_correct_word_lookup is None:
-            mappings = self.user.almost_correct_words.all()
-            self._almost_correct_word_lookup = mappings
-        for m in self._almost_correct_word_lookup:
-            if m.word == self._data[index] and m.language.language == self.language:
-                if m.almost_correct == guess:
-                    return True
-        return False
-
-    @property
-    def raw_score(self):
-        if self._raw_score is None:
-            column_len = 20
-            raw_score = 0
-            cbc_r = self.cell_by_cell_result[0:self.start_of_emptiness]
-            chunks = [cbc_r[0 + i:column_len + i]
-                      for i in range(0, len(cbc_r), column_len)]
-            for i, chunk in enumerate(chunks, start=1):
-                if i == len(chunks):  # last chunk
-                    column_len = len(chunk)
-                c = collections.Counter(chunk)
-                if c[Item.correct] + c[Item.almost_correct] == column_len:
-                    raw_score += c[Item.correct]
-                elif c[Item.correct] + c[Item.almost_correct] == column_len - 1:
-                    raw_score += max(0, column_len / 2 - c[Item.almost_correct])
-            self._raw_score = math.ceil(raw_score)
-        return self._raw_score
-
-    @property
-    def points(self):
-        if (self.memo_time, self.recall_time) == (5, 15):
-            return math.ceil(self.raw_score*1000/125)
-        elif (self.memo_time, self.recall_time) == (15, 30):
-            return math.ceil(self.raw_score*1000/312)
-        else:
-            return -1
-
-
-class DatesData(DisciplineData):
-    enum = Discipline.dates
-
-    def __init__(self, data, memo_time=-1, recall_time=-1):
-        super().__init__(data)
-        self.memo_time = memo_time
-        self.recall_time = recall_time
-        self._lookup = {recall_order: date for date, story, recall_order
-                        in data}
-
-    @classmethod
-    def random(cls, nr_items, language):
-        language = language.strip().lower()
-        try:
-            language = Language.query.filter_by(language=language).one()
-        except sqlalchemy.orm.exc.NoResultFound:
-            stories = list()
-        else:
-            stories = language.stories
-        stories = [s.story for s in stories]
-        if len(stories) < nr_items:
-            nr_items = len(stories)
-        random.shuffle(stories)
-        stories = stories[0:nr_items]
-        dates = [random.randint(1000, 2099) for _ in stories]
-        recall_order = list(range(nr_items))
-        random.shuffle(recall_order)
-        data = list(zip(dates, stories, recall_order))
-        random.shuffle(data)
-        return cls(data)
-
-    @classmethod
-    def from_text(cls, text):
-        lines = unique_lines_in_textarea(text, lower=False)
-        stories = list()
-        dates = list()
-        for line in lines:
-            date, story = line.split(maxsplit=1)
-            if not (1000 <= int(date) <= 2099):
-                raise ValueError(f'Date out of range: 1000 <= {date} <= 2099')
-            stories.append(story.strip())
-            dates.append(int(date))
-        recall_order = list(range(len(stories)))
-        random.shuffle(recall_order)
-        data = list(zip(dates, stories, recall_order))
-        return cls(data)
-
-    def compare(self, guess: int, index: int):
-        if int(guess) == self._lookup[index]:
-            return Item.correct
-        else:
-            return Item.wrong
-
-    @property
-    def raw_score(self):
-        if self._raw_score is None:
-            raw_score = 0
-            cbc_r = self.cell_by_cell_result[0:self.start_of_emptiness]
-            c = collections.Counter(cbc_r)
-            raw_score += c[Item.correct]
-            raw_score -= c[Item.wrong]/2
-            raw_score = max(0, raw_score)
-            self._raw_score = math.ceil(raw_score)
-        return self._raw_score
-
-    @property
-    def points(self):
-        return math.ceil(self.raw_score*1000/125)
-
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)
@@ -375,7 +92,6 @@ class User(db.Model):
     @classmethod
     def from_request(cls, request):
         return cls(
-            # Todo: restrict username characters and length
             username=request.form['username'].strip().lower(),
             password=request.form['password'],
             email=request.form['email'],
@@ -412,27 +128,29 @@ class MemoData(db.Model):
     discipline = db.Column(db.Enum(Discipline), nullable=False)
     memo_time = db.Column(db.Integer, nullable=False)  # Seconds
     recall_time = db.Column(db.Integer, nullable=False)  # Seconds
-    # Todo: change language to foreign key
-    language = db.Column(db.String(40))
     data = db.Column(db.PickleType, nullable=False)
     generated = db.Column(db.Boolean, nullable=False)
     state = db.Column(db.Enum(State), nullable=False)
 
     # ForeignKeys
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
 
     # Relationships
-    # Todo: make plural
-    xls_doc = db.relationship('XlsDoc', backref='memo',
-                              cascade="save-update, merge, delete",
-                              lazy='dynamic')
+    xls_docs = db.relationship('XlsDoc', backref='memo',
+                               cascade="save-update, merge, delete",
+                               lazy='dynamic')
     recalls = db.relationship('RecallData', backref='memo',
                               cascade="save-update, merge, delete",
                               lazy='dynamic')
 
-    def __init__(self, ip,
-                 discipline, memo_time, recall_time,
-                 language, data,
+    __mapper_args__ = {
+        'polymorphic_on': discipline
+    }
+
+    def __init__(self, ip, discipline,
+                 memo_time, recall_time,
+                 data,
                  generated, state=State.private):
 
         self.datetime = datetime.utcnow()
@@ -445,41 +163,40 @@ class MemoData(db.Model):
         if recall_time < 0:
             raise ValueError(f'recall_time cannot be negative: {recall_time}')
         self.recall_time = recall_time
-        # Language must be provided if words and dates,
-        # set it to None for other disciplines.
-        if discipline == Discipline.words or \
-                        discipline == Discipline.dates:
-            if not language:
-                raise ValueError(
-                    f'Language must be provided for "{discipline.value}"')
-            self.language = language.strip().lower()
-        else:
-            self.language = None
-        self.data = data
+        self.data = tuple(data)
         self.generated = generated
         self.state = state
 
-    @classmethod
-    def from_request(cls, request, user):
+    def __len__(self):
+        return len(self.data)
+
+    @staticmethod
+    def from_request(request, user):
         form = request.form
         ip = request.remote_addr
 
         d = form['discipline'].strip().lower()
         if d == 'binary':
-            maker = Base2Data
+            cls = Base2Data
+            discipline = Discipline.base2
         elif d == 'decimals':
-            maker = Base10Data
+            cls = Base10Data
+            discipline = Discipline.base10
         elif d == 'words':
-            maker = WordsData
+            cls = WordsData
+            discipline = Discipline.words
         elif d == 'dates':
-            maker = DatesData
+            cls = DatesData
+            discipline = Discipline.dates
         else:
             raise ValueError(f'Invalid discipline form form: "{d}"')
 
         memo_time, recall_time = form['time'].strip().lower().split(',')
         memo_time, recall_time = int(memo_time), int(recall_time)
-
         language = form.get('language')
+        if language:
+            language = language.strip().lower()
+            language = Language.query.filter_by(language=language).one()
         data = form.get('data')
         nr_items = form.get('nr_items')
         assert data or nr_items, "data or nr_items must be provided!"
@@ -489,32 +206,240 @@ class MemoData(db.Model):
             # If data was not provided, we must generate it ourselves.
             # In order to do so we need to know how many items to
             # generate, + language if words or dates.
-            discipline_data = maker.random(int(nr_items), language)
+            discipline_data = cls.random(int(nr_items), language)
         else:
             # Parse text data user provided
-            discipline_data = maker.from_text(data)
+            discipline_data = cls.from_text(data)
 
         m = cls(
             ip=ip,
-            discipline=discipline_data.enum,
+            discipline=discipline,
             memo_time=memo_time,
             recall_time=recall_time,
-            language=language,
-            data=discipline_data.data,
+            data=discipline_data,
             generated=generated,
             state=State.private
         )
         m.user = user
+        m.language = language
         return m
 
-    def get_data_handler(self):
-        for cls in (Base2Data, Base10Data, WordsData, DatesData):
-            if self.discipline == cls.enum:
-                return cls(self.data, self.memo_time, self.recall_time)
-        raise AssertionError(f'Now Data class for {self.memo.discipline}.')
+    def compare(self, guess: int, index: int):
+        if int(guess) == self.data[index]:
+            return Item.correct
+        else:
+            return Item.wrong
+
+    @staticmethod
+    def _raw_score_digits(cbc_r, row_len):
+        raw_score = 0
+        chunks = [cbc_r[0 + i:row_len + i]
+                  for i in range(0, len(cbc_r), row_len)]
+        for i, chunk in enumerate(chunks, start=1):
+            if i == len(chunks):  # Last chunk
+                row_len = len(chunk)
+            c = collections.Counter(chunk)
+            if c[Item.correct] == row_len:
+                raw_score += c[Item.correct]
+            elif c[Item.correct] == row_len - 1:
+                raw_score += math.ceil(c[Item.correct]/2)
+        return raw_score
 
     def __repr__(self):
-        return f'<MemoData {self.id}>'
+        return f'<{self.__class__.__name__} {self.id}>'
+
+
+class Base2Data(MemoData):
+    __mapper_args__ = {
+        'polymorphic_identity': Discipline.base2,
+    }
+    xls_table = staticmethod(recall.xls.get_binary_table)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    @staticmethod
+    def random(nr_items, *args):
+        return tuple(random.randint(0, 1) for _ in range(nr_items))
+
+    @staticmethod
+    def from_text(text):
+        return tuple(int(digit) for digit in re.findall('[01]', text))
+
+    def raw_score(self, cbc_r):
+        return self._raw_score_digits(cbc_r, 30)
+
+    def points(self, raw_score):
+        if (self.memo_time, self.recall_time) == (5, 15):
+            return math.ceil(raw_score*1000/1178)
+        elif (self.memo_time, self.recall_time) == (30, 60):
+            return math.ceil(raw_score*1000/4673)
+        else:
+            return -1
+
+
+class Base10Data(MemoData):
+    __mapper_args__ = {
+        'polymorphic_identity': Discipline.base10,
+    }
+    xls_table = staticmethod(recall.xls.get_decimal_table)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    @staticmethod
+    def random(nr_items, *args):
+        return tuple(random.randint(0, 9) for _ in range(nr_items))
+
+    @staticmethod
+    def from_text(text):
+        return tuple(int(digit) for digit in re.findall('\d', text))
+
+    def raw_score(self, cbc_r):
+        return self._raw_score_digits(cbc_r, 40)
+
+    def points(self, raw_score):
+        if (self.memo_time, self.recall_time) == (5, 15):
+            return math.ceil(raw_score*1000/547)
+        elif (self.memo_time, self.recall_time) == (15, 30):
+            return math.ceil(raw_score*1000/1112)
+        elif (self.memo_time, self.recall_time) == (30, 60):
+            return math.ceil(raw_score*1000/1752)
+        elif (self.memo_time, self.recall_time) == (60, 120):
+            return math.ceil(raw_score*1000/3234)
+        else:
+            return -1
+
+
+class WordsData(MemoData):
+    __mapper_args__ = {
+        'polymorphic_identity': Discipline.words,
+    }
+    xls_table = staticmethod(recall.xls.get_words_table)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    @staticmethod
+    def random(nr_items, language):
+        words = [w.word for w in language.words]
+        random.shuffle(words)
+        data = tuple(words[0:nr_items])
+        return data
+
+    @staticmethod
+    def from_text(text):
+        return tuple(unique_lines_in_textarea(text, lower=True))
+
+    def compare(self, guess: str, index: int):
+        guess = str(guess)
+        if guess == self.data[index]:
+            return Item.correct
+        elif self._word_almost_correct(guess, index):
+            return Item.almost_correct
+        else:
+            return Item.wrong
+
+    def _word_almost_correct(self, guess: str, index: int):
+        if not hasattr(self, '_almost_correct_word_lookup'):
+            mappings = self.user.almost_correct_words.all()
+            self._almost_correct_word_lookup = mappings
+        for m in self._almost_correct_word_lookup:
+            if m.word == self.data[index] and m.language == self.language:
+                if m.almost_correct == guess:
+                    return True
+        return False
+
+    @staticmethod
+    def raw_score(cbc_r):
+        column_len = 20
+        raw_score = 0
+        chunks = [cbc_r[0 + i:column_len + i]
+                  for i in range(0, len(cbc_r), column_len)]
+        for i, chunk in enumerate(chunks, start=1):
+            if i == len(chunks):  # last chunk
+                column_len = len(chunk)
+            c = collections.Counter(chunk)
+            if c[Item.correct] + c[Item.almost_correct] == column_len:
+                raw_score += c[Item.correct]
+            elif c[Item.correct] + c[Item.almost_correct] == column_len - 1:
+                raw_score += max(0, column_len / 2 - c[Item.almost_correct])
+        raw_score = math.ceil(raw_score)
+        return raw_score
+
+    def points(self, raw_score):
+        if (self.memo_time, self.recall_time) == (5, 15):
+            return math.ceil(raw_score*1000/125)
+        elif (self.memo_time, self.recall_time) == (15, 30):
+            return math.ceil(raw_score*1000/312)
+        else:
+            return -1
+
+
+class DatesData(MemoData):
+    __mapper_args__ = {
+        'polymorphic_identity': Discipline.dates,
+    }
+    xls_table = staticmethod(recall.xls.get_dates_table)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    @property
+    def lookup(self):
+        if not hasattr(self, '_lookup'):
+            self._lookup = {recall_order: date for date, story, recall_order
+                            in self.data}
+        return self._lookup
+
+    @staticmethod
+    def random(nr_items, language):
+        stories = [s.story for s in language.stories]
+        if len(stories) < nr_items:
+            nr_items = len(stories)
+        random.shuffle(stories)
+        stories = stories[0:nr_items]
+        dates = [random.randint(1000, 2099) for _ in stories]
+        recall_order = list(range(nr_items))
+        random.shuffle(recall_order)
+        data = list(zip(dates, stories, recall_order))
+        random.shuffle(data)
+        return data
+
+    @staticmethod
+    def from_text(text):
+        lines = unique_lines_in_textarea(text, lower=False)
+        stories = list()
+        dates = list()
+        for line in lines:
+            date, story = line.split(maxsplit=1)
+            if not (1000 <= int(date) <= 2099):
+                raise ValueError(f'Date out of range: 1000 <= {date} <= 2099')
+            stories.append(story.strip())
+            dates.append(int(date))
+        recall_order = list(range(len(stories)))
+        random.shuffle(recall_order)
+        data = list(zip(dates, stories, recall_order))
+        return data
+
+    def compare(self, guess: int, index: int):
+        if int(guess) == self.lookup[index]:
+            return Item.correct
+        else:
+            return Item.wrong
+
+    @staticmethod
+    def raw_score(cbc_r):
+        raw_score = 0
+        c = collections.Counter(cbc_r)
+        raw_score += c[Item.correct]
+        raw_score -= c[Item.wrong]/2
+        raw_score = max(0, raw_score)
+        return raw_score
+
+    @staticmethod
+    def points(raw_score):
+        return math.ceil(raw_score*1000/125)
 
 
 class XlsDoc(db.Model):
@@ -538,25 +463,12 @@ class XlsDoc(db.Model):
         The table can later be saved to disk as .xls file
         with the .save() function.
         """
+        table = memo.xls_table
 
-        # Depending on which discipline we have, we'll need discipline
-        # specific table and description
-        if memo.discipline == Discipline.base2:
-            table = recall.xls.get_binary_table
-        elif memo.discipline == Discipline.base10:
-            table = recall.xls.get_decimal_table
-        elif memo.discipline == Discipline.words:
-            table = recall.xls.get_words_table
-        elif memo.discipline == Discipline.dates:
-            table = recall.xls.get_dates_table
-        else:
-            raise ValueError(
-                f'Invalid discipline: "{memo.discipline}"'
-            )
         # The description include language if available
         nr_items = len(memo.data)
         if memo.language:
-            description = f'{memo.discipline.value}, {memo.language.title()}, {nr_items} st.'
+            description = f'{memo.discipline.value}, {memo.language.language.title()}, {nr_items} st.'
         else:
             description = f'{memo.discipline.value}, {nr_items} st.'
         # Create header
@@ -618,29 +530,62 @@ class RecallData(db.Model):
         self.data = data
         self.time_remaining = time_remaining
 
+    @property
+    def start_of_emptiness(self):
+        if not hasattr(self, '_start_of_emptiness'):
+            nr_items = len(self.memo.data)
+            self._start_of_emptiness = 0
+            for i, recall_cell in enumerate(self.data):
+                if recall_cell and i < nr_items:
+                    self._start_of_emptiness = i + 1
+        return self._start_of_emptiness
+
     @classmethod
     def from_request(cls, request, user):
         form = request.form
-        ip = request.remote_addr
         memo_id = form['memo_id'].strip().lower()
         memo = MemoData.query.filter_by(id=memo_id).one()
-        time_remaining = float(form['seconds_remaining'])
-
         data = list()
         for i in range(len(form)):
             try:
-                data.append(form[f'recall_cell_{i}'])
+                recall_cell = form[f'recall_cell_{i}'].strip()
             except KeyError:
                 break
-
+            else:
+                data.append(recall_cell)
         r = RecallData(
-            ip=ip,
+            ip=request.remote_addr,
             data=data,
-            time_remaining=time_remaining
+            time_remaining=float(form['seconds_remaining'])
         )
         r.user = user
         r.memo = memo
         return r
+
+    def _correct_cells(self):
+        result = [None]*len(self.data)
+        nr_items = len(self.memo.data)
+        for i, user_value in enumerate(self.data, start=0):
+            if i >= nr_items:
+                result[i] = Item.off_limits
+            else:
+                if not user_value.strip():
+                    # Empty cell
+                    if i < self.start_of_emptiness:
+                        result[i] = Item.gap
+                    else:
+                        result[i] = Item.not_reached
+                else:
+                    result[i] = self.memo.compare(user_value, i)
+        return result
+
+    def correct(self):
+        cell_by_cell_result = self._correct_cells()[0:self.start_of_emptiness]
+        raw_score = self.memo.raw_score(cell_by_cell_result)
+        points = self.memo.points(raw_score)
+        c = Correction(raw_score, points, cell_by_cell_result)
+        c.recall = self
+        return c
 
     def __repr__(self):
         return f'<RecallData {self.memo_id}>'
@@ -655,6 +600,8 @@ class Correction(db.Model):
     correct = db.Column(db.Integer, nullable=False)
     wrong = db.Column(db.Integer, nullable=False)
     almost_correct = db.Column(db.Integer, nullable=False)
+
+    consecutive = db.Column(db.Integer, nullable=False)
 
     raw_score = db.Column(db.Float, nullable=False)
     points = db.Column(db.Float, nullable=False)
@@ -673,6 +620,13 @@ class Correction(db.Model):
         self.wrong = c[Item.wrong]
         self.almost_correct = c[Item.almost_correct]
 
+        self.consecutive = 0
+        for cell in cell_by_cell:
+            if cell == Item.correct:
+                self.consecutive += 1
+            else:
+                break
+
         self.raw_score = raw_score
         self.points = points
         self.cell_by_cell = cell_by_cell
@@ -685,10 +639,32 @@ class Correction(db.Model):
             ('correct', self.correct),
             ('wrong', self.wrong),
             ('almost_correct', self.almost_correct),
+            ('consecutive', self.consecutive),
             ('raw_score', self.raw_score),
             ('points', self.points),
             ('cell_by_cell', [i.name for i in self.cell_by_cell])
         )
+
+    def __repr__(self):
+        return f'<Correction {self.correct}, {self.raw_score}, {self.points}>'
+
+
+class Language(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    language = db.Column(db.String(80), unique=True, nullable=False)
+
+    # Relationships
+    words = db.relationship('Word', backref="language", lazy='dynamic')
+    stories = db.relationship('Story', backref="language", lazy='dynamic')
+    almost_correct_words = db.relationship('AlmostCorrectWord',
+                                           backref="language", lazy='dynamic')
+    memos = db.relationship('MemoData', backref="language", lazy='dynamic')
+
+    def __init__(self, language):
+        self.language = language
+
+    def __repr__(self):
+        return f'<Language {self.language}>'
 
 
 class AlmostCorrectWord(db.Model):
@@ -713,24 +689,6 @@ class AlmostCorrectWord(db.Model):
         return f'<{self.word} ~= {self.almost_correct}>'
 
 
-class Language(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    language = db.Column(db.String(80), unique=True, nullable=False)
-
-    # Relationships
-    words = db.relationship('Word', backref="language", lazy='dynamic')
-    stories = db.relationship('Story', backref="language", lazy='dynamic')
-    almost_correct_words = db.relationship('AlmostCorrectWord',
-                                           backref="language", lazy='dynamic')
-
-    def __init__(self, language):
-        self.language = language
-
-    def __repr__(self):
-        return f'<Language {self.language}>'
-
-
-# Todo: Database of almost correct words during competition
 class Word(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)

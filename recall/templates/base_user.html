@@ -110,7 +110,7 @@
                         <td>{{ memo.memo_time }} / {{memo.recall_time }}</td>
                           <!-- Language -->
                           {% if memo.language %}
-                        <td>{{ memo.language|title }}</td>
+                        <td>{{ memo.language.language|title }}</td>
                           {% else %}
                         <td>-</td>
                           {% endif %}
@@ -203,7 +203,7 @@
 
                           <!-- Language -->
                           {% if recall.memo.language %}
-                        <td>{{ recall.memo.language|title }}</td>
+                        <td>{{ recall.memo.language.language|title }}</td>
                           {% else %}
                         <td>-</td>
                           {% endif %}
@@ -250,12 +250,6 @@
 <script>
 $( document ).ready(function() {
     $('td, th').addClass('text-center')
-
-     /*$(':input[type="submit"]').prop('disabled', true);
-     $('#language_selection').change(function() {
-        $(':input[type="submit"]').prop('disabled', false);
-     });*/
-
 });
 </script>
 {% endblock %}

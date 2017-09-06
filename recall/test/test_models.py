@@ -1,7 +1,7 @@
 import os
 
-if os.path.isfile('../test.db'):
-    os.remove('../test.db')
+if os.path.isfile('../database.db'):
+    os.remove('../database.db')
 
 from recall import db
 from recall.models import *
@@ -9,8 +9,8 @@ import random
 
 db.create_all()
 
-u1 = User('sm2017', 'asdf', 'Idriz Z', 'Sweden')
-u2 = User('daniel', 'afdgf', 'Daniel', 'Sweden')
+u1 = User('sm2017', 'asdf', 'asdf@rg', 'Idriz Z', 'Sweden')
+u2 = User('daniel', 'afdgf', 'fewfe@fdf', 'Daniel', 'Sweden')
 l1 = Language('swedish')
 l2 = Language('english')
 db.session.add(u1)
@@ -26,7 +26,7 @@ def rand_disip():
     return random.choice(list(Discipline))
 
 def rand_lang():
-    return random.choice(['swedish', 'english'])
+    return random.choice([l1, l2])
 
 def rand_time(discipline):
     if discipline == Discipline.base2:
@@ -69,11 +69,11 @@ def rand_memo(user):
         discipline=rand_disip(),
         memo_time=mt,
         recall_time=rt,
-        language=rand_lang(),
         data=data,
         generated=True,
         state=rand_state()
     )
+    m.language = rand_lang()
     m.user = user
     return m
 
@@ -81,10 +81,10 @@ def rand_recall(user, memo):
     r = RecallData(
         ip=rand_ip(),
         data=rand_data(memo.discipline),
-        time_remaining=round(12.543*random.random(), 1)
+        time_remaining=round(12.543*random.random(), 1),
     )
-    r.user = user
     r.memo = memo
+    r.user = user
     return r
 
 

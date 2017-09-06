@@ -9,8 +9,6 @@
 <h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.language|title }}, {{ memo.recall_time }} min Recall</h3>
 {% endblock %}
 
-{% block seconds_remaining %}30{% endblock %}
-
 <!-- This part defines the recall table layout -->
 {% block table_logic %}
 {% for nr_cols in nr_cols_iter %}
