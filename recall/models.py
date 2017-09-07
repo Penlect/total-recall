@@ -137,9 +137,6 @@ class MemoData(db.Model):
     language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
 
     # Relationships
-    xls_docs = db.relationship('XlsDoc', backref='memo',
-                               cascade="save-update, merge, delete",
-                               lazy='dynamic')
     recalls = db.relationship('RecallData', backref='memo',
                               cascade="save-update, merge, delete",
                               lazy='dynamic')
@@ -169,6 +166,9 @@ class MemoData(db.Model):
 
     def __len__(self):
         return len(self.data)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__} {self.id}>'
 
     @staticmethod
     def from_request(request, user):
@@ -245,8 +245,52 @@ class MemoData(db.Model):
                 raw_score += math.ceil(c[Item.correct]/2)
         return raw_score
 
-    def __repr__(self):
-        return f'<{self.__class__.__name__} {self.id}>'
+    def get_xls_filedata(self, pattern):
+        """Take relevant data of memo and create table
+
+        The table can later be saved to disk as .xls file
+        with the .save() function.
+        """
+        # The description include language if available
+        nr_items = len(self.data)
+        if self.language:
+            description = f'{self.discipline.value}, ' \
+                          f'{self.language.language.title()}, {nr_items} st.'
+        else:
+            description = f'{self.discipline.value}, {nr_items} st.'
+        # Create header
+        header = recall.xls.Header(
+            title='Svenska Minnesförbundet',
+            description=description,
+            recall_key=self.id,
+            memo_time=self.memo_time,
+            recall_time=self.recall_time
+        )
+        # Create table
+        t = self.xls_table(header=header, pattern=pattern)
+        # Update the table with data
+        for n in self.data:
+            t.add_item(n)
+        # Write xls file to file object
+        filedata = io.BytesIO()
+        t.save(filedata)
+        filedata.seek(0)
+        return filedata
+
+    def get_xls_filename(self, pattern):
+        filename_fmt = ('{id}_{discipline}_{memo_time}-{recall_time}min'
+                        '_{language}_{nr}st_p{pattern_str}.xls')
+        filename = filename_fmt.format(
+            id=self.id,
+            discipline=self.discipline.value.replace(' ', '_'),
+            memo_time=self.memo_time,
+            recall_time=self.recall_time,
+            language=self.language.language.replace(' ', '_').title()\
+                if self.language else '',
+            nr=len(self.data),
+            pattern_str=pattern if pattern is not None else ''
+        )
+        return filename
 
 
 class Base2Data(MemoData):
@@ -440,69 +484,6 @@ class DatesData(MemoData):
     @staticmethod
     def points(raw_score):
         return math.ceil(raw_score*1000/125)
-
-
-class XlsDoc(db.Model):
-
-    # Fields
-    id = db.Column(db.Integer, primary_key=True)
-    pattern = db.Column(db.String(120))
-    data = db.Column(db.PickleType, nullable=False)
-
-    # ForeignKeys
-    memo_id = db.Column(db.Integer, db.ForeignKey('memo_data.id'))
-
-    def __init__(self, pattern, data):
-        self.pattern = pattern
-        self.data = data
-
-    @classmethod
-    def from_memo(cls, memo, pattern):
-        """Take relevant data of memo and create table
-
-        The table can later be saved to disk as .xls file
-        with the .save() function.
-        """
-        table = memo.xls_table
-
-        # The description include language if available
-        nr_items = len(memo.data)
-        if memo.language:
-            description = f'{memo.discipline.value}, {memo.language.language.title()}, {nr_items} st.'
-        else:
-            description = f'{memo.discipline.value}, {nr_items} st.'
-        # Create header
-        header = recall.xls.Header(
-            title='Svenska Minnesförbundet',
-            description=description,
-            recall_key=memo.id,
-            memo_time=memo.memo_time,
-            recall_time=memo.recall_time
-        )
-        # Create table
-        t = table(header=header, pattern=pattern)
-        # Update the table with data
-        for n in memo.data:
-            t.add_item(n)
-        # Write xls file to file object
-        filedata = io.BytesIO()
-        t.save(filedata)
-        filedata.seek(0)
-        # Create instance and attach memo reference
-        xls_doc = cls(pattern, filedata)
-        xls_doc.memo = memo
-        return xls_doc
-
-    @property
-    def filename(self):
-        """Create xls filename containing blob data"""
-        # Todo: Think about this
-        XLS_FILENAME_FMT = '{discipline}_{nr}st_{language}_{memo_time}-{recall_time}min_p{pattern_str}_{correction}_{recall_key}'
-        return None
-
-
-    def __repr__(self):
-        return f'<XlsDoc {self.memo_id}; p={self.pattern}; {len(self.data)} bytes>'
 
 
 class RecallData(db.Model):

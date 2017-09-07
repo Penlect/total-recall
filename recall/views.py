@@ -2,7 +2,7 @@
 import os
 import re
 from flask import (render_template, request, jsonify, send_file, url_for,
-                   flash, redirect)
+                   flash, redirect, send_from_directory)
 from flask_login import login_user, logout_user, current_user, login_required
 import random
 import time
@@ -286,7 +286,7 @@ def make_discipline():
         return 'Successfully created discipline'
 
 
-@app.route('/download/xls/<int:memo_id>', methods=['GET'])
+@app.route('/xls/<int:memo_id>', methods=['GET'])
 @login_required
 def download_xls(memo_id: int):
     pattern = request.args.get('pattern')
@@ -305,24 +305,15 @@ def download_xls(memo_id: int):
         if memo.state != models.State.public:
             return 'Download not allowed.'
 
-    try:
-        xls_doc = models.XlsDoc.query.filter_by(memo_id=memo.id,
-                                                pattern=pattern).one()
-    except sqlalchemy.orm.exc.NoResultFound:
-        # Failed to find already-created xls, create it:
-        try:
-            xls_doc = models.XlsDoc.from_memo(memo, pattern)
-        except Exception as e:
-            return f'Failed to create xls document: {e}'
-        else:
-            db.session.add(xls_doc)
-            db.session.commit()
-
-    return send_file(xls_doc.data,
-                     attachment_filename=f'{memo_id}.xls',
-                     as_attachment=True,
-                     mimetype='application/vnd.ms-excel'
-                     )
+    filename = memo.get_xls_filename(pattern)
+    fullfile = os.path.join(app.root_path, f'xls/{filename}')
+    if not os.path.isfile(fullfile):
+        filedata = memo.get_xls_filedata(pattern)
+        with open(fullfile, 'wb') as h:
+            h.write(filedata.getvalue())
+    return send_from_directory(os.path.join(app.root_path, 'xls'),
+                               filename,
+                               as_attachment=True)
 
 
 @app.route('/recall/<string:memo_id>')
@@ -393,7 +384,6 @@ def recall_(memo_id):
 def arbeiter():
     app.logger.info(f'Arbeiter got data from {request.remote_addr}')
     if request.method == 'POST':
-        app.logger.info(str(request.form))
         recall = models.RecallData.from_request(request, current_user)
         # Todo: Backup solution if commit fails
         db.session.add(recall)
@@ -405,7 +395,6 @@ def arbeiter():
 
         app.logger.info(f'Arbeiter has corrected {recall.user.username}\'s '
                         f'recall of memo {recall.memo.id}')
-        app.logger.info(dict(correction))
         return jsonify(dict(correction))
 
 
