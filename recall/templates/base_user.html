@@ -183,6 +183,7 @@
                     <th>Language</th>
                     <th>User</th>
 
+                    <th>Nr Consec.</th>
                     <th>Nr Correct</th>
                     <th>Raw Score</th>
                     <th>Points</th>
@@ -209,6 +210,7 @@
                           {% endif %}
 
                         <td><a href="{{ url_for('user', username=recall.user.username) }}">{{ recall.user.username }}</a></td>
+                        <td>{{ recall.correction.consecutive }}</td>
                         <td>{{ recall.correction.correct }}</td>
                         <td>{{ recall.correction.raw_score }}</td>
                         <td>{{ recall.correction.points }}</td>
@@ -216,7 +218,7 @@
 
                           <!-- View -->
                           {% if users_home_page or (not users_home_page and (recall.memo.state.value == 'Public' or recall.user.id == current_user.id)) %}
-                        <td><a href="{{ url_for('download_xls', memo_id=recall.memo.id) }}">{{ recall.memo.id }}.xls</a></td>
+                        <td><a href="{{ url_for('view_recall', recall_id=recall.id) }}">{{ recall.id }}</a></td>
                         {% else %}
                          <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
                         {% endif %}

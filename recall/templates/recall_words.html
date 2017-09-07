@@ -6,7 +6,7 @@
 
 
 {% block subheader %}
-<h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.language|title }}, {{ memo.recall_time }} min Recall</h3>
+<h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.language.language|title }}, {{ memo.recall_time }} min Recall</h3>
 {% endblock %}
 
 <!-- This part defines the recall table layout -->
@@ -17,11 +17,16 @@
         {% for row_i in range(nr_words_in_column) %}
         <tr class="recall_row">
             {% for col_i in range(nr_cols) %}
-                <td><input class="recall_cell"
+                <td><input class="recall_cell {% if view is defined %}recall_{{ recall.correction.cell_by_cell[table.index0*100 + col_i*nr_words_in_column + row_i].name }}{% endif %}"
                            id="recall_cell_{{ table.index0*100 + col_i*nr_words_in_column + row_i }}"
                            name="recall_cell_{{ table.index0*100 + col_i*nr_words_in_column + row_i }}"
                            type="text"
-                           autocomplete="off">
+                           autocomplete="off"
+                           {% if view is defined %}
+                                value="{{ recall.data[table.index0*100 + col_i*nr_words_in_column + row_i] }}">
+                           {% else %}
+                                value="">
+                           {% endif %}
                 </td>
             {% endfor %}
             <td class="row_enumeration">Row {{ table.index0*nr_words_in_column + row_i + 1 }}</td>
@@ -33,7 +38,9 @@
 
 <!-- This part handles what will happen when a key is pressed -->
 {% block keydown%}
+   {% if view is not defined %}
     var grid = new RecallGrid(nrCells/{{ nr_words_in_column }}, {{ nr_words_in_column }}, $(this), false);
     keydownHandlerWords(event, grid);
+   {% endif %}
 {% endblock keydown%}
 

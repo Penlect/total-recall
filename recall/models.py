@@ -561,10 +561,10 @@ class RecallData(db.Model):
         return result
 
     def correct(self):
-        cell_by_cell_result = self._correct_cells()[0:self.start_of_emptiness]
-        raw_score = self.memo.raw_score(cell_by_cell_result)
+        cbc_r = self._correct_cells()
+        raw_score = self.memo.raw_score(cbc_r[0:self.start_of_emptiness])
         points = self.memo.points(raw_score)
-        c = Correction(raw_score, points, cell_by_cell_result)
+        c = Correction(raw_score, points, cbc_r)
         c.recall = self
         return c
 

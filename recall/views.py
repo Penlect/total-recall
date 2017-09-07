@@ -398,39 +398,64 @@ def arbeiter():
         return jsonify(dict(correction))
 
 
-@app.route('/results/view', methods=['GET'])
-def view_recall():
-    file = request.args.get('data')
-    filename = os.path.join(
-        app.root_path, f'recalldata/{file}')
-    with open(filename, 'rb') as file:
-        client, result = pickle.load(file)
-        blob = load_blob(client.recall_key)
-    d = blob['discipline']
-    if d == 'binary':
-        nr_rows = math.ceil(len(blob['data'])/30)
-        return render_template('view_recall_numbers.html', blob=blob,
-                               client_data=client, result=result,
-                                   nr_cols=30, nr_rows=nr_rows)
-    elif d == 'decimal':
-        nr_rows = math.ceil(len(blob['data'])/40)
-        return render_template('view_recall_numbers.html', blob=blob,
-                               client_data=client, result=result,
-                                   nr_cols=40, nr_rows=nr_rows)
-    elif d == 'words':
-        nr_cols = math.ceil(len(blob['data'])/20)
-        if nr_cols%5 == 0:
-            nr_cols_iter = [5]*(nr_cols//5)
+@app.route('/recall/view/<string:recall_id>')
+@login_required
+def view_recall(recall_id):
+    """View recall"""
+    # Todo: Make sure user is allowed to do this
+    try:
+        recall = models.RecallData.query.filter_by(id=recall_id).one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        return f'Does not exists'
+
+    # If we reach here, the user is allowed to view recall
+    app.logger.info(
+        f'User {current_user.username} view recall {recall_id}')
+
+    nr_items = len(recall.memo.data)
+    seconds_remaining = recall.time_remaining
+    if recall.memo.discipline == models.Discipline.base2:
+        nr_rows = math.ceil(nr_items/NR_DIGITS_IN_ROW_BINARY)
+        return render_template('recall_numbers.html', memo=recall.memo,
+                               nr_cols=NR_DIGITS_IN_ROW_BINARY,
+                               nr_rows=nr_rows,
+                               nr_digits_in_column=NR_DIGITS_IN_COLUMN,
+                               seconds_remaining=seconds_remaining,
+                               view=True,
+                               recall=recall)
+    elif recall.memo.discipline == models.Discipline.base10:
+        nr_rows = math.ceil(nr_items/NR_DIGITS_IN_ROW_DECIMALS)
+        return render_template('recall_numbers.html', memo=recall.memo,
+                               nr_cols=NR_DIGITS_IN_ROW_DECIMALS,
+                               nr_rows=nr_rows,
+                               nr_digits_in_column=NR_DIGITS_IN_COLUMN,
+                               seconds_remaining=seconds_remaining,
+                               view=True,
+                               recall=recall)
+    elif recall.memo.discipline == models.Discipline.words:
+        # Compute the total nr of columns (acc over all pages)
+        nr_cols = int(math.ceil(nr_items/NR_WORDS_IN_COLUMN))
+        nr_full_tables = nr_cols//NR_WORDS_IN_ROW
+        remainder_cols = nr_cols%NR_WORDS_IN_ROW
+        if remainder_cols == 0:
+            nr_cols_iter = [NR_WORDS_IN_ROW]*nr_full_tables
         else:
-            nr_cols_iter = [5]*(nr_cols//5) + [nr_cols%5]
-        return render_template('view_recall_words.html', blob=blob,
-                               client_data=client, result=result,
-                               nr_cols_iter=nr_cols_iter)
-    elif d == 'dates':
-        return render_template('view_recall_dates.html', blob=blob,
-                               client_data=client, result=result)
+            nr_cols_iter = [NR_WORDS_IN_ROW]*nr_full_tables + [remainder_cols]
+        return render_template('recall_words.html', memo=recall.memo,
+                               nr_cols_iter=nr_cols_iter,
+                               nr_words_in_column=NR_WORDS_IN_COLUMN,
+                               seconds_remaining=seconds_remaining,
+                               view=True,
+                               recall=recall)
+    elif recall.memo.discipline == models.Discipline.dates:
+        return render_template('recall_dates.html', memo=recall.memo,
+                               data=sorted(recall.memo.data, key=lambda x: x[2]),
+                               nr_dates_in_column=NR_DATES_IN_COLUMN,
+                               seconds_remaining=seconds_remaining,
+                               view=True,
+                               recall=recall)
     else:
-        raise Exception(f'Blob contain invalid discipline: {d}')
+        return 'Recall not implemented yet: ' + recall.memo.discipline
 
 
 @app.route('/database/stories', methods=['GET', 'POST'])

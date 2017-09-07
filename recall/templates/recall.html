@@ -16,9 +16,15 @@
     <h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.recall_time }} min Recall</h3>
     {% endblock %}
 
+    {% if view is not defined %}
     <button id="start_recall" class="btn btn-danger btn-lg" type="button">Start Recall</button>
+    {% endif %}
 
+    {% if view is not defined %}
     <form action="{{ url_for('arbeiter') }}" method="post">
+    {% else %}
+    <form>
+    {% endif %}
         <fieldset>
         <div id="recallsheet" style="display:none;">
             <p>Seconds remaining: <span id="seconds_remaining">{{ seconds_remaining }}</span></p>
@@ -29,7 +35,9 @@
             {% block table_logic %}
             {% endblock %}
 
+            {% if view is not defined %}
             <button id="recall_submit_button" type="submit" class="btn btn-danger">Submit Recall</button>
+            {% endif %}
         </div>
         </fieldset>
     </form>
@@ -39,19 +47,19 @@
         <table>
             <tr>
                 <td>Nr consecutive</td>
-                <td id="consecutive">{{ consecutive }}</td>
+                <td id="consecutive">{% if view is defined %}{{ recall.correction.consecutive }}{% endif %}</td>
             </tr>
             <tr>
                 <td>Nr correct</td>
-                <td id="correct">{{ correct }}</td>
+                <td id="correct">{% if view is defined %}{{ recall.correction.correct }}{% endif %}</td>
             </tr>
             <tr>
                 <td>Raw score</td>
-                <td id="raw_score">{{ raw_score }}</td>
+                <td id="raw_score">{% if view is defined %}{{ recall.correction.raw_score }}{% endif %}</td>
             </tr>
             <tr>
                 <td>Points</td>
-                <td id="points">{{ points }}</td>
+                <td id="points">{% if view is defined %}{{ recall.correction.points }}{% endif %}</td>
             </tr>
         </table>
     </div>
@@ -64,6 +72,8 @@
 <script>
 
 $(document).ready(function(){
+
+    {% if view is not defined %}
 
     function recallSubmit(result, status, xhr){
         console.log(result);
@@ -121,6 +131,14 @@ $(document).ready(function(){
 	  clearTimeout(recallTimer);
       return false;
    });
+   {% else %}
+
+   $('fieldset').prop('disabled', true);
+   $('#recallsheet').css("display", "block");
+   $("#score_table").css("display", "block");
+
+
+   {% endif %}
 
 });
 </script>

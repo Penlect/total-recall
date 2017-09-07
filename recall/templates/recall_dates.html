@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block subheader %}
-<h3>Historical {{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.language|title }}, {{ memo.recall_time }} min Recall</h3>
+<h3>Historical {{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.language.language|title }}, {{ memo.recall_time }} min Recall</h3>
 {% endblock %}
 
 <!-- This part defines the recall table layout -->
@@ -13,13 +13,18 @@
 <table border="1px" class="recall_table">
 {% for date, story, order in data %}
     <tr class="recall_row">
-        <td><input class="recall_cell"
+        <td><input class="recall_cell {% if view is defined %}recall_{{ recall.correction.cell_by_cell[loop.index0].name }}{% endif %}"
                    id="recall_cell_{{ loop.index0 }}"
                    name="recall_cell_{{ loop.index0 }}"
                    type="text"
                    maxlength="4"
                    size="4"
-                   autocomplete="off">
+                   autocomplete="off"
+                   {% if view is defined %}
+                        value="{{ recall.data[loop.index0] }}">
+                   {% else %}
+                        value="">
+                   {% endif %}
         </td>
         <td class="story">{{ story }}</td>
     </tr>
@@ -33,7 +38,9 @@
 
 <!-- This part handles what will happen when a key is pressed -->
 {% block keydown%}
+   {% if view is not defined %}
     var grid = new RecallGrid(nrRows, nrCells/nrRows, $(this));
     // $(this).val().length
     keydownHandlerDates(event, grid);
+   {% endif %}
 {% endblock keydown%}

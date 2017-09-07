@@ -32,7 +32,6 @@ if restart:
         models.RecallData.__table__,
         models.Correction.__table__,
         models.User.__table__,
-        models.XlsDoc.__table__,
         models.AlmostCorrectWord.__table__,
     ])
 db.create_all()
