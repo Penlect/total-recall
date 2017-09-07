@@ -4,8 +4,18 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
 app = Flask(__name__)
-app.secret_key = 'some_secret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.secret_key = 'Melodies of Life 34fj34ofi34jfl3'
+if True:
+    SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
+        username="penlect",
+        password="melodiesoflife",
+        hostname="penlect.mysql.pythonanywhere-services.com",
+        databasename="penlect$recall",
+    )
+else:
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'
+app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
+app.config["SQLALCHEMY_POOL_RECYCLE"] = 280
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
