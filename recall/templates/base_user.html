@@ -107,7 +107,11 @@
                       <tr>
                         <td>{{ memo.id }}</td>
                         <td>{{ memo.discipline.value }}</td>
-                        <td>{{ memo.memo_time }} / {{memo.recall_time }}</td>
+                          {% if memo.discipline.name == 'spoken' %}
+                            <td>~{{ (memo.data|length/60)|round(2) }} / {{memo.recall_time }}</td>
+                          {% else %}
+                            <td>{{ memo.memo_time }} / {{memo.recall_time }}</td>
+                          {% endif %}
                           <!-- Language -->
                           {% if memo.language %}
                         <td>{{ memo.language.language|title }}</td>
@@ -127,6 +131,8 @@
                           <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=user.settings.pattern_words) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
                           {% elif memo.discipline.name == 'dates' %}
                           <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=user.settings.pattern_dates) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
+                          {% elif memo.discipline.name == 'spoken' %}
+                          <td><a href="{{ url_for('play_spoken', memo_id=memo.id) }}"><span class="glyphicon glyphicon-volume-up" aria-hidden="true"></span></a></td>
                           {% endif %}
                         {% else %}
                          <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
@@ -183,10 +189,10 @@
                     <th>Language</th>
                     <th>User</th>
 
-                    <th>Nr Consec.</th>
-                    <th>Nr Correct</th>
-                    <th>Raw Score</th>
                     <th>Points</th>
+                    <th>Raw Score</th>
+                    <th>Nr Correct</th>
+                    <th>Nr Consec.</th>
                     <th>Time rem.</th>
                     <th>View</th>
                     <th>Recalled</th>
@@ -210,10 +216,10 @@
                           {% endif %}
 
                         <td><a href="{{ url_for('user', username=recall.user.username) }}">{{ recall.user.username }}</a></td>
-                        <td>{{ recall.correction.consecutive }}</td>
-                        <td>{{ recall.correction.correct }}</td>
-                        <td>{{ recall.correction.raw_score }}</td>
                         <td>{{ recall.correction.points }}</td>
+                        <td>{{ recall.correction.raw_score }}</td>
+                        <td>{{ recall.correction.correct }}</td>
+                        <td>{{ recall.correction.consecutive }}</td>
                         <td>{{ recall.time_remaining|round(1) }}</td>
 
                           <!-- View -->

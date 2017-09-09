@@ -118,6 +118,50 @@
             </div>
         </div>
 
+        <div class="row">
+            <div class="col-md-{{ left_column_width }}">
+                <h1>Cards</h1>
+                <div class="well cards">
+                    <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
+                        <fieldset disabled="disabled">
+                        <input name="discipline" type="hidden" value="cards">
+                        {{ nr_items(max=20000) }}
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <select name="time" class="form-control">
+                                  <option value="10,30">10min / 30min</option>
+                                  <option value="30,60">30min / 60min</option>
+                                  <option value="60,120">60min / 120min</option>
+                                </select>
+                            </div>
+                        </div>
+                        {{ common_fields('Generate') }}
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-{{ right_column_width }}">
+                <h1>Spoken Numbers</h1>
+                <div class="well spoken">
+                    <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
+                        <input name="discipline" type="hidden" value="spoken">
+                        {{ nr_items(max=10000) }}
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <select name="time" class="form-control">
+                                  <option value="0,5">- / 5min</option>
+                                  <option value="0,10">- / 10min</option>
+                                  <option value="0,15">- / 15min</option>
+                                  <option value="0,20">- / 20min</option>
+                                </select>
+                            </div>
+                        </div>
+                        {{ common_fields('Generate') }}
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- CREATE -->
 
         <div class="row">
@@ -217,6 +261,58 @@
             </div>
         </div>
 
+
+        <div class="row">
+            <div class="col-md-{{ left_column_width }}">
+                <h1>Cards</h1>
+                <div class="well cards">
+                    <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
+                    <fieldset disabled="disabled">
+                        <input name="discipline" type="hidden" value="cards">
+                          <div class="form-group">
+                            <div class="col-sm-12">
+                                <textarea class="form-control" name="data" rows="10" placeholder="Not implemented"></textarea>
+                            </div>
+                          </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <select name="time" class="form-control">
+                                  <option value="10,30">10min / 30min</option>
+                                  <option value="30,60">30min / 60min</option>
+                                  <option value="60,120">60min / 120min</option>
+                                </select>
+                            </div>
+                        </div>
+                        {{ common_fields('Generate') }}
+                    </fieldset>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-{{ right_column_width }}">
+                <h1>Spoken Numbers</h1>
+                <div class="well spoken">
+                    <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
+                        <input name="discipline" type="hidden" value="spoken">
+                          <div class="form-group">
+                            <div class="col-sm-12">
+                                <textarea class="form-control" name="data" rows="10"></textarea>
+                            </div>
+                          </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <select name="time" class="form-control">
+                                  <option value="0,5">- / 5min</option>
+                                  <option value="0,10">- / 10min</option>
+                                  <option value="0,15">- / 15min</option>
+                                  <option value="0,20">- / 20min</option>
+                                </select>
+                            </div>
+                        </div>
+                        {{ common_fields('Generate') }}
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
 {% endblock %}

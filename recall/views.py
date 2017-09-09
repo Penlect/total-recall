@@ -10,6 +10,7 @@ import math
 import hashlib
 import pickle
 import collections
+import json
 
 import sqlalchemy.orm
 
@@ -316,7 +317,17 @@ def download_xls(memo_id: int):
                                as_attachment=True)
 
 
-@app.route('/recall/<string:memo_id>')
+@app.route('/play/<int:memo_id>', methods=['GET'])
+@login_required
+def play_spoken(memo_id: int):
+    try:
+        memo = models.MemoData.query.filter_by(id=memo_id).one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        return f'Could not find memo for key={memo_id}'
+    return render_template('play_spoken.html', data=json.dumps(memo.data))
+
+
+@app.route('/recall/<int:memo_id>')
 @login_required
 def recall_(memo_id):
     """Send the user to the recall page of memorization provided id
@@ -351,7 +362,8 @@ def recall_(memo_id):
                                nr_rows=nr_rows,
                                nr_digits_in_column=NR_DIGITS_IN_COLUMN,
                                seconds_remaining=seconds_remaining)
-    elif memo.discipline == models.Discipline.base10:
+    elif memo.discipline == models.Discipline.base10\
+            or memo.discipline == models.Discipline.spoken:
         nr_rows = math.ceil(nr_items/NR_DIGITS_IN_ROW_DECIMALS)
         return render_template('recall_numbers.html', memo=memo,
                                nr_cols=NR_DIGITS_IN_ROW_DECIMALS,
@@ -398,7 +410,23 @@ def arbeiter():
         return jsonify(dict(correction))
 
 
-@app.route('/recall/view/<string:recall_id>')
+@app.route('/arbeiter/correct/<int:recall_id>')
+def recorrect(recall_id):
+    app.logger.info(f'Arbeiter will re-correct recall {recall_id}')
+    try:
+        recall = models.RecallData.query.filter_by(id=recall_id).one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        return f'Does not exists'
+    if recall.memo.user.id != current_user.id:
+        return 'Not allowed. This user do not own the memorization'
+    old = recall.correction
+    recall.correction = recall.correct()
+    db.session.delete(old)
+    db.session.commit()
+    return redirect(url_for('view_recall', recall_id=recall_id))
+
+
+@app.route('/recall/view/<int:recall_id>')
 @login_required
 def view_recall(recall_id):
     """View recall"""
@@ -423,7 +451,8 @@ def view_recall(recall_id):
                                seconds_remaining=seconds_remaining,
                                view=True,
                                recall=recall)
-    elif recall.memo.discipline == models.Discipline.base10:
+    elif recall.memo.discipline == models.Discipline.base10\
+            or recall.memo.discipline == models.Discipline.spoken:
         nr_rows = math.ceil(nr_items/NR_DIGITS_IN_ROW_DECIMALS)
         return render_template('recall_numbers.html', memo=recall.memo,
                                nr_cols=NR_DIGITS_IN_ROW_DECIMALS,
@@ -625,9 +654,11 @@ def table_almost_correct_words():
             except sqlalchemy.orm.exc.NoResultFound:
                 mappings = list()
             else:
-                mappings = language.almost_correct_words.order_by(models.AlmostCorrectWord.word).all()
+                mappings = language.almost_correct_words.filter_by(
+                    user_id=current_user.id).order_by(models.AlmostCorrectWord.word).all()
         else:
-            mappings = models.AlmostCorrectWord.query.order_by(models.AlmostCorrectWord.word).all()
+            mappings = models.AlmostCorrectWord.query.filter_by(
+                user_id=current_user.id).order_by(models.AlmostCorrectWord.word).all()
         return render_template('table_almost_correct_words.html', mappings=mappings)
 
     elif request.method == 'POST':

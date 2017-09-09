@@ -1,0 +1,67 @@
+{% extends "base_navigation.html" %}
+
+{% block body %}
+
+{{ super() }}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            Spoken numbers playing ... <span id="progress"></span>
+        </div>
+    </div>
+</div>
+
+{% endblock body %}
+
+{% block javascript %}
+<script>
+
+var numbers = {{ data }};
+
+var sounds = [];
+for (var i = 0; i <= 9; i++) {
+    sounds.push(new Audio("/static/spoken/eng/" + i + ".wav"));
+}
+
+function playSound(digit) {
+    sounds[digit].play();
+}
+
+var SECOND = 1000 // milliseconds
+
+function getRecallTimer(){
+	var sec = 0;
+	var interval = SECOND; // ms
+	var expected = Date.now();
+	function step() {
+	    console.log('Playing ' + numbers[sec] + ' at t = ' + Date.now());
+	    playSound(numbers[sec]);
+		sec++;
+		$('#progress').html(sec);
+		if(sec < numbers.length ){
+			var dt = Date.now() - expected; // the drift (positive for overshooting)
+			if (dt > interval) {
+				console.log('Warning: dt = ' + dt);
+			}
+			expected += interval;
+			recallTimer = setTimeout(step, Math.max(0, interval - dt)); // take into account drift
+		}
+		else{
+			console.log('Done');
+		    $('#progress').html('Done');
+		}
+	}
+	return step;
+}
+
+function playSpoken() {
+    console.log('Playing Spoken Numbers ...');
+    spokenTimer = getRecallTimer();
+    spokenTimer();
+}
+
+$( document ).ready(function() {
+    playSpoken();
+});
+</script>
+{% endblock %}

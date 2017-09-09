@@ -19,6 +19,7 @@ class Discipline(enum.Enum):
     base10 = 'Decimal Numbers'
     words = 'Words'
     dates = 'Historical Dates'
+    spoken = 'Spoken Numbers'
 
 
 class Item(enum.Enum):
@@ -188,6 +189,9 @@ class MemoData(db.Model):
         elif d == 'dates':
             cls = DatesData
             discipline = Discipline.dates
+        elif d == 'spoken':
+            cls = SpokenData
+            discipline = Discipline.spoken
         else:
             raise ValueError(f'Invalid discipline form form: "{d}"')
 
@@ -299,9 +303,6 @@ class Base2Data(MemoData):
     }
     xls_table = staticmethod(recall.xls.get_binary_table)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     @staticmethod
     def random(nr_items, *args):
         return tuple(random.randint(0, 1) for _ in range(nr_items))
@@ -328,9 +329,6 @@ class Base10Data(MemoData):
     }
     xls_table = staticmethod(recall.xls.get_decimal_table)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     @staticmethod
     def random(nr_items, *args):
         return tuple(random.randint(0, 9) for _ in range(nr_items))
@@ -355,14 +353,40 @@ class Base10Data(MemoData):
             return -1
 
 
+class SpokenData(MemoData):
+    __mapper_args__ = {
+        'polymorphic_identity': Discipline.spoken,
+    }
+    xls_table = staticmethod(recall.xls.get_decimal_table)
+
+    @staticmethod
+    def random(nr_items, *args):
+        return tuple(random.randint(0, 9) for _ in range(nr_items))
+
+    @staticmethod
+    def from_text(text):
+        return tuple(int(digit) for digit in re.findall('\d', text))
+
+    @staticmethod
+    def raw_score(cbc_r):
+        consecutive = 0
+        for cell in cbc_r:
+            if cell == Item.correct:
+                consecutive += 1
+            else:
+                break
+        return consecutive
+
+    @staticmethod
+    def points(raw_score):
+        return round(math.sqrt(raw_score)*47.3)
+
+
 class WordsData(MemoData):
     __mapper_args__ = {
         'polymorphic_identity': Discipline.words,
     }
     xls_table = staticmethod(recall.xls.get_words_table)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     @staticmethod
     def random(nr_items, language):
@@ -425,9 +449,6 @@ class DatesData(MemoData):
         'polymorphic_identity': Discipline.dates,
     }
     xls_table = staticmethod(recall.xls.get_dates_table)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     @property
     def lookup(self):
