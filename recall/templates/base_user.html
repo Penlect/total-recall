@@ -265,9 +265,12 @@
 {% endblock %}
 
 {% block javascript %}
+
 <script>
 $( document ).ready(function() {
-    $('td, th').addClass('text-center')
+    $('td, th').addClass('text-center');
+    $("nav").find(".active").removeClass("active");
+    $("#home").addClass("active");
 });
 </script>
 {% endblock %}

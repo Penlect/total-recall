@@ -40,4 +40,8 @@
 {% endblock %}
 
 {% block javascript %}
+<script>
+    $("nav").find(".active").removeClass("active");
+    $("#users").addClass("active");
+</script>
 {% endblock %}
