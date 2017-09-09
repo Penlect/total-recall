@@ -4,11 +4,7 @@ import re
 from flask import (render_template, request, jsonify, send_file, url_for,
                    flash, redirect, send_from_directory)
 from flask_login import login_user, logout_user, current_user, login_required
-import random
-import time
 import math
-import hashlib
-import pickle
 import collections
 import json
 

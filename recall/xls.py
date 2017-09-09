@@ -20,6 +20,7 @@ import itertools
 import re
 import xlwt
 
+MAX_LENGTH_PATTERN = 40
 
 def convert_row_width(cm):
     return round(1000*cm/0.77)
@@ -44,6 +45,10 @@ def verify_and_clean_pattern(pattern):
     if any(p <= 0 for p in pattern_ints):
         raise ValueError(f'The pattern "{pattern}" contains non-positive '
                          f'integers.')
+    if len(pattern_ints) > MAX_LENGTH_PATTERN:
+        raise ValueError(f'The pattern is too long ({len(pattern_ints)}), '
+                         f'maximum {MAX_LENGTH_PATTERN} integers are allowed.')
+
     return ','.join(str(p) for p in pattern_ints)
 
 

@@ -3,11 +3,10 @@ import enum
 from datetime import datetime
 import re
 import io
-import os
 import math
 import random
 import collections
-from collections import namedtuple
+
 import sqlalchemy.orm
 from passlib.hash import sha256_crypt
 
