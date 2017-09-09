@@ -5,7 +5,7 @@ from flask_login import LoginManager
 
 app = Flask(__name__)
 app.secret_key = 'Melodies of Life 34fj34ofi34jfl3'
-if True:
+if False:
     SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
         username="penlect",
         password="melodiesoflife",

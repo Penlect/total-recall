@@ -131,7 +131,7 @@ def delete_account():
     db.session.delete(current_user)
     db.session.commit()
     logout_user()
-    flash('Account "{current_user.username}" deleted.', 'danger')
+    flash(f'Account "{current_user.username}" deleted.', 'danger')
     return redirect(url_for('index'))
 
 
@@ -147,7 +147,7 @@ def delete_memo(memo_id):
         flash(f'Deleted memo {memo_id}', 'success')
         db.session.delete(memo)
         db.session.commit()
-    return redirect(url_for('user', username=current_user.username))
+    return redirect(url_for('user_delete_column', username=current_user.username))
 
 
 @app.route('/delete/all_memos')
@@ -173,6 +173,18 @@ def delete_recall(recall_id):
         flash(f'Deleted recall {recall_id}', 'success')
         db.session.delete(recall)
         db.session.commit()
+    return redirect(url_for('user_delete_column', username=current_user.username))
+
+
+@app.route('/delete/all_recalls')
+@login_required
+def delete_all_recalls():
+    for memo in current_user.memos:
+        for recall in memo.recalls:
+            if recall.user_id == current_user.id:
+                db.session.delete(recall)
+    flash(f'Deleted recalls', 'success')
+    db.session.commit()
     return redirect(url_for('user', username=current_user.username))
 
 

@@ -28,9 +28,11 @@
                        onclick="return confirm('Permanently delete account {{ user.username }}?')">
                     Delete account</a></li>
                 <li role="presentation"><a href="{{ url_for('delete_all_memos') }}" onclick="return confirm('Delete ALL memorizations?')">Delete all my Memorizations (and associated recalls)</a></li>
-                <li role="presentation"><a href="#"
+                <li role="presentation"><a href="{{ url_for('delete_all_recalls') }}"
                        onclick="return confirm('Delete recalls?')">
                     Delete all my Recalls of my Memorizations</a></li>
+                <li role="presentation"><a href="{{ url_for('user_delete_column', username=current_user.username) }}">
+                    Display trash bins</a></li>
             </ul>
 
               </div></div>
@@ -97,8 +99,10 @@
                     <th>Recall</th>
                       {% if users_home_page %}
                     <th>State</th>
-                    <th>Created</th>
-                    <th>Delete</th>
+                        {% if delete_column %}
+                        <th>Created</th>
+                        <th>Delete</th>
+                          {% endif %}
                       {% endif %}
                   </tr>
                 </thead>
@@ -161,16 +165,18 @@
                           {% else %}
                           {% endif %}
 
+                        {% if delete_column %}
                         <td>{{ memo.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                           <!-- Delete -->
                           {% if memo.state.name == 'private' %}
-                        <td><a href="{{ url_for('delete_memo', memo_id=memo.id) }}"
-                        onclick="return confirm('Permanently delete {{ memo.id }}?')">
-                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
-                        </td>
+                            <td><a href="{{ url_for('delete_memo', memo_id=memo.id) }}"
+                            onclick="return confirm('Permanently delete {{ memo.id }}?')">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+                            </td>
                           {% else %}
                             <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
                           {% endif %}
+                        {% endif %}
                       {% endif %}
                       </tr>
                 {% endfor %}
@@ -194,9 +200,9 @@
                     <th>Nr Correct</th>
                     <th>Nr Consec.</th>
                     <th>Time rem.</th>
-                    <th>View</th>
                     <th>Recalled</th>
-                      {% if users_home_page %}
+                      {% if users_home_page and delete_column%}
+                    <th>Recall id</th>
                     <th>Delete</th>
                       {% endif %}
                   </tr>
@@ -216,22 +222,26 @@
                           {% endif %}
 
                         <td><a href="{{ url_for('user', username=recall.user.username) }}">{{ recall.user.username }}</a></td>
-                        <td>{{ recall.correction.points }}</td>
-                        <td>{{ recall.correction.raw_score }}</td>
-                        <td>{{ recall.correction.correct }}</td>
-                        <td>{{ recall.correction.consecutive }}</td>
-                        <td>{{ recall.time_remaining|round(1) }}</td>
 
-                          <!-- View -->
                           {% if users_home_page or (not users_home_page and (recall.memo.state.value == 'Public' or recall.user.id == current_user.id)) %}
-                        <td><a href="{{ url_for('view_recall', recall_id=recall.id) }}">{{ recall.id }}</a></td>
+                            <td>{{ recall.correction.points }}</td>
+                            <td>{{ recall.correction.raw_score }}</td>
+                            <td>{{ recall.correction.correct }}</td>
+                            <td>{{ recall.correction.consecutive }}</td>
+                            <td>{{ recall.time_remaining|round(1) }}</td>
+                            <td><a href="{{ url_for('view_recall', recall_id=recall.id) }}">{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</a></td>
                         {% else %}
-                         <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                            <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                            <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                            <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                            <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                            <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                             <td>{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                         {% endif %}
 
-                        <td>{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                           <!-- Delete -->
-                      {% if users_home_page %}
+                      {% if users_home_page and delete_column %}
+                            <td>{{ recall.id }}</td>
                           {% if recall.memo.user_id == user.id %}
                         <td><a href="{{ url_for('delete_recall', recall_id=recall.id) }}"
                         onclick="return confirm('Permanently delete?')">
