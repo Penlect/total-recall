@@ -15,43 +15,61 @@
     </div>
     <div class="row">
         <div class="col-md-5">
-                <div class="well dates">
-                    <form class="form-horizontal" action="" method="post">
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                {{ languages() }}
-                            </div>
+            <div class="well dates">
+                <form class="form-horizontal" action="" method="post">
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            {{ languages() }}
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <textarea class="form-control" required name="data" rows="10" id="word_input"></textarea>
-                            </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <textarea class="form-control" required name="data"
+                                      rows="10" id="word_input"></textarea>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <button type="submit" type="button" class="btn btn-default btn-block">Submit</button>
-                            </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <button type="submit" type="button"
+                                    class="btn btn-default btn-block">Submit
+                            </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
+            </div>
         </div>
         <div class="col-md-7">
-            <p>Please select a language and write one or more stories in the text area. Submit when you are done.
-                <ul>
-            <li>Write the stories in the same language as you selected.</li>
-            <li>The length of the story must be between one and six words.</li>
-            <li>All stories must be fictitious or general and non-culturally specific (e.g. Peace Treaty signed).</li>
-                </ul>
+            <p>Please select a language and write one or more stories in the
+                text area and click Submit.
+            <ul>
+                <li>Write the stories in the same language as you selected.
+                </li>
+                <li>The length of the story must be between one and six
+                    words.
+                </li>
+                <li>All stories must be fictitious or general and
+                    non-culturally specific (e.g. Peace Treaty signed).
+                </li>
+            </ul>
             </p>
-            <p><strong>Syntax:</strong> Type one story per line. Empty lines will be ignored. For example, adding four stories:
-                <div class="well" >
-            <em>Politiker fuskar i val</em><br>
-            <em>Prinsessa visar sig vara prins</em><br>
-            <em>Snövit blir förkyld</em><br>
-            <em>Solen lyser dubbelt så starkt</em><br>
+            <p><strong>Syntax:</strong> Type one story per line. Empty lines
+                will be ignored. For example, adding four stories:
+            <div class="well">
+                <em>Politiker fuskar i val</em><br>
+                <em>Prinsessa visar sig vara prins</em><br>
+                <em>Snövit blir förkyld</em><br>
+                <em>Solen lyser dubbelt så starkt</em><br>
             </div>
+            </p>
+
+            <p><strong>Delete:</strong>
+                Delete a story from the database by clicking the red delete button.
+            </p>
+            <p><strong>Export:</strong>
+                Click this link to view all stories in csv format:
+                <a href="{{ url_for('db_stories_csv') }}">CSV</a>
             </p>
         </div>
     </div>
@@ -125,5 +143,6 @@ function send_delete(id) {
 	 });
 
   });
+
 </script>
 {% endblock %}

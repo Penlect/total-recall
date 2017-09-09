@@ -520,6 +520,16 @@ def db_stories():
         return render_template('db_stories.html')
 
 
+@app.route('/database/stories/csv', methods=['GET'])
+@login_required
+def db_stories_csv():
+    """Words database dashboard"""
+    if request.method == 'GET':
+        rows = (str(w) for w in models.Story.query.order_by(
+            models.Story.language_id).all())
+        return '<br>'.join(rows)
+
+
 @app.route('/database/stories/table', methods=['GET', 'POST'])
 @login_required
 def table_stories():
@@ -583,6 +593,16 @@ def db_words():
     """Words database dashboard"""
     if request.method == 'GET':
         return render_template('db_words.html')
+
+
+@app.route('/database/words/csv', methods=['GET'])
+@login_required
+def db_words_csv():
+    """Words database dashboard"""
+    if request.method == 'GET':
+        rows = (str(w) for w in models.Word.query.order_by(
+            models.Word.language_id).all())
+        return '<br>'.join(rows)
 
 
 @app.route('/database/words/table', methods=['GET', 'POST'])

@@ -10,67 +10,98 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-                <h1>Database: Words</h1>
+            <h1>Database: Words</h1>
         </div>
     </div>
     <div class="row">
         <div class="col-md-5">
-                <div class="well words">
+            <div class="well words">
 
-                    <form class="form-horizontal" action="" method="post">
+                <form class="form-horizontal" action="" method="post">
 
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                {{ languages() }}
-                            </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            {{ languages() }}
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <select class="form-control" name="word_class" id="word_class_selection" required>
-                                    <option value="" selected disabled>Choose word class ... </option>
-    <optgroup label="Word class">
-                                  <option value="concrete_noun">Concrete Noun</option>
-                                  <option value="abstract_noun">Abstract Noun</option>
-                                  <option value="infinitive_verb">Infinitive Verb</option>
-    </optgroup>
-                                </select>
-                            </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <select class="form-control" name="word_class"
+                                    id="word_class_selection" required>
+                                <option value="" selected disabled>Choose word
+                                    class ...
+                                </option>
+                                <optgroup label="Word class">
+                                    <option value="concrete_noun">Concrete
+                                        Noun
+                                    </option>
+                                    <option value="abstract_noun">Abstract
+                                        Noun
+                                    </option>
+                                    <option value="infinitive_verb">Infinitive
+                                        Verb
+                                    </option>
+                                </optgroup>
+                            </select>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <textarea class="form-control" required name="data" rows="10" id="word_input"></textarea>
-                            </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <textarea class="form-control" required name="data"
+                                      rows="10" id="word_input"></textarea>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <button type="submit" type="button" class="btn btn-default btn-block">Submit</button>
-                            </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <button type="submit"
+                                    class="btn btn-default btn-block">Submit
+                            </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
+            </div>
         </div>
         <div class="col-md-7">
-            <p>Please enter values in the form to the left in order to add/modify words in the database.</p>
-            <p><ul>
-            <li>Write the words in the same language as you selected.</li>
-            <li>The words should be sourced from an internationally recognised dictionary.</li>
-            <li>Approximately
-                <span class="label label-primary">80% concrete nouns</span>,
-                <span class="label label-warning">10% abstract nouns</span> and
-                <span class="label label-success">10% infinitive verbs</span> is the desired word distribution.</li>
-                </ul>
-            <p><strong>Syntax:</strong> Type one word per line. Empty lines will be ignored. Everything will be converted to lower case. Example, adding three words:
-                <div class="well" ><em>pizza</em><br>
+            <p>Please enter values in the form to the left in order to
+                add/modify words in the database.</p>
+            <p>
+            <ul>
+                <li>Write the words in the same language as you selected.</li>
+                <li>The words should be sourced from an internationally
+                    recognised dictionary.
+                </li>
+                <li>Approximately
+                    <span class="label label-primary">80% concrete nouns</span>,
+                    <span class="label label-warning">10% abstract nouns</span>
+                    and
+                    <span class="label label-success">10% infinitive verbs</span>
+                    is the desired word distribution.
+                </li>
+            </ul>
+            </p>
+            <p><strong>Syntax:</strong> Type one word per line. Empty lines
+                will be ignored. Everything will be converted to lower case.
+                Example, adding three words:
+            <div class="well"><em>pizza</em><br>
                 <em>sjöhäst</em><br>
                 <em>kortlek</em><br>
             </div>
             </p>
             <p><strong>Conflicts:</strong>
-            If you add a word that already exists - nothing will happen - unless the word class is different. If the
-            word class is different the word will be updated to have the new word class.</p>
+                If you add a word that already exists - nothing will happen -
+                unless the word class is different. If the
+                word class is different the word will be updated to have the
+                new word class.</p>
+            <p><strong>Delete:</strong>
+                Delete a word from the database by clicking the red delete button.
+            </p>
+            <p><strong>Export:</strong>
+                Click this link to view all words in csv format:
+                <a href="{{ url_for('db_stories_csv') }}">CSV</a>
+            </p>
         </div>
     </div>
 
@@ -144,6 +175,7 @@ $(document).ready(function(){
 	 });
 
 });
+
 
 </script>
 {% endblock %}

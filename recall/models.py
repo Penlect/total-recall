@@ -719,6 +719,13 @@ class Word(db.Model):
         self.word = word
         self.word_class = word_class
 
+    def __str__(self):
+        return '{lang},{cls},{word}'.format(
+            lang=self.language.language,
+            cls=self.word_class.name,
+            word=self.word
+        )
+
     def __repr__(self):
         return f'<Word {self.word}>'
 
@@ -746,6 +753,9 @@ class Story(db.Model):
             raise ValueError('Maximum 6 words allowed in a story. '
                              f'{nr_words} words found in "{story}".')
         self.story = story
+
+    def __str__(self):
+        return f'{self.language.language},{self.story}'
 
     def __repr__(self):
         return f'<Story "{self.story}">'

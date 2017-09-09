@@ -10,65 +10,89 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-                <h1>Database: Almost correct Words</h1>
+            <h1>Database: Almost correct Words</h1>
         </div>
     </div>
     <div class="row">
         <div class="col-md-5">
-                <div class="well words">
+            <div class="well words">
 
-                    <form class="form-horizontal" action="" method="post">
+                <form class="form-horizontal" action="" method="post">
 
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                {{ languages() }}
-                            </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            {{ languages() }}
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <input class="form-control"
-                                       required
-                                       name="word"
-                                       id="word"
-                                       autocomplete="off"
-                                       placeholder="Word">
-                            </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <input class="form-control"
+                                   required
+                                   name="word"
+                                   id="word"
+                                   autocomplete="off"
+                                   placeholder="Word">
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <input class="form-control"
-                                       required
-                                       name="almost_correct"
-                                       id="almost_correct"
-                                       autocomplete="off"
-                                       placeholder="Almost correct word">
-                            </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <input class="form-control"
+                                   required
+                                   name="almost_correct"
+                                   id="almost_correct"
+                                   autocomplete="off"
+                                   placeholder="Almost correct word">
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <button type="submit" type="button" class="btn btn-default btn-block">Submit</button>
-                            </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <button type="submit" type="button"
+                                    class="btn btn-default btn-block">Submit
+                            </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
+            </div>
         </div>
         <div class="col-md-7">
-            <p>Please enter values in the form to the left in order to add/modify the Almost Correct Words database.</p>
-            <p><ul>
-            <li>Write the words in the same language as you selected.</li>
-            <li>The words should be sourced from an internationally recognised dictionary.</li>
-            <li>Approximately
-                <span class="label label-primary">80% concrete nouns</span>,
-                <span class="label label-warning">10% abstract nouns</span> and
-                <span class="label label-success">10% infinitive verbs</span> is the desired word distribution.</li>
-                </ul>
+            <p>Please enter values in the form to the left and click Submit to
+                add the misspelling to the database.</p>
+            <p>This database is used when a recall of the Words discipline is
+                corrected.
+                If a word has been clearly memorized, but has been spelt
+                incorrectly, no points are given for this word. This rule helps
+                limit complications that may arise from spelling
+                ambiguities, mistakes in translations, dyslexia, and handicaps
+                for
+                non-English speakers etc.
             </p>
-            <p><strong>Conflicts:</strong>
-            If you add a word that already exists - nothing will happen - unless the word class is different. If the
-            word class is different the word will be updated to have the new word class.</p>
+            <p>In the field "Word" you type the correct spelling of the word.
+                In the "Almost correct word" you type the misspelled version of
+                the "Word".</p>
+            <p>
+            <ul>
+                <li>Write the words in the same language as you selected.</li>
+                <li>Note that singular and plural mistakes should always be
+                    counted as a memory mistake - so do not add them.
+                </li>
+                <li>You can provide multiple misspellings of the same words.
+                </li>
+                <li>Words are saved in lowercase.</li>
+                <li>This database is specific to each user.</li>
+            </ul>
+            </p>
+            <div class="well">
+                <em>word = <span class="text-success">augusti</span>, almost
+                    correct word = <span
+                            class="text-warning">agusti</span></em><br>
+                <em>word = <span class="text-success">fläskfilé</span>, almost
+                    correct word = <span class="text-warning">fläskfile</span></em><br>
+                <em>word = <span class="text-success">fläskfilé</span>, almost
+                    correct word = <span class="text-warning">fleskfilé</span></em><br>
+            </div>
         </div>
     </div>
 
@@ -142,6 +166,7 @@ $(document).ready(function(){
 	 });
 
 });
+
 
 </script>
 {% endblock %}
