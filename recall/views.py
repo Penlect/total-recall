@@ -297,7 +297,10 @@ def make_discipline():
     if request.method == 'GET':
         return render_template('make.html')
     elif request.method == 'POST':
-        memo = models.MemoData.from_request(request, current_user)
+        try:
+            memo = models.MemoData.from_request(request, current_user)
+        except models.InvalidHistoricalDate as error:
+            return 'Failed to create discipline: ' + str(error)
         if len(memo.data) == 0:
             if memo.language is None:
                 return 'Failed to create discipline!'
@@ -322,7 +325,10 @@ def download_xls(memo_id: int):
     try:
         memo = models.MemoData.query.filter_by(id=memo_id).one()
     except sqlalchemy.orm.exc.NoResultFound:
-        return f'Could not find memo for key={memo_id}'
+        return f'Could not find memo {memo_id}'
+
+    if memo.discipline == models.Discipline.spoken:
+        return 'Not possible for discipline Spoken Numbers'
 
     # If the current user doesn't own the memorization,
     # he/she is only allowed to download xls if it is

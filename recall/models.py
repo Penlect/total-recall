@@ -451,6 +451,9 @@ class WordsData(MemoData):
             return -1
 
 
+class InvalidHistoricalDate(Exception):
+    pass
+
 class DatesData(MemoData):
     __mapper_args__ = {
         'polymorphic_identity': Discipline.dates,
@@ -484,11 +487,23 @@ class DatesData(MemoData):
         stories = list()
         dates = list()
         for line in lines:
-            date, story = line.split(maxsplit=1)
+            try:
+                date, story = line.split(maxsplit=1)
+            except ValueError:
+                raise InvalidHistoricalDate(
+                    f'Invalid Historical Date: "{line}"')
+            try:
+                date = int(date)
+            except ValueError:
+                raise InvalidHistoricalDate(
+                    f'Failed to interpret "{date}" '
+                    'as a date between 1000 and 2099'
+                )
             if not (1000 <= int(date) <= 2099):
-                raise ValueError(f'Date out of range: 1000 <= {date} <= 2099')
+                raise InvalidHistoricalDate(
+                    f'Date out of range: 1000 <= {date} <= 2099')
             stories.append(story.strip())
-            dates.append(int(date))
+            dates.append(date)
         recall_order = list(range(len(stories)))
         random.shuffle(recall_order)
         data = list(zip(dates, stories, recall_order))
