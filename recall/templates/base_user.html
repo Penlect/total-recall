@@ -23,17 +23,19 @@
                 <div id="manageaccount" class="panel-collapse collapse">
               <div class="panel-body">
 
-            <ul>
-                <li role="presentation"><a href="{{ url_for('delete_account') }}"
-                       onclick="return confirm('Permanently delete account {{ user.username }}?')">
-                    Delete account</a></li>
-                <li role="presentation"><a href="{{ url_for('delete_all_memos') }}" onclick="return confirm('Delete ALL memorizations?')">Delete all my Memorizations (and associated recalls)</a></li>
-                <li role="presentation"><a href="{{ url_for('delete_all_recalls') }}"
+            <dl class="dl-horizontal">
+                <dt role="presentation"><a href="{{ url_for('user_delete_column', username=current_user.username) }}">
+                    Display delete-icon</a></dt>
+                <dd>Your Home-page will be displayed as usual except the Memorizations' and Recall's table which will have an extra column with a delete-icon. This makes it possible to delete individual memorization or recall entries in table.</dd>
+
+                <dt role="presentation"><a href="{{ url_for('delete_all_recalls') }}"
                        onclick="return confirm('Delete recalls?')">
-                    Delete all my Recalls of my Memorizations</a></li>
-                <li role="presentation"><a href="{{ url_for('user_delete_column', username=current_user.username) }}">
-                    Display trash bins</a></li>
-            </ul>
+                    Delete all Recalls</a></dt>
+                <dd>Delete all Recalls you have made of memorizations you have created. (You can't delete recalls you have made on other users memorizations.)</dd>
+
+                <dt role="presentation"><a href="{{ url_for('delete_all_memos') }}" onclick="return confirm('Delete ALL memorizations?')">Delete all Memos</a></dt>
+                <dd>Delete all Memorizations you have created. All recalls made on these memorizations will be deleted as well (yours and others).</dd>
+            </dl>
 
               </div></div>
             </div>
@@ -49,16 +51,19 @@
               <div class="panel-body">
 
 <form action="" method=post class="form-horizontal">
+    <blockquote>
+  <p>Grid pattern in memorization sheets.</p>
+</blockquote>
   <div class="form-group">
     <label for="binary" class="col-sm-2 control-label">Binary Numbers</label>
     <div class="col-sm-10">
-      <input name="pattern_binary" type="text" class="form-control" id="binary" placeholder="pattern" value="{{user.settings.pattern_binary}}" autocomplete="off">
+      <input name="pattern_binary" type="text" class="form-control" id="binary" placeholder="pattern, for example: 4,3,3" value="{{user.settings.pattern_binary}}" autocomplete="off">
     </div>
   </div>
   <div class="form-group">
     <label for="decimal" class="col-sm-2 control-label">Decimal Numbers</label>
     <div class="col-sm-10">
-      <input name="pattern_decimals" type="text" class="form-control" id="decimal" placeholder="pattern" value="{{user.settings.pattern_decimals}}" autocomplete="off">
+      <input name="pattern_decimals" type="text" class="form-control" id="decimal" placeholder="pattern, for example: 2" value="{{user.settings.pattern_decimals}}" autocomplete="off">
     </div>
   </div>
   <div class="form-group">
