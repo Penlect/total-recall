@@ -9,6 +9,7 @@ import random
 import collections
 from collections import namedtuple
 import sqlalchemy.orm
+from passlib.hash import sha256_crypt
 
 from recall import db, app
 import recall.xls
@@ -59,6 +60,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)
     email = db.Column(db.String(120))
     real_name = db.Column(db.String(120))
     country = db.Column(db.String(120))
@@ -94,7 +96,7 @@ class User(db.Model):
     def from_request(cls, request):
         return cls(
             username=request.form['username'].strip().lower(),
-            password=request.form['password'],
+            password=sha256_crypt.encrypt(request.form['password']),
             email=request.form['email'],
             real_name=request.form['real_name'],
             country=request.form['country']
@@ -200,7 +202,12 @@ class MemoData(db.Model):
         language = form.get('language')
         if language:
             language = language.strip().lower()
-            language = Language.query.filter_by(language=language).one()
+            try:
+                language = Language.query.filter_by(language=language).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                language = Language(language=language)
+                db.session.add(language)
+                db.session.commit()
         data = form.get('data')
         nr_items = form.get('nr_items')
         assert data or nr_items, "data or nr_items must be provided!"

@@ -13,6 +13,7 @@ import collections
 import json
 
 import sqlalchemy.orm
+from passlib.hash import sha256_crypt
 
 from recall import app, db, login_manager
 from recall import models
@@ -51,7 +52,7 @@ login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info'
 
 
-def verify_username(username):
+def valid_username(username):
     """Make sure the username is OK to use as a username"""
     candidate = username.strip().lower()
     MAX_LENGTH = 12
@@ -66,13 +67,26 @@ def verify_username(username):
         return username
 
 
+def valid_password(pwd):
+    """Make sure the username is OK to use as a username"""
+    MIN_LENGTH = 8
+    if len(pwd) < MIN_LENGTH:
+        raise ValueError(f'Password to short! '
+                         f'Minimum {MIN_LENGTH} characters required.')
+    return pwd
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
         return render_template('register.html')
     username = request.form['username'].strip().lower()
     try:
-        username = verify_username(username)
+        valid_username(username)
+    except ValueError as error:
+        flash(str(error) + ' Try again.', 'danger')
+        return redirect(url_for('register'))
+    try:
+        valid_password(request.form['password'])
     except ValueError as error:
         flash(str(error) + ' Try again.', 'danger')
         return redirect(url_for('register'))
@@ -83,6 +97,8 @@ def register():
     flash('User successfully registered', 'success')
     return redirect(url_for('login'))
 
+class WrongPasswordError(Exception):
+    pass
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -91,7 +107,9 @@ def login():
     username = request.form['username'].strip().lower()
     try:
         user = models.User.query.filter_by(username=username).one()
-    except sqlalchemy.orm.exc.NoResultFound:
+        if not sha256_crypt.verify(request.form['password'], user.password):
+            raise WrongPasswordError
+    except (sqlalchemy.orm.exc.NoResultFound, WrongPasswordError):
         flash('Username or Password is invalid', 'danger')
         return redirect(url_for('login'))
     login_user(user)
@@ -280,6 +298,13 @@ def make_discipline():
         return render_template('make.html')
     elif request.method == 'POST':
         memo = models.MemoData.from_request(request, current_user)
+        if len(memo.data) == 0:
+            if memo.language is None:
+                return 'Failed to create discipline!'
+            else:
+                return ('Failed to create discipline. '
+                        'Maybe the database has no data for language = '
+                        f'"{memo.language.language}" ?')
         db.session.add(memo)
         db.session.commit()
         app.logger.info(
