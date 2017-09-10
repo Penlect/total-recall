@@ -1,0 +1,6 @@
+flask
+flask-sqlalchemy
+flask-login
+passlib
+xlwt
+mysql-connector-python

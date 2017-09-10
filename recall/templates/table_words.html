@@ -36,7 +36,15 @@
   <tr>
     <td>{{ loop.index }}</td>
     <td>{{ word.word }}</td>
-    <td>{{ word.word_class.value|title }}</td>
+    <td><span
+            {% if word.word_class.name == 'concrete_noun' %}
+            class="label label-primary"
+            {% elif word.word_class.name == 'abstract_noun' %}
+            class="label label-warning"
+            {% elif word.word_class.name == 'infinitive_verb' %}
+            class="label label-success"
+            {% endif %}
+    >{{ word.word_class.value|title }}</span></td>
     <td>{{ word.language.language|title }}</td>
     <td>{{ word.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
     <td><button type="button" class="btn btn-danger btn-xs" onclick="send_delete({{ word.id }});">X</button></td>
