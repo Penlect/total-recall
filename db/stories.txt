@@ -1,0 +1,210 @@
+swedish,Alla superhjältar bannlyses
+swedish,Amazonas återuppbyggs
+swedish,Analoga kameror skrotas
+swedish,Apa lär sig dansa
+swedish,Apa kör bil
+swedish,Barn kräver sina rättigheter
+swedish,Basket ny världssport
+swedish,Bilar körs på el
+swedish,Cyklar förbjuds
+swedish,Cyklist i doppingskandal
+swedish,Danmark bryter sig loss
+swedish,Dansande grodor äts upp
+swedish,Datorer helt i plast
+swedish,Denguefeber i Norge
+swedish,Diktator bygger nytt palats
+swedish,Djurpark stänger
+swedish,Doping blir lagligt
+swedish,Drakens eld tar slut
+swedish,Drottning gifter om sig
+swedish,El blir en bristvara
+swedish,Elever strejkar
+swedish,Filmstjärna gör ny film
+swedish,Flygande cykel byggs
+swedish,Flygplan helt i papper byggs
+swedish,Flygplan landar baklänges
+swedish,Flyktingar vägrar att fly
+swedish,Fotboll förbjuds
+swedish,Fotbolls VM ställs in
+swedish,Fotograf i skandal
+swedish,Fred avslutas
+swedish,Fåglarna slutar flyga
+swedish,Förkylning utrotas
+swedish,Första diamantmedaljen
+swedish,Första människan på mars
+swedish,Golfstjärna i skandal
+swedish,Gorilla lär sig teckenspråk
+swedish,Grekland i konkurs
+swedish,Grön gräsmatta blir blå
+swedish,Gud visar sig
+swedish,Hangarfartyg sjunker
+swedish,Hav svämmar över
+swedish,Hello Kitty ingen katt
+swedish,Homofobi utrotas
+swedish,Hund landar på månen
+swedish,Hundar talar med katter
+swedish,Hungerstrejk avsluts
+swedish,Hästhoppning utan hästar
+swedish,Hövding annekterar Island
+swedish,Internet stannar
+swedish,Jesus återvänder
+swedish,Jorden får nytt ekosystem
+swedish,Jordenruntflygning flygning av hund
+swedish,Jupiter får en ny måne
+swedish,Kalle Anka blir levande figur
+swedish,Katter slutar äta fisk
+swedish,Kina kommunistiskt igen
+swedish,Kung abdikerar
+swedish,Kung ljuger om sin ålder
+swedish,Kvinna president i Kina
+swedish,Kändis blir fotograferad
+swedish,Kändisar adopterar dotter
+swedish,Kärnkraftverk exploderar
+swedish,Lastbil kör jorden runt
+swedish,Lastfartyg fastnar i hamn
+swedish,Laxar lär sig prata
+swedish,Lejon slutar ryta
+swedish,Liv på annan planet upptäcks
+swedish,Lärarlöner sänks till noll
+swedish,Löpare springer för fort
+swedish,Madagaskar under vatten
+swedish,Madonna lämnar jorden
+swedish,Malariamyggor utrotas
+swedish,Manliga politiker förbjuds
+swedish,Mars lämnar solsystemet
+swedish,Maskar lämnar jorden
+swedish,Minnesatlet vinner OS
+swedish,Moses simmar över havet
+swedish,Muhammed flyttar på berget
+swedish,Ny dinosaurieart hittas
+swedish,Ny färg upptäcks
+swedish,Ny galax hittas
+swedish,Ny media upptäcks
+swedish,Ny religion upptäcks
+swedish,Ny sjukdom upptäcks
+swedish,Ny superhjälte uppfinns
+swedish,Nyheter gamla
+swedish,Nyheter på TV upphör
+swedish,Nytt land upptäcks
+swedish,Nyval i Sverige
+swedish,OS på månen
+swedish,Oljan tar slut
+swedish,Orangutang vinner minnes VM
+swedish,Pandemi stoppas
+swedish,Papper förbjuds som material
+swedish,Par gifter om sig
+swedish,Par skiljer sig
+swedish,Pluto blir planet igen
+swedish,Politiker byter sida
+swedish,Politiker fuskar i val
+swedish,Politiker lovar för mycket
+swedish,Politiker slåss i parlament
+swedish,Politiker säger upp sig
+swedish,Politikerpar skiljer sig
+swedish,President gör en skönhetsoperation
+swedish,Prins rider hem
+swedish,Prinsessa föds
+swedish,Prinsessa visar sig vara prins
+swedish,Rapunzel färgar håret
+swedish,Rektor startar privat skola
+swedish,Religion upphör
+swedish,Rymdturism öppnar
+swedish,Sagoprins ramlar av häst
+swedish,Sagoprinsessa trött på rosa
+swedish,Seriefigur blir president
+swedish,Simmare simmar runt jorden
+swedish,Sista skogen huggs ner
+swedish,Sista tidningen trycks
+swedish,Skolor stängs
+swedish,Skrattfest över hela jorden
+swedish,Slott brinner ner
+swedish,Slottsruin restaureras
+swedish,Snövit blir förkyld
+swedish,Solen lyser dubbelt så starkt
+swedish,Spindel med nio ben upptäcks
+swedish,Spindelmanen slutar sitt jobb
+swedish,Stjärna exploderar
+swedish,Storm ödelägger stad
+swedish,Stålmanen smälter
+swedish,Superhjälte upptäcks
+swedish,Sverige och Norge ett land
+swedish,TV reporter säger upp sig
+swedish,TV spel blir skolämne
+swedish,Teleportering uppfinns
+swedish,Trillingar gifter sig
+swedish,Tropisk värme över hela jorden
+swedish,Tsunami varning ställs in
+swedish,Tyngdlyftare lyfter sig själv
+swedish,Tyskland drivs på grön el
+swedish,USA delar sig
+swedish,Underjordisk sjö upptäcks
+swedish,Uppstoppade djur återupplivas
+swedish,Utomjordingar åker förbi jorden
+swedish,VM i fotboll i Kenya
+swedish,Val dyker till havsbotten
+swedish,Val ställs in
+swedish,Valmanifest ren lögn
+swedish,Vargar blir tama
+swedish,Vattenkraft slutar fungera
+swedish,Vattenpolo VM på land
+swedish,Venus himmel klarnar
+swedish,Vulkan förintar Venezuela
+swedish,Världens största båt byggs
+swedish,Världsrekord i dykning
+swedish,Wimbledon ställs in
+swedish,Zebra i djurpark flyr
+swedish,Äldsta trädet brinner upp
+swedish,Ö med dinosaurier upptäcks
+swedish,Örnar blir vegetarianer
+swedish,Kattmat serveras på restaurang
+swedish,Katt med 10 liv föds
+swedish,Självkörande bilar blir standard
+swedish,Matematiker dividerade med noll
+swedish,Kanelbullar förbjuds
+swedish,Bibliotek brinner ner
+swedish,Bilnycklar glömdes
+swedish,Blommor vissnar av vatten
+swedish,Regnar i öken
+swedish,Äpple blir dator
+swedish,Ärta hittas under säng
+swedish,Giftigt äpple saneras
+swedish,Glutenfria våfflor smakar surt
+swedish,Träd slutar växa
+swedish,Vitlök i mat blir obligatoriskt
+swedish,Vägg målas rosa
+swedish,Hundar börjar vissla
+swedish,Vispgrädde vispas till smör
+swedish,Signalfel i tågtrafiken
+swedish,Alla ädelstenar har hittats
+swedish,Havsnivån stiger 1 meter
+swedish,Datorvirus smittar människor
+swedish,Vind blåser i alla riktingar samtidigt
+swedish,Alla verktyg rostar bort
+swedish,Ved kan inte längre brinna
+swedish,Alla veckotidningar slutsålda
+swedish,Vattna blommor förbjuds
+swedish,Blåa vattenmeloner odlas
+swedish,Vattenkokare exploderar
+swedish,Matlåda möglar sönder
+swedish,Vattenflaska hittas på havets botten
+swedish,Vantar blir mode på sommaren
+swedish,Vallmo vissnar
+swedish,Väckarklockor används för att somna
+swedish,Urna hälls ut i badkaret
+swedish,Underkläder används som överkläder
+swedish,Ugn används som kylskåp
+swedish,Fiskmåsar byts till Ugglor i Göteborg
+swedish,Tåg utan ventilation blir standard
+swedish,Älgar tältar i skogen
+swedish,Tyrann köper en hamn
+swedish,Tvål används som tandgräm
+swedish,Kläder tvättas i bensin
+swedish,Tupp lägger ett ägg
+swedish,Tunnbröd blir tjockt
+swedish,Blommvatten ny hälsodryck
+swedish,Tuggummi försämrar minne
+swedish,Däggdjur saknar ryggrad
+swedish,Träskor standard i balettskolor
+swedish,Troll flyttar till regnskogen
+swedish,Trappa utan steg uppfinns
+swedish,Traktor ersätter försenat tåg
