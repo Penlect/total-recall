@@ -1,5 +1,10 @@
 
 {% extends "base.html" %}
+
+{% block headtail %}
+<script src='https://www.google.com/recaptcha/api.js'></script>
+{% endblock %}
+
 {% block body %}
 
 {{ super() }} <!-- Flash messages -->
@@ -42,11 +47,14 @@
       autocomplete="off">
     </div>
 
+      <div class="g-recaptcha" data-sitekey="6LfWbjAUAAAAAKIJQoanEE1Cc2DKkt5aF50pqknO"></div>
+
     <div class="control-group">
         <div class="controls">
-          <button type="submit" class="btn btn-success">Signup</button>
+          <button type="submit" class="btn btn-success" style="margin-top:10px;margin-bottom:10px;">Signup</button>
         </div>
     </div>
+
   </form>
 
 <p>

@@ -10,6 +10,7 @@ import json
 
 import sqlalchemy.orm
 from passlib.hash import sha256_crypt
+import requests
 
 from recall import app, db, login_manager
 from recall import models
@@ -71,20 +72,66 @@ def valid_password(pwd):
                          f'Minimum {MIN_LENGTH} characters required.')
     return pwd
 
+
+def valid_country(country):
+    """Make sure the country is OK"""
+    MAX_LENGTH = 20
+    if len(country) > MAX_LENGTH:
+        raise ValueError(f'Country "{country}" is too long! '
+                         f'Maximum {MAX_LENGTH} characters allowed.')
+    return country
+
+
+def verify_length(parameter, length):
+    if len(parameter) > length:
+        raise ValueError(f'Parameter "{parameter}" is too long! '
+                         f'Maximum {length} characters allowed.')
+    return parameter
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
         return render_template('register.html')
+
     username = request.form['username'].strip().lower()
     try:
         valid_username(username)
+        valid_password(request.form['password'])
+        verify_length(request.form['email'], length=30)
+        verify_length(request.form['real_name'], length=30)
+        verify_length(request.form['country'], length=20)
     except ValueError as error:
         flash(str(error) + ' Try again.', 'danger')
         return redirect(url_for('register'))
-    try:
-        valid_password(request.form['password'])
-    except ValueError as error:
-        flash(str(error) + ' Try again.', 'danger')
+
+    # Verify that user is not a robot
+    # https://www.google.com/recaptcha/intro/
+    app.logger.info(request.form['g-recaptcha-response'])
+    resp = requests.post(
+        url='https://www.google.com/recaptcha/api/siteverify',
+        data={
+            'secret': '6LfWbjAUAAAAAB57PUEvWxN3QqTJkYqjugrOUgNn',
+            'response': request.form['g-recaptcha-response']
+        }
+    ).json()
+    if resp['success'] is not True:
+        app.logger.error(resp)
+        err_code = resp['error-codes'][0]
+        if err_code == 'missing-input-secret':
+            app.logger.error('The secret parameter is missing.')
+            flash('reCAPTCHA: Server failed with secret parameter.', 'danger')
+        elif err_code == 'invalid-input-secret':
+            app.logger.error('The secret parameter is invalid or malformed.')
+            flash('reCAPTCHA: Server failed with secret parameter.', 'danger')
+        elif err_code == 'missing-input-response':
+            app.logger.error('The response parameter is missing.')
+            flash('reCAPTCHA: Missing parameter.', 'danger')
+        elif err_code == 'invalid-input-response':
+            app.logger.error('The response parameter is invalid or malformed.')
+            flash('reCAPTCHA: Invalid parameter.', 'danger')
+        elif err_code == 'bad-request':
+            app.logger.error('The request is invalid or malformed.')
+            flash('reCAPTCHA: Bad request.', 'danger')
         return redirect(url_for('register'))
 
     user = models.User.from_request(request)
