@@ -4,3 +4,4 @@ flask-login
 passlib
 xlwt
 mysql-connector-python
+requests

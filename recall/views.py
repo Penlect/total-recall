@@ -482,18 +482,41 @@ def recall_(memo_id):
 def arbeiter():
     app.logger.info(f'Arbeiter got data from {request.remote_addr}')
     if request.method == 'POST':
-        recall = models.RecallData.from_request(request, current_user)
         # Todo: Backup solution if commit fails
-        db.session.add(recall)
+
+        memo_id = request.form['memo_id'].strip().lower()
+        memo = models.MemoData.query.filter_by(id=memo_id).one()
+        recall = memo.recalls.filter_by(user_id=current_user.id).first()
+
+        if recall:
+            app.logger.info('Found old recall')
+            recall.__init__(request)
+        else:
+            app.logger.info('This is a new recall')
+            recall = models.RecallData(request)
+            recall.user = current_user
+            recall.memo = memo
+            db.session.add(recall)
         db.session.commit()
 
-        correction = recall.correct()
-        db.session.add(correction)
+        raw_score, points, cbc_r = recall.correct()
+
+        if recall.correction:
+            app.logger.info('Re-correct')
+            recall.correction.__init__(raw_score, points, cbc_r)
+        else:
+            app.logger.info('New correct')
+            correction = models.Correction(raw_score, points, cbc_r)
+            recall.correction = correction
+            db.session.add(correction)
+
+        app.logger.info(recall.correction)
+
         db.session.commit()
 
         app.logger.info(f'Arbeiter has corrected {recall.user.username}\'s '
                         f'recall of memo {recall.memo.id}')
-        return jsonify(dict(correction))
+        return jsonify(dict(recall.correction))
 
 
 @app.route('/arbeiter/correct/<int:recall_id>')

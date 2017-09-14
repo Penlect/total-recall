@@ -97,11 +97,24 @@ $(document).ready(function(){
         $("#score_table").css("display", "block");
     }
 
+    function earlyRecallSubmit(){
+        if($('fieldset').prop('disabled') == false){
+          // Copy seconds remaining to hidden input field
+          $('#seconds_remaining_field').val($('#seconds_remaining').text());
+          // Post all the recall input data to the server
+          console.log('Posting data to server ...');
+          $.post($('form').attr('action'), $('form').serialize());
+          console.log('Done posting data to server ...');
+          }
+    }
+
     // The timer is started when the Start-Recall button is clicked
    $('#start_recall').on('click', function(event){
         $(this).remove();
         $('#recallsheet').css("display", "block");
         recallTimer = setTimeout(getRecallTimer($('#seconds_remaining'), $('#recall_submit_button')), SECOND);
+        earlyRecallSubmit();
+        setInterval(earlyRecallSubmit, 10000);
    })
 
    var nrRows = $('.recall_table .recall_row').length;

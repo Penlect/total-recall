@@ -546,12 +546,21 @@ class RecallData(db.Model):
                                  cascade="save-update, merge, delete",
                                  uselist=False)
 
-    def __init__(self, ip, data, time_remaining: float):
+    def __init__(self, request):
+        form = request.form
 
         self.datetime = datetime.utcnow()
-        self.ip = ip
+        self.ip = request.remote_addr
+        data = list()
+        for i in range(len(form)):
+            try:
+                recall_cell = form[f'recall_cell_{i}'].strip()
+            except KeyError:
+                break
+            else:
+                data.append(recall_cell)
         self.data = data
-        self.time_remaining = time_remaining
+        self.time_remaining = float(form['seconds_remaining'])
 
     @property
     def start_of_emptiness(self):
@@ -562,28 +571,6 @@ class RecallData(db.Model):
                 if recall_cell and i < nr_items:
                     self._start_of_emptiness = i + 1
         return self._start_of_emptiness
-
-    @classmethod
-    def from_request(cls, request, user):
-        form = request.form
-        memo_id = form['memo_id'].strip().lower()
-        memo = MemoData.query.filter_by(id=memo_id).one()
-        data = list()
-        for i in range(len(form)):
-            try:
-                recall_cell = form[f'recall_cell_{i}'].strip()
-            except KeyError:
-                break
-            else:
-                data.append(recall_cell)
-        r = RecallData(
-            ip=request.remote_addr,
-            data=data,
-            time_remaining=float(form['seconds_remaining'])
-        )
-        r.user = user
-        r.memo = memo
-        return r
 
     def _correct_cells(self):
         result = [None]*len(self.data)
@@ -606,9 +593,7 @@ class RecallData(db.Model):
         cbc_r = self._correct_cells()
         raw_score = self.memo.raw_score(cbc_r[0:self.start_of_emptiness])
         points = self.memo.points(raw_score)
-        c = Correction(raw_score, points, cbc_r)
-        c.recall = self
-        return c
+        return raw_score, points, cbc_r
 
     def __repr__(self):
         return f'<RecallData {self.memo_id}>'
