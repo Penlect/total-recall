@@ -115,6 +115,65 @@ function keydownHandler(event, grid){
 			grid.set(digit);
 			grid.select_next();
 			break;
+        case 32:
+		case 39: // Right Arrow
+			console.log("RIGHT ARROW KEY: " + event.which);
+		    grid.select_next();
+			break;
+		case 37: // Left Arrow
+			console.log("LEFT ARROW KEY: " + event.which);
+		    grid.select_previous();
+			break;
+		case 38: // Up Arrow
+			console.log("UP ARROW KEY: " + event.which);
+			grid.select_up();
+			break;
+		case 40: // Down Arrow
+			console.log("DOWN ARROW KEY: " + event.which);
+			grid.select_down();
+			break;
+		case 70: // F character
+			console.log("RIGHT SHIFT BEFORE KEY: " + event.which);
+			grid.shift_right_row();
+			break;
+		case 66: // B character
+			console.log("LEFT SHIFT BEFORE KEY: " + event.which);
+			grid.shift_left_row();
+			break;
+		case 80: // P character
+			console.log("RIGHT SHIFT AFTER KEY: " + event.which);
+			grid.shift_right_after();
+			break;
+		case 77: // M character
+			console.log("LEFT SHIFT AFTER KEY: " + event.which);
+			grid.shift_left_after();
+			break;
+		case 8: // Backspace
+			console.log("BACKSPACE KEY: " + event.which);
+		    grid.set('');
+		    grid.select_previous();
+		    break;
+		case 46: // Del key
+			console.log("DELETE KEY: " + event.which);
+		    grid.set('');
+		    grid.select_next();
+		    break;
+		default:
+			console.log("INVALID KEY: " + event.which);
+	}
+}
+
+function keydownHandlerBinary(event, grid){
+	   
+	switch(event.which) {
+		case 48: // 0
+		case 49:
+			console.log("NUMERIC KEY: " + event.which);
+			var digit = event.which - 48;
+			grid.set(digit);
+			grid.select_next();
+			break;
+        case 32:
 		case 39: // Right Arrow
 			console.log("RIGHT ARROW KEY: " + event.which);
 		    grid.select_next();

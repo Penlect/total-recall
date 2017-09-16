@@ -39,11 +39,45 @@
 </table>
 {% endblock table_logic %}
 
+{% block instructions %}
+<h3>Controls</h3>
+<dl class="dl-horizontal">
+  <dt></dt>
+  <dd></dd>
+    {% if memo.discipline.name == 'base2' %}
+  <dt><kbd>0</kbd>, <kbd>1</kbd></dt>
+    {% else %}
+  <dt><kbd>0</kbd>, <kbd>1</kbd>, ..., <kbd>8</kbd>, <kbd>9</kbd></dt>
+    {% endif %}
+  <dd>Enter digit to active cell and advance focus to next cell.</dd>
+  <dt><kbd>Backspace</kbd></dt>
+  <dd>Clear active cell and focus previous cell.</dd>
+  <dt><kbd>Del</kbd></dt>
+  <dd>Clear active cell and focus next cell.</dd>
+  <dt><kbd>Arrow keys</kbd></dt>
+  <dd>Navigate which cell to focus.</dd>
+  <dt><kbd>Space</kbd></dt>
+  <dd>Same as <kbd>Right Arrow</kbd>.</dd>
+  <dt><kbd>P</kbd></dt>
+    <dd>(P)lus. Shift active cell and <em>all</em> aftercoming cells one step right.</dd>
+  <dt><kbd>M</kbd></dt>
+    <dd>(M)inus. Clear active cell and shift <em>all</em> aftercoming cells one step left.</dd>
+  <dt><kbd>F</kbd></dt>
+  <dd>(F)orward. Same as <kbd>P</kbd> but only for the current row.</dd>
+  <dt><kbd>B</kbd></dt>
+  <dd>(B)ack. Same as <kbd>M</kbd> but only for the current row.</dd>
+</dl>
+{% endblock %}
+
 <!-- This part handles what will happen when a key is pressed -->
 {% block keydown%}
    {% if view is not defined %}
        event.preventDefault();
        var grid = new RecallGrid(nrRows, nrCells/nrRows, $(this));
-       keydownHandler(event, grid);
+        {% if memo.discipline.name == 'base2' %}
+           keydownHandlerBinary(event, grid);
+        {% else %}
+           keydownHandler(event, grid);
+        {% endif %}
    {% endif %}
 {% endblock keydown%}

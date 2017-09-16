@@ -36,6 +36,20 @@
 </table>
 {% endblock table_logic %}
 
+{% block instructions %}
+<h3>Controls</h3>
+<dl class="dl-horizontal">
+  <dt></dt>
+  <dd></dd>
+  <dt><kbd>0</kbd>, <kbd>1</kbd>, ..., <kbd>8</kbd>, <kbd>9</kbd></dt>
+  <dd>Type date in active cell.</dd>
+  <dt><kbd>Arrow keys</kbd></dt>
+  <dd>Navigate which cell to focus.</dd>
+  <dt><kbd>Enter</kbd></dt>
+  <dd>Focus next cell.</dd>
+</dl>
+{% endblock %}
+
 <!-- This part handles what will happen when a key is pressed -->
 {% block keydown%}
    {% if view is not defined %}

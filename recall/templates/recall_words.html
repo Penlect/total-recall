@@ -36,6 +36,29 @@
 {% endfor %}
 {% endblock table_logic %}
 
+
+{% block instructions %}
+<h3>Controls</h3>
+<dl class="dl-horizontal">
+  <dt></dt>
+  <dd></dd>
+  <dt><kbd>Printable keys</kbd></dt>
+  <dd>Type word in active cell.</dd>
+  <dt><kbd>Arrow keys</kbd></dt>
+  <dd>Navigate which cell to focus.</dd>
+  <dt><kbd>Enter</kbd></dt>
+  <dd>Focus next cell.</dd>
+  <dt><kbd>9</kbd></dt>
+    <dd>Shift active cell and <em>all</em> aftercoming cells one step down.</dd>
+  <dt><kbd>8</kbd></dt>
+    <dd>Clear active cell and shift <em>all</em> aftercoming cells one step up.</dd>
+  <dt><kbd>2</kbd></dt>
+  <dd>Same as <kbd>9</kbd> but only for the current column.</dd>
+  <dt><kbd>1</kbd></dt>
+  <dd>Same as <kbd>8</kbd> but only for the current column.</dd>
+</dl>
+{% endblock %}
+
 <!-- This part handles what will happen when a key is pressed -->
 {% block keydown%}
    {% if view is not defined %}
