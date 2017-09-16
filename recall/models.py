@@ -591,7 +591,7 @@ class RecallData(db.Model):
         data = list()
         for i in range(len(form)):
             try:
-                recall_cell = form[f'recall_cell_{i}'].strip()
+                recall_cell = form[f'r_{i}'].strip()
             except KeyError:
                 break
             else:
