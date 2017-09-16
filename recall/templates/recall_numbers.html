@@ -15,7 +15,7 @@
     <tr class="recall_row">
         {% for col_i in range(nr_cols) %}
             <td>
-                <input class="recall_cell {% if view is defined %}recall_{{ recall.correction.cell_by_cell[row_i*nr_cols + col_i].name }}{% endif %}"
+                <input class="recall_cell"
                        id="recall_cell_{{ row_i*nr_cols + col_i }}"
                        name="recall_cell_{{ row_i*nr_cols + col_i }}"
                        type="text"

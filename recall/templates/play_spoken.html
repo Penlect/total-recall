@@ -20,7 +20,9 @@ var numbers = {{ data }};
 
 var sounds = [];
 for (var i = 0; i <= 9; i++) {
-    sounds.push(new Audio("/static/spoken/eng/" + i + ".wav"));
+    var audio = new Audio("/static/spoken/eng/" + i + ".wav");
+    audio.preload = "auto";
+    sounds.push(audio);
 }
 
 function playSound(digit) {
@@ -61,7 +63,7 @@ function playSpoken() {
 }
 
 $( document ).ready(function() {
-    playSpoken();
+    setTimeout(playSpoken, 3000);
 });
 </script>
 {% endblock %}

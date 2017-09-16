@@ -30,7 +30,7 @@ NR_DIGITS_IN_ROW_DECIMALS = 40
 NR_DIGITS_IN_COLUMN = 25
 NR_WORDS_IN_ROW = 5
 NR_WORDS_IN_COLUMN = 20
-NR_DATES_IN_COLUMN = 20
+NR_DATES_IN_COLUMN = 40
 
 
 @app.route('/', methods=['GET'])
@@ -608,7 +608,8 @@ def view_recall(recall_id):
                                nr_digits_in_column=NR_DIGITS_IN_COLUMN,
                                seconds_remaining=seconds_remaining,
                                view=True,
-                               recall=recall)
+                               recall=recall,
+                               result=json.dumps(dict(recall.correction)))
     elif recall.memo.discipline == models.Discipline.base10\
             or recall.memo.discipline == models.Discipline.spoken:
         nr_rows = math.ceil(nr_items/NR_DIGITS_IN_ROW_DECIMALS)
@@ -618,7 +619,8 @@ def view_recall(recall_id):
                                nr_digits_in_column=NR_DIGITS_IN_COLUMN,
                                seconds_remaining=seconds_remaining,
                                view=True,
-                               recall=recall)
+                               recall=recall,
+                               result=json.dumps(dict(recall.correction)))
     elif recall.memo.discipline == models.Discipline.words:
         # Compute the total nr of columns (acc over all pages)
         nr_cols = int(math.ceil(nr_items/NR_WORDS_IN_COLUMN))
@@ -633,14 +635,16 @@ def view_recall(recall_id):
                                nr_words_in_column=NR_WORDS_IN_COLUMN,
                                seconds_remaining=seconds_remaining,
                                view=True,
-                               recall=recall)
+                               recall=recall,
+                               result=json.dumps(dict(recall.correction)))
     elif recall.memo.discipline == models.Discipline.dates:
         return render_template('recall_dates.html', memo=recall.memo,
                                data=sorted(recall.memo.data, key=lambda x: x[2]),
                                nr_dates_in_column=NR_DATES_IN_COLUMN,
                                seconds_remaining=seconds_remaining,
                                view=True,
-                               recall=recall)
+                               recall=recall,
+                               result=json.dumps(dict(recall.correction)))
     else:
         return 'Recall not implemented yet: ' + recall.memo.discipline
 

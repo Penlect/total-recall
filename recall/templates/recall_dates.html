@@ -13,7 +13,7 @@
 <table border="1px" class="recall_table">
 {% for date, story, order in data %}
     <tr class="recall_row">
-        <td><input class="recall_cell {% if view is defined %}recall_{{ recall.correction.cell_by_cell[loop.index0].name }}{% endif %}"
+        <td><input class="recall_cell"
                    id="recall_cell_{{ loop.index0 }}"
                    name="recall_cell_{{ loop.index0 }}"
                    type="text"

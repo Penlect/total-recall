@@ -2,26 +2,10 @@
     text-align: left;
 	padding-left:10px;
 	margin:0px;
-	width: 130px;
+	width: 150px;
 	font-size:18px;
 	border: 0px;
 }
 #recallsheet input[type=text]:focus {
     background-color: lightblue;
-}
-#recallsheet table {
-	border-collapse: collapse;
-	margin-top: 10px;
-	margin-bottom: 40px;
-}
-#recallsheet tr, td {
-	padding:0px;
-	margin:0px;
-	white-space: nowrap;
-	border: 1px solid;
-}
-#recallsheet .row_enumeration {
-    padding-left:20px;
-    padding-right:10px;
-    border-left: 1px solid;
 }

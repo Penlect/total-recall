@@ -17,7 +17,7 @@
         {% for row_i in range(nr_words_in_column) %}
         <tr class="recall_row">
             {% for col_i in range(nr_cols) %}
-                <td><input class="recall_cell {% if view is defined %}recall_{{ recall.correction.cell_by_cell[table.index0*100 + col_i*nr_words_in_column + row_i].name }}{% endif %}"
+                <td><input class="recall_cell"
                            id="recall_cell_{{ table.index0*100 + col_i*nr_words_in_column + row_i }}"
                            name="recall_cell_{{ table.index0*100 + col_i*nr_words_in_column + row_i }}"
                            type="text"

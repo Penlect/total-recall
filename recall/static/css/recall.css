@@ -1,4 +1,36 @@
 
+body{
+    color: black;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+#recallsheet table {
+	border-collapse: collapse;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+#recallsheet tr, #recallsheet td {
+	padding:0px;
+	margin:0px;
+	white-space: nowrap;
+	border: 1px solid;
+}
+#recallsheet .row_enumeration {
+    padding-left:20px;
+    padding-right:10px;
+    border-left: 1px solid;
+}
+#score_table tr, #score_table td {
+	padding-left:10px;
+	padding-right:10px;
+	border: 1px solid;
+}
+
+#recall_submit_button {
+    margin-top: 10px;
+}
+
 .recall_correct {
     background-color:lime;
 }
@@ -6,7 +38,7 @@
     background-color:#ff0022;
 }
 .recall_gap {
-    background-color:#42d7f4;
+    background-color:#afceff;
 }
 .recall_not_reached {
     background-color:#eaeaea;
@@ -16,16 +48,4 @@
 }
 .recall_almost_correct {
     background-color:#ffff66;
-}
-
-#score_table tr, #score_table td {
-	padding-left:10px;
-	padding-right:10px;
-	border: 1px solid;
-}
-
-body{
-    color: black;
-    margin-left: 20px;
-    margin-bottom: 20px;
 }

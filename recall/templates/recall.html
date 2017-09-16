@@ -43,19 +43,19 @@
         <table>
             <tr>
                 <td>Nr consecutive</td>
-                <td id="consecutive">{% if view is defined %}{{ recall.correction.consecutive }}{% endif %}</td>
+                <td id="consecutive"></td>
             </tr>
             <tr>
                 <td>Nr correct</td>
-                <td id="correct">{% if view is defined %}{{ recall.correction.correct }}{% endif %}</td>
+                <td id="correct"></td>
             </tr>
             <tr>
                 <td>Raw score</td>
-                <td id="raw_score">{% if view is defined %}{{ recall.correction.raw_score }}{% endif %}</td>
+                <td id="raw_score"></td>
             </tr>
             <tr>
                 <td>Points</td>
-                <td id="points">{% if view is defined %}{{ recall.correction.points }}{% endif %}</td>
+                <td id="points"></td>
             </tr>
         </table>
 
@@ -75,7 +75,6 @@
 
 $(document).ready(function(){
 
-    {% if view is not defined %}
 
     function showCorrection(result){
         $("#recall_submit_button").remove();
@@ -90,6 +89,8 @@ $(document).ready(function(){
         $("#score_table").css("display", "block");
     }
 
+    {% if view is not defined %}
+    
     function sendRecallToServer(finalSubmit){
           // Post all the recall input data to the server
           console.log('Posting recall data to server ...');
@@ -140,7 +141,8 @@ $(document).ready(function(){
    console.log("Cells = " + nrCells);
 
    $('.recall_cell').keydown(function(event) {
-        // The different disciplines will handle keypresses slightly different in the keydown block
+        /* The different disciplines will handle keypresses
+        slightly different in the keydown block */
        {% block keydown %}
            event.preventDefault();
            var grid = new RecallGrid(nrRows, nrCells/nrRows, $(this));
@@ -158,6 +160,8 @@ $(document).ready(function(){
    });
    {% else %}
 
+   var result = {{ result|safe }};
+   showCorrection(result);
    $('fieldset').prop('disabled', true);
    $('#recallsheet').css("display", "block");
    $("#score_table").css("display", "block");
