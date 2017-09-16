@@ -155,6 +155,9 @@ def login():
     except (sqlalchemy.orm.exc.NoResultFound, WrongPasswordError):
         flash('Username or Password is invalid', 'danger')
         return redirect(url_for('login'))
+    if user.blocked is True:
+        flash('This user is blocked', 'danger')
+        return redirect(url_for('login'))
     login_user(user)
     flash(f'Logged in user "{username}" successfully', 'success')
     # Todo: investigate below
@@ -410,6 +413,9 @@ def play_spoken(memo_id: int):
         memo = models.MemoData.query.filter_by(id=memo_id).one()
     except sqlalchemy.orm.exc.NoResultFound:
         return f'Could not find memo for key={memo_id}'
+    if memo.user.id != current_user.id:
+        if memo.state != models.State.public:
+            return 'Play not allowed.'
     return render_template('play_spoken.html', data=json.dumps(memo.data))
 
 
@@ -480,43 +486,86 @@ def recall_(memo_id):
 
 @app.route('/arbeiter', methods=['POST'])
 def arbeiter():
-    app.logger.info(f'Arbeiter got data from {request.remote_addr}')
-    if request.method == 'POST':
-        # Todo: Backup solution if commit fails
+    # Todo: Backup solution if commit fails
+    """Accept posted recall data, correct, and store in database"""
 
-        memo_id = request.form['memo_id'].strip().lower()
-        memo = models.MemoData.query.filter_by(id=memo_id).one()
-        recall = memo.recalls.filter_by(user_id=current_user.id).first()
+    # Make sure a user is logged in
+    if not current_user.is_authenticated:
+        app.logger.warning('Arbeiter: User is not authenticated.')
+        return jsonify({'error': 'User is not authenticated'})
 
-        if recall:
-            app.logger.info('Found old recall')
+    arbeiter = f'{current_user.username}\'s Arbeiter:'
+    app.logger.info(f'{arbeiter}: Got recall data from competitor')
+
+    # There must exist a corresponding memorization for this
+    # Recall in the database
+    memo_id = int(request.form['memo_id'])
+    memo = models.MemoData.query.filter_by(id=memo_id).one()
+
+    # Check if there already exists a recall entry for this
+    # memorization and user in the database.
+    user_id = int(request.form['user_id'])
+    recall = memo.recalls.filter_by(user_id=user_id).first()
+
+    if recall:
+        app.logger.debug(f'{arbeiter}: Found existing recall for competitor: '
+                         f'recall {recall.id}')
+        if recall.locked is True and user_id != memo.user_id:
+            # If the recall is locked, no further submits will
+            # be accepted - unless the user is the owner of the
+            # memorization, then he can recall as many times he
+            # wants.
+            app.logger.warning(f'{arbeiter}: Recall {recall.id} is locked')
+            return jsonify({'error': 'Recall is locked'})
+
+        if recall.user_id == current_user.id:
+            # Update the recall instance with new field values
             recall.__init__(request)
         else:
-            app.logger.info('This is a new recall')
-            recall = models.RecallData(request)
-            recall.user = current_user
-            recall.memo = memo
-            db.session.add(recall)
-        db.session.commit()
+            # In this case the Arbeiter got recall data of a
+            # user who is no longer logged in - that is not
+            # allowed.
+            app.logger.warning(f'{arbeiter}: Wrong user logged in')
+            return jsonify({'error': 'User not logged in'})
+    else:
+        app.logger.debug(f'{arbeiter}: First time recall of memo {memo.id}')
+        # Create a new recall object and add to database
+        recall = models.RecallData(request)
+        recall.user = current_user
+        recall.memo = memo
+        db.session.add(recall)
 
-        raw_score, points, cbc_r = recall.correct()
+    # In the final submit the client should send a signal to
+    # lock the recall, so no further recalls will be accepted.
+    # (unless the client is the owner of the memorization)
+    if request.form['locked'] == 'true':
+        app.logger.info(f'{arbeiter}: Recall {recall.id} is now locked')
+        recall.locked = True
 
-        if recall.correction:
-            app.logger.info('Re-correct')
-            recall.correction.__init__(raw_score, points, cbc_r)
-        else:
-            app.logger.info('New correct')
-            correction = models.Correction(raw_score, points, cbc_r)
-            recall.correction = correction
-            db.session.add(correction)
+    db.session.commit()
 
-        app.logger.info(recall.correction)
+    raw_score, points, cbc_r = recall.correct()
 
-        db.session.commit()
+    if recall.correction:
+        app.logger.debug(f'{arbeiter}: Re-correcting recall {recall.id}')
+        recall.correction.__init__(raw_score, points, cbc_r)
+    else:
+        app.logger.debug(
+            f'{arbeiter}: Correcting recall {recall.id} for the first time')
+        correction = models.Correction(raw_score, points, cbc_r)
+        correction.recall = recall
+        db.session.add(correction)
 
-        app.logger.info(f'Arbeiter has corrected {recall.user.username}\'s '
-                        f'recall of memo {recall.memo.id}')
+    app.logger.info(recall.correction)
+
+    db.session.commit()
+
+    app.logger.info(f'Arbeiter has corrected {recall.user.username}\'s '
+                    f'recall of memo {recall.memo.id}')
+    if recall.locked is True:
         return jsonify(dict(recall.correction))
+    else:
+        return jsonify({'success': 'Recall received'})
 
 
 @app.route('/arbeiter/correct/<int:recall_id>')

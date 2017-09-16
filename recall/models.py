@@ -536,6 +536,7 @@ class RecallData(db.Model):
     ip = db.Column(db.String(40), nullable=False)
     data = db.Column(db.PickleType, nullable=False)
     time_remaining = db.Column(db.Float, nullable=False)
+    locked = db.Column(db.Boolean, nullable=False)
 
     # ForeignKeys
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -561,6 +562,7 @@ class RecallData(db.Model):
                 data.append(recall_cell)
         self.data = data
         self.time_remaining = float(form['seconds_remaining'])
+        self.locked = False
 
     @property
     def start_of_emptiness(self):
@@ -654,7 +656,11 @@ class Correction(db.Model):
         )
 
     def __repr__(self):
-        return f'<Correction {self.correct}, {self.raw_score}, {self.points}>'
+        return (f'<Correction of recall {self.recall_id}: '
+                f'points={self.points}, '
+                f'raw_score{self.raw_score}, '
+                f'correct={self.correct}, '
+                f'consecutive={self.consecutive}>')
 
 
 class Language(db.Model):

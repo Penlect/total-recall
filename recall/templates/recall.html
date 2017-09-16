@@ -10,7 +10,7 @@
 {% block body %}
 
     <div class="page-header">
-        <h1>{{ current_user.username }}: Recall of id={{ memo.id }}</h1>
+        <h1>{{ current_user.username }}: Recall of memo id={{ memo.id }}</h1>
     </div>
     {% block subheader %}
     <h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.recall_time }} min Recall</h3>
@@ -20,17 +20,13 @@
     <button id="start_recall" class="btn btn-danger btn-lg" type="button">Start Recall</button>
     {% endif %}
 
-    {% if view is not defined %}
-    <form action="{{ url_for('arbeiter') }}" method="post">
-    {% else %}
     <form>
-    {% endif %}
         <fieldset>
         <div id="recallsheet" style="display:none;">
             <p>Seconds remaining: <span id="seconds_remaining">{{ seconds_remaining }}</span></p>
 
             <input name="memo_id" type="hidden" value="{{ memo.id }}">
-            <input id="seconds_remaining_field" name="seconds_remaining" type="hidden">
+            <input name="user_id" type="hidden" value="{{ current_user.id }}">
 
             {% block table_logic %}
             {% endblock %}
@@ -81,10 +77,7 @@ $(document).ready(function(){
 
     {% if view is not defined %}
 
-    function recallSubmit(result, status, xhr){
-        console.log(result);
-        console.log(status);
-
+    function showCorrection(result){
         $("#recall_submit_button").remove();
         var arrayLength = result.cell_by_cell.length;
         for (var i = 0; i < arrayLength; i++){
@@ -97,24 +90,48 @@ $(document).ready(function(){
         $("#score_table").css("display", "block");
     }
 
-    function earlyRecallSubmit(){
-        if($('fieldset').prop('disabled') == false){
-          // Copy seconds remaining to hidden input field
-          $('#seconds_remaining_field').val($('#seconds_remaining').text());
+    function sendRecallToServer(finalSubmit){
           // Post all the recall input data to the server
-          console.log('Posting data to server ...');
-          $.post($('form').attr('action'), $('form').serialize());
-          console.log('Done posting data to server ...');
+          console.log('Posting recall data to server ...');
+          var extraParams = {
+            seconds_remaining: $('#seconds_remaining').text(),
+            locked: finalSubmit
           }
+          console.log($('form').serialize() + '&' + $.param(extraParams));
+          $.ajax({
+            type: "POST",
+            url: "{{ url_for('arbeiter') }}",
+            data: $('form').serialize() + '&' + $.param(extraParams),
+            success: function(data, status, xhr){
+                        console.log(data);
+                        console.log(status);
+                        if (finalSubmit){
+                            showCorrection(data);
+                            $('fieldset').prop('disabled', true);
+                        }
+                    },
+            dataType: 'json',
+            error: function(XMLHttpRequest, textStatus, errorThrown){
+                        console.log(XMLHttpRequest);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    }
+          });  
+          console.log('Done posting recall data to server.');
     }
 
     // The timer is started when the Start-Recall button is clicked
    $('#start_recall').on('click', function(event){
+        console.log('Recall start button pressed');
         $(this).remove();
         $('#recallsheet').css("display", "block");
         recallTimer = setTimeout(getRecallTimer($('#seconds_remaining'), $('#recall_submit_button')), SECOND);
-        earlyRecallSubmit();
-        setInterval(earlyRecallSubmit, 10000);
+        sendRecallToServer(false);
+        setInterval(function(){
+            if($('fieldset').prop('disabled') == false){
+                sendRecallToServer(false);
+            }
+        }, 5000);
    })
 
    var nrRows = $('.recall_table .recall_row').length;
@@ -123,29 +140,18 @@ $(document).ready(function(){
    console.log("Cells = " + nrCells);
 
    $('.recall_cell').keydown(function(event) {
-       {% block keydown%}
+        // The different disciplines will handle keypresses slightly different in the keydown block
+       {% block keydown %}
            event.preventDefault();
            var grid = new RecallGrid(nrRows, nrCells/nrRows, $(this));
            keydownHandler(event, grid);
-       {% endblock keydown%}
+       {% endblock keydown %}
    });
 
    $('form').submit(function(event){
-      console.log('Recall submit initiated');
+      console.log('Final recall submit initiated');
 	  event.preventDefault();
-
-      // Copy seconds remaining to hidden input field
-	  $('#seconds_remaining_field').val($('#seconds_remaining').text());
-
-	  // Post all the recall input data to the server
-      console.log('Posting data to server ...');
-      $.post($(this).attr('action'), $(this).serialize(), recallSubmit, 'json');
-      console.log('Done posting data to server ...');
-
-      /* Disable the recall form because we don't want anyone
-       to modify it after the time has run out */
-      $('fieldset').prop('disabled', true);
-
+      sendRecallToServer(true);
       // Stop the clock from ticking
 	  clearTimeout(recallTimer);
       return false;
@@ -155,7 +161,6 @@ $(document).ready(function(){
    $('fieldset').prop('disabled', true);
    $('#recallsheet').css("display", "block");
    $("#score_table").css("display", "block");
-
 
    {% endif %}
 
