@@ -1,7 +1,7 @@
 
 import os
 import re
-from flask import (render_template, request, jsonify, send_file, url_for,
+from flask import (render_template, request, jsonify, url_for,
                    flash, redirect, send_from_directory)
 from flask_login import login_user, logout_user, current_user, login_required
 import math
@@ -14,13 +14,13 @@ import requests
 
 from recall import app, db, login_manager
 from recall import models
-
 import recall.xls
 
 import logging
 handler = logging.FileHandler('flask.log')
-handler.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
@@ -49,64 +49,25 @@ login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info'
 
 
-def valid_username(username):
-    """Make sure the username is OK to use as a username"""
-    candidate = username.strip().lower()
-    MAX_LENGTH = 12
-    if len(candidate) > MAX_LENGTH:
-        raise ValueError(f'Username "{candidate}" too long! '
-                         f'Maximum {MAX_LENGTH} characters allowed.')
-    elif not re.match(r'[\w_]+$', candidate):
-        raise ValueError(f'Username "{candidate}" forbidden characters.')
-    elif models.User.query.filter_by(username=candidate).first() is not None:
-        raise ValueError(f'Username "{candidate}" is already taken.')
-    else:
-        return username
-
-
-def valid_password(pwd):
-    """Make sure the username is OK to use as a username"""
-    MIN_LENGTH = 8
-    if len(pwd) < MIN_LENGTH:
-        raise ValueError(f'Password to short! '
-                         f'Minimum {MIN_LENGTH} characters required.')
-    return pwd
-
-
-def valid_country(country):
-    """Make sure the country is OK"""
-    MAX_LENGTH = 20
-    if len(country) > MAX_LENGTH:
-        raise ValueError(f'Country "{country}" is too long! '
-                         f'Maximum {MAX_LENGTH} characters allowed.')
-    return country
-
-
-def verify_length(parameter, length):
-    if len(parameter) > length:
-        raise ValueError(f'Parameter "{parameter}" is too long! '
-                         f'Maximum {length} characters allowed.')
-    return parameter
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
         return render_template('register.html')
 
-    username = request.form['username'].strip().lower()
     try:
-        valid_username(username)
-        valid_password(request.form['password'])
-        verify_length(request.form['email'], length=30)
-        verify_length(request.form['real_name'], length=30)
-        verify_length(request.form['country'], length=20)
-    except ValueError as error:
+        user = models.User(
+            username=request.form['username'],
+            password=request.form['password'],
+            email=request.form['email'],
+            real_name=request.form['real_name'],
+            country=request.form['country']
+        )
+    except models.RegisterUserError as error:
         flash(str(error) + ' Try again.', 'danger')
         return redirect(url_for('register'))
 
     # Verify that user is not a robot
     # https://www.google.com/recaptcha/intro/
-    app.logger.info(request.form['g-recaptcha-response'])
     resp = requests.post(
         url='https://www.google.com/recaptcha/api/siteverify',
         data={
@@ -134,14 +95,16 @@ def register():
             flash('reCAPTCHA: Bad request.', 'danger')
         return redirect(url_for('register'))
 
-    user = models.User.from_request(request)
     db.session.add(user)
     db.session.commit()
     flash('User successfully registered', 'success')
+    app.logger.info(f'New user registered: {user}')
     return redirect(url_for('login'))
+
 
 class WrongPasswordError(Exception):
     pass
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -160,6 +123,7 @@ def login():
         return redirect(url_for('login'))
     login_user(user)
     flash(f'Logged in user "{username}" successfully', 'success')
+    app.logger.info(f'User logged in: {username}')
     # Todo: investigate below
     # is_safe_url should check if the url is safe for redirects.
     # See http://flask.pocoo.org/snippets/62/ for an example.
@@ -167,10 +131,12 @@ def login():
 
 
 @app.route('/logout')
+@login_required
 def logout():
     username = current_user.username
     logout_user()
     flash(f'Logged out user "{username}" successfully', 'success')
+    app.logger.info(f'User logged out: {username}')
     return redirect(url_for('login'))
 
 
@@ -178,10 +144,12 @@ def logout():
 @login_required
 def delete_account():
     # Todo: figure out the correct order of doing things
+    username = current_user.username
     db.session.delete(current_user)
     db.session.commit()
     logout_user()
-    flash(f'Account "{current_user.username}" deleted.', 'danger')
+    flash(f'Account "{username}" deleted.', 'danger')
+    app.logger.info(f'User deleted account: {username}')
     return redirect(url_for('index'))
 
 
@@ -369,7 +337,7 @@ def make_discipline():
         db.session.add(memo)
         db.session.commit()
         app.logger.info(
-            f'User {current_user.username} created memorization {memo.id}')
+            f'User {current_user.username} created memorization {memo}')
         return 'Successfully created discipline'
 
 
@@ -401,6 +369,7 @@ def download_xls(memo_id: int):
         filedata = memo.get_xls_filedata(pattern)
         with open(fullfile, 'wb') as h:
             h.write(filedata.getvalue())
+    app.logger.info(f'{current_user.username} downloads {filename}')
     return send_from_directory(os.path.join(app.root_path, 'xls'),
                                filename,
                                as_attachment=True)
@@ -416,6 +385,7 @@ def play_spoken(memo_id: int):
     if memo.user.id != current_user.id:
         if memo.state != models.State.public:
             return 'Play not allowed.'
+    app.logger.info(f'{current_user.username} plays {memo}')
     return render_template('play_spoken.html', data=json.dumps(memo.data))
 
 
@@ -569,6 +539,7 @@ def arbeiter():
 
 
 @app.route('/arbeiter/correct/<int:recall_id>')
+@login_required
 def recorrect(recall_id):
     app.logger.info(f'Arbeiter will re-correct recall {recall_id}')
     try:

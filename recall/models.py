@@ -55,6 +55,10 @@ def unique_lines_in_textarea(data: str, lower=False):
     return lines
 
 
+class RegisterUserError(Exception):
+    pass
+
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)
@@ -78,11 +82,11 @@ class User(db.Model):
 
     def __init__(self, username, password, email, real_name, country):
         self.datetime = datetime.utcnow()
-        self.username = username
-        self.password = password
-        self.email = email
-        self.real_name = real_name
-        self.country = country
+        self.username = self._valid_username(username)
+        self.password = sha256_crypt.encrypt(self._valid_password(password))
+        self.email = self._verify_length(email, length=40)
+        self.real_name = self._verify_length(real_name, length=30)
+        self.country = self._verify_length(country, length=30)
         self.settings = {
             'pattern_binary': '',
             'pattern_decimals': '',
@@ -119,6 +123,38 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
+
+    @staticmethod
+    def _valid_username(username):
+        """Make sure the username is OK to use as a username"""
+        candidate = username.strip().lower()
+        User._verify_length(candidate, length=12)
+        if not re.match(r'[\w_]+$', candidate):
+            raise RegisterUserError(
+                f'Username "{candidate}" contains forbidden characters.')
+        elif User.query.filter_by(username=candidate).first() is not None:
+            raise RegisterUserError(
+                f'Username "{candidate}" is already taken.')
+        else:
+            return candidate
+
+    @staticmethod
+    def _valid_password(pwd):
+        """Make sure the username is OK to use as a username"""
+        MIN_LENGTH = 8
+        if len(pwd) < MIN_LENGTH:
+            raise RegisterUserError(
+                f'Password to short! '
+                f'Minimum {MIN_LENGTH} characters required.')
+        return pwd
+
+    @staticmethod
+    def _verify_length(parameter, length):
+        if len(parameter) > length:
+            raise RegisterUserError(
+                f'Parameter "{parameter}" is too long! '
+                f'Maximum {length} characters allowed.')
+        return parameter
 
 
 class MemoData(db.Model):
