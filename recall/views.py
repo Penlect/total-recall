@@ -548,8 +548,9 @@ def recorrect(recall_id):
         return f'Does not exists'
     if recall.memo.user.id != current_user.id:
         return 'Not allowed. This user do not own the memorization'
+    raw_score, points, cbc_r = recall.correct()
     old = recall.correction
-    recall.correction = recall.correct()
+    recall.correction = models.Correction(raw_score, points, cbc_r)
     db.session.delete(old)
     db.session.commit()
     return redirect(url_for('view_recall', recall_id=recall_id))
