@@ -103,7 +103,7 @@ $(document).ready(function(){
             seconds_remaining: $('#seconds_remaining').text(),
             locked: finalSubmit
           }
-          console.log($('form').serialize() + '&' + $.param(extraParams));
+          //console.log($('form').serialize() + '&' + $.param(extraParams));
           $.ajax({
             type: "POST",
             url: "{{ url_for('arbeiter') }}",
@@ -164,7 +164,7 @@ $(document).ready(function(){
       return false;
    });
    {% else %}
-
+   console.log('View recall');
    var result = {{ result|safe }};
    showCorrection(result);
    $('fieldset').prop('disabled', true);
