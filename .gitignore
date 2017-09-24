@@ -3,3 +3,4 @@ __pycache__/
 database/
 *.xls
 *.log
+*.db

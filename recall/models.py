@@ -1,4 +1,16 @@
+"""
 
+
+User
+MemoData -> User, Language
+RecallData -> User, MemoData
+Correction -> RecallData
+Language
+AlmostCorrectWord -> User, Language
+Word -> Language
+Story -> Language
+
+"""
 import enum
 from datetime import datetime
 import re
@@ -509,7 +521,7 @@ class DatesData(MemoData):
             nr_items = len(stories)
         random.shuffle(stories)
         stories = stories[0:nr_items]
-        dates = [random.randint(1000, 2099) for _ in stories]
+        dates = random.sample(range(1000, 2100), len(stories))
         recall_order = list(range(nr_items))
         random.shuffle(recall_order)
         data = list(zip(dates, stories, recall_order))
