@@ -81,7 +81,7 @@ class Table:
         self.nr_header_rows = nr_header_rows
         self.nr_item_rows = nr_item_rows
         self.nr_page_rows = nr_page_rows
-        self.nr_empty_tail_rows = nr_page_rows - (nr_header_rows + nr_item_rows)
+        self.nr_empty_tail_rows = nr_page_rows - (nr_header_rows + nr_item_rows*item_height)
 
         assert nr_page_cols >= left_padding + nr_item_cols
         self.left_padding = left_padding
@@ -502,6 +502,109 @@ class DatesTable(Table):
         self.next_pos(direction='vertical')
 
 
+class StandardDeck:
+
+    card_values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+                   'J', 'Q', 'K']
+    card_suites = ['\u2660', '\u2665', '\u2666', '\u2663']
+
+    def get_card(self, card_id):
+        card_id = int(card_id)
+        value, suite = card_id%13, card_id//13
+        return self.card_values[value], self.card_suites[suite]
+
+
+class CardTable(Table):
+
+    normal_value_black = (
+        'font: name Arial, height 260, bold true;'
+        'alignment: horizontal center, vertical bottom;'
+    )
+    normal_suite_black = (
+        'font: name Arial, height 360;'
+        'alignment: horizontal center;'
+    )
+    normal_value_red = (
+        'font: name Arial, height 260, bold true, color red;'
+        'alignment: horizontal center, vertical bottom;'
+    )
+    normal_suite_red = (
+        'font: name Arial, height 360, color red;'
+        'alignment: horizontal center;'
+    )
+    style_item_single = (
+        xlwt.easyxf(normal_value_black + 'borders: left thin, right thin, top thin;'),
+        xlwt.easyxf(normal_value_red + 'borders: left thin, right thin, top thin;'),
+        xlwt.easyxf(normal_suite_black + 'borders: left thin, right thin, bottom thin;'),
+        xlwt.easyxf(normal_suite_red + 'borders: left thin, right thin, bottom thin;'),
+    )
+    style_item_normal = style_item_single
+    style_item_start = (
+        xlwt.easyxf(normal_value_black + 'borders: left thin, right hair, top thin;'),
+        xlwt.easyxf(normal_value_red + 'borders: left thin, right hair, top thin;'),
+        xlwt.easyxf(normal_suite_black + 'borders: left thin, right hair, bottom thin;'),
+        xlwt.easyxf(normal_suite_red + 'borders: left thin, right hair, bottom thin;'),
+    )
+    style_item_middle = (
+        xlwt.easyxf(normal_value_black + 'borders: left hair, right hair, top thin;'),
+        xlwt.easyxf(normal_value_red + 'borders: left hair, right hair, top thin;'),
+        xlwt.easyxf(normal_suite_black + 'borders: left hair, right hair, bottom thin;'),
+        xlwt.easyxf(normal_suite_red + 'borders: left hair, right hair, bottom thin;'),
+    )
+    style_item_stop = (
+        xlwt.easyxf(normal_value_black + 'borders: left hair, right thin, top thin;'),
+        xlwt.easyxf(normal_value_red + 'borders: left hair, right thin, top thin;'),
+        xlwt.easyxf(normal_suite_black + 'borders: left hair, right thin, bottom thin;'),
+        xlwt.easyxf(normal_suite_red + 'borders: left hair, right thin, bottom thin;'),
+    )
+
+    def __init__(self, header, **kwargs):
+        self.header = header
+        super().__init__(**kwargs)
+        self.nr_items = 0
+        # The last page_column need to be wider to fit "Row 23"
+        self.set_column_widths([0.65]*self.nr_page_cols)
+
+    def add_item(self, item):
+        assert 0 <= int(item) <= 51
+        value, suite = StandardDeck().get_card(item)
+
+        # Check for newline action
+        if self.new_row is True:
+            self._set_row_height(self.y_cell, 0.75)
+            self._set_row_height(self.y_cell + 1, 0.6)
+            if self.nr_items%52 == 48:
+                height = 0.6
+            else:
+                height = 0.35
+            self._set_row_height(self.y_cell + 2, height)
+
+        # Check for new page action
+        if self.new_page is True:
+            self.write_header(self.header)
+
+        self.nr_items += 1
+        (value_style_black, value_style_red,
+         suite_style_black, suite_style_red) = next(self.item_styles)
+
+        if item//13 == 0 or item//13 == 3:
+            value_style = value_style_black
+            suite_style = suite_style_black
+        else:
+            value_style = value_style_red
+            suite_style = suite_style_red
+        self.sheet_memo.write(self.y_cell, self.x_cell, value, value_style)
+        self.sheet_memo.write(self.y_cell + 1, self.x_cell, suite, suite_style)
+        self.sheet_memo.write(self.y_cell + 2, self.x_cell, '')
+        # Todo: recall sheet: hair -> thin, none -> hair
+        self.sheet_recall.write(self.y_cell, self.x_cell, '', value_style)
+        self.sheet_recall.write(self.y_cell + 1, self.x_cell, '', suite_style)
+        self.sheet_recall.write(self.y_cell + 2, self.x_cell, '')
+        if self.nr_items%52 == 0:
+            self.x_item = self.nr_item_cols - 1
+        self.next_pos(direction='horizontal')
+
+
 def get_decimal_table(header, pattern):
     header.right_offset = -5
     return NumberTable(
@@ -565,6 +668,23 @@ def get_dates_table(header, pattern):
                     left_padding=0
                     )
 
+
+def get_card_table(header, pattern):
+    header.right_offset = -5
+    return CardTable(
+                    header=header,
+                    pattern=pattern,
+                    nr_header_rows=7,
+                    nr_item_rows=3*4,
+                    nr_page_rows=50,
+                    nr_item_cols=24,
+                    nr_page_cols=30,
+                    item_width=1,
+                    item_height=3,
+                    left_padding=3
+                    )
+
+
 class Header:
     def __init__(self, title, description, recall_key, memo_time, recall_time):
         self.title = title
@@ -582,28 +702,35 @@ if __name__ == '__main__':
     header_decimal = Header(
         title='Svenska Minnesförbundet',
         description='Decimal Numbers, 1234 st',
-        recall_key='A4B2C9',
+        recall_key='4211',
         memo_time='5',
         recall_time='15'
     )
     header_binary = Header(
         title='Svenska Minnesförbundet',
         description='Binary Numbers, 1234 st',
-        recall_key='A4B2C9',
+        recall_key='7452',
         memo_time='5',
         recall_time='15'
     )
     header_words = Header(
         title='Svenska Minnesförbundet',
         description='Words, 1234 st',
-        recall_key='A4B2C9',
+        recall_key='2344',
         memo_time='5',
         recall_time='15'
     )
     header_dates = Header(
         title='Svenska Minnesförbundet',
         description='Dates, 1234 st',
-        recall_key='A4B2C9',
+        recall_key='7812',
+        memo_time='5',
+        recall_time='15'
+    )
+    header_cards = Header(
+        title='Svenska Minnesförbundet',
+        description='Cards, 1234 st',
+        recall_key='5632',
         memo_time='5',
         recall_time='15'
     )
@@ -611,12 +738,14 @@ if __name__ == '__main__':
     b = get_binary_table(header_binary, pattern='4, 3, 3')
     w = get_words_table(header_words, pattern='2')
     h = get_dates_table(header_dates, pattern='10')
+    c = get_card_table(header_cards, pattern='2')
 
     # Cards: Q\u2665 2\u2666 A\u2663
     words = itertools.cycle(['bacon', 'pizza', 'hej', 'vattenfall', 'åäö'])
     dates = itertools.cycle([('2017', 'Katter kan flyga'),
                              ('2008', 'Hunda vill bli katt'),
                              ('2008', 'Åäö tas bort från svenskan')])
+    cards = (random.randint(0, 51) for _ in range(10**10))
     for _ in range(12340):
         d.add_item(random.randint(0, 9))
         b.add_item(random.randint(0, 1))
@@ -624,7 +753,10 @@ if __name__ == '__main__':
         w.add_item(next(words))
     for _ in range(300):
         h.add_item(next(dates))
+    for _ in range(52*9):
+        c.add_item(next(cards))
     d.save('Decimal.xls')
     b.save('Binary.xls')
     w.save('Word.xls')
     h.save('Dates.xls')
+    c.save('Cards.xls')
