@@ -32,6 +32,7 @@ class Discipline(enum.Enum):
     words = 'Words'
     dates = 'Historical Dates'
     spoken = 'Spoken Numbers'
+    cards = 'Cards'
 
 
 class Item(enum.Enum):
@@ -574,6 +575,34 @@ class DatesData(MemoData):
     @staticmethod
     def points(raw_score):
         return math.ceil(raw_score*1000/125)
+
+
+class CardData(MemoData):
+    __mapper_args__ = {
+        'polymorphic_identity': Discipline.cards,
+    }
+    xls_table = staticmethod(recall.xls.get_card_table)
+
+    @staticmethod
+    def random(nr_items, *args):
+        return tuple(random.randint(0, 51) for _ in range(nr_items))
+
+    @staticmethod
+    def from_text(text):
+        return tuple(int(digit) for digit in text.split(',') if digit.strip())
+
+    def raw_score(self, cbc_r):
+        return self._raw_score_digits(cbc_r, 52)
+
+    def points(self, raw_score):
+        if (self.memo_time, self.recall_time) == (10, 30):
+            return math.ceil(raw_score*1000/436)
+        elif (self.memo_time, self.recall_time) == (30, 60):
+            return math.ceil(raw_score*1000/877)
+        elif (self.memo_time, self.recall_time) == (60, 120):
+            return math.ceil(raw_score*1000/1560)
+        else:
+            return -1
 
 
 class RecallData(db.Model):
