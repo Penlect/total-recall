@@ -564,6 +564,8 @@ class CardTable(Table):
         self.nr_items = 0
         # The last page_column need to be wider to fit "Row 23"
         self.set_column_widths([0.65]*self.nr_page_cols)
+        # "Reset" grid pattern for each deck of cards
+        self.item_styles = itertools.cycle(itertools.islice(self.item_styles, 52))
 
     def add_item(self, item):
         assert 0 <= int(item) <= 51
@@ -738,7 +740,7 @@ if __name__ == '__main__':
     b = get_binary_table(header_binary, pattern='4, 3, 3')
     w = get_words_table(header_words, pattern='2')
     h = get_dates_table(header_dates, pattern='10')
-    c = get_card_table(header_cards, pattern='2')
+    c = get_card_table(header_cards, pattern='3')
 
     # Cards: Q\u2665 2\u2666 A\u2663
     words = itertools.cycle(['bacon', 'pizza', 'hej', 'vattenfall', 'åäö'])
@@ -753,7 +755,7 @@ if __name__ == '__main__':
         w.add_item(next(words))
     for _ in range(300):
         h.add_item(next(dates))
-    for _ in range(52*9):
+    for _ in range(52*5 + 17):
         c.add_item(next(cards))
     d.save('Decimal.xls')
     b.save('Binary.xls')
