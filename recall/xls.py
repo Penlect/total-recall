@@ -277,19 +277,20 @@ class NumberTable(Table):
         'font: name Arial, height 180;'
         'alignment: horizontal center, vertical center;'
     )
-    style_item_normal = xlwt.easyxf(normal)
-    style_item_single = xlwt.easyxf(
-        normal + 'borders: left hair, right hair, top hair, bottom hair;'
-    )
-    style_item_start = xlwt.easyxf(
-        normal + 'borders: left hair, top hair, bottom hair;'
-    )
-    style_item_middle = xlwt.easyxf(
-        normal + 'borders: top hair, bottom hair;'
-    )
-    style_item_stop = xlwt.easyxf(
-        normal + 'borders: right hair, top hair, bottom hair;'
-    )
+    # Tuples of memorization sheet cell style, and recall sheet cell style
+    style_item_normal = (xlwt.easyxf(normal), xlwt.easyxf(normal))
+    style_item_single = (
+        xlwt.easyxf(normal + 'borders: left hair, right hair, top hair, bottom hair;'),
+        xlwt.easyxf(normal + 'borders: left thin, right thin, top thin, bottom thin;'))
+    style_item_start = (
+        xlwt.easyxf(normal + 'borders: left hair, top hair, bottom hair;'),
+        xlwt.easyxf(normal + 'borders: left thin, right hair, top thin, bottom thin;'))
+    style_item_middle = (
+        xlwt.easyxf(normal + 'borders: top hair, bottom hair;'),
+        xlwt.easyxf(normal + 'borders: left hair, right hair, top thin, bottom thin;'))
+    style_item_stop = (
+        xlwt.easyxf(normal + 'borders: right hair, top hair, bottom hair;'),
+        xlwt.easyxf(normal + 'borders: left hair, right thin, top thin, bottom thin;'))
 
     def __init__(self, header, **kwargs):
         self.header = header
@@ -323,10 +324,10 @@ class NumberTable(Table):
             self.write_header(self.header)
 
         self.nr_items += 1
-        style = next(self.item_styles)
-        self.sheet_memo.write(self.y_cell, self.x_cell, item, style)
+        style_memo, style_recall = next(self.item_styles)
+        self.sheet_memo.write(self.y_cell, self.x_cell, item, style_memo)
         # Todo: recall sheet: hair -> thin, none -> hair
-        self.sheet_recall.write(self.y_cell, self.x_cell, '', style)
+        self.sheet_recall.write(self.y_cell, self.x_cell, '', style_recall)
         self.next_pos(direction='horizontal')
 
 
@@ -396,13 +397,74 @@ class WordTable(Table):
 
 class DatesTable(Table):
 
-    style_item_normal = (
+    _style_item_normal = (
         'font: name Arial, height 220;'
     )
-    style_item_single = style_item_normal + 'borders: top hair, bottom hair;'
-    style_item_start = style_item_normal + 'borders: top hair;'
-    style_item_middle = style_item_normal
-    style_item_stop = style_item_normal + 'borders: bottom hair;'
+    _style_item_single = _style_item_normal + 'borders: top hair, bottom hair;'
+    _style_item_start = _style_item_normal + 'borders: top hair;'
+    _style_item_middle = _style_item_normal
+    _style_item_stop = _style_item_normal + 'borders: bottom hair;'
+
+    _recall_style_item_normal = (
+        'font: name Arial, height 220;'
+    )
+    _recall_style_item_single = _style_item_normal + 'borders: top thin, bottom thin;'
+    _recall_style_item_start = _style_item_normal + 'borders: top thin, bottom hair;'
+    _recall_style_item_middle = _style_item_normal + 'borders: top hair, bottom hair;'
+    _recall_style_item_stop = _style_item_normal + 'borders: top hair, bottom thin;'
+
+    _left = 'alignment: horizontal left, vertical center;'
+    _right = 'alignment: horizontal right, vertical center;'
+    style_item_normal = (
+        (
+            xlwt.easyxf(_style_item_normal + _left),
+            xlwt.easyxf(_style_item_normal + _right)
+        ),
+        (
+            xlwt.easyxf(_recall_style_item_normal + _left),
+            xlwt.easyxf(_recall_style_item_normal + _right)
+        )
+    )
+    style_item_single = (
+        (
+            xlwt.easyxf(_style_item_single + _left),
+            xlwt.easyxf(_style_item_single + _right)
+        ),
+        (
+            xlwt.easyxf(_recall_style_item_single + _left),
+            xlwt.easyxf(_recall_style_item_single + _right)
+        )
+    )
+    style_item_start = (
+        (
+            xlwt.easyxf(_style_item_start + _left),
+            xlwt.easyxf(_style_item_start + _right)
+        ),
+        (
+            xlwt.easyxf(_recall_style_item_start + _left),
+            xlwt.easyxf(_recall_style_item_start + _right)
+        )
+    )
+    style_item_middle = (
+        (
+            xlwt.easyxf(_style_item_middle + _left),
+            xlwt.easyxf(_style_item_middle + _right)
+        ),
+        (
+            xlwt.easyxf(_recall_style_item_middle + _left),
+            xlwt.easyxf(_recall_style_item_middle + _right)
+        )
+    )
+    style_item_stop = (
+        (
+            xlwt.easyxf(_style_item_stop + _left),
+            xlwt.easyxf(_style_item_stop + _right)
+        ),
+        (
+            xlwt.easyxf(_recall_style_item_stop + _left),
+            xlwt.easyxf(_recall_style_item_stop + _right)
+        )
+    )
 
     def __init__(self, header, **kwargs):
         self.header = header
@@ -422,19 +484,19 @@ class DatesTable(Table):
             self.write_header(self.header)
 
         self.nr_items += 1
-        style = next(self.item_styles)
-        style_story = xlwt.easyxf(style + 'alignment: horizontal left, vertical center;')
-        style_date = xlwt.easyxf(style + 'alignment: horizontal right, vertical center;')
+        ((style_story, style_date),
+         (recall_style_story, recall_style_date)) = next(self.item_styles)
 
-        self.sheet_memo.write(self.y_cell, self.x_cell + 0, self.nr_items, style_date)
-        self.sheet_memo.write(self.y_cell, self.x_cell + 1, str(date), style_date)
-        self.sheet_memo.write(self.y_cell, self.x_cell + 2, '', style_date)
-        self.sheet_memo.write(self.y_cell, self.x_cell + 3, str(story), style_story)
-        # Todo: recall sheet: hair -> thin, none -> hair
-        self.sheet_recall.write(self.y_cell, self.x_cell + 0, self.nr_items, style_date)
-        self.sheet_recall.write(self.y_cell, self.x_cell + 1, '', style_date)
-        self.sheet_recall.write(self.y_cell, self.x_cell + 2, '', style_date)
-        self.sheet_recall.write(self.y_cell, self.x_cell + 3, str(story), style_story)
+        y, x = self.y_cell, self.x_cell
+        self.sheet_memo.write(y, x + 0, self.nr_items, style_date)
+        self.sheet_memo.write(y, x + 1, str(date), style_date)
+        self.sheet_memo.write(y, x + 2, '', style_date)
+        self.sheet_memo.write(y, x + 3, str(story), style_story)
+
+        self.sheet_recall.write(y, x + 0, self.nr_items, recall_style_date)
+        self.sheet_recall.write(y, x + 1, '', recall_style_date)
+        self.sheet_recall.write(y, x + 2, '', recall_style_date)
+        self.sheet_recall.write(y, x + 3, str(story), recall_style_story)
         self.next_pos(direction='vertical')
 
 
