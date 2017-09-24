@@ -278,7 +278,9 @@ class NumberTable(Table):
         'alignment: horizontal center, vertical center;'
     )
     # Tuples of memorization sheet cell style, and recall sheet cell style
-    style_item_normal = (xlwt.easyxf(normal), xlwt.easyxf(normal))
+    style_item_normal = (
+        xlwt.easyxf(normal),
+        xlwt.easyxf(normal + 'borders: left hair, right hair, top hair, bottom hair;'))
     style_item_single = (
         xlwt.easyxf(normal + 'borders: left hair, right hair, top hair, bottom hair;'),
         xlwt.easyxf(normal + 'borders: left thin, right thin, top thin, bottom thin;'))
@@ -406,7 +408,7 @@ class DatesTable(Table):
     _style_item_stop = _style_item_normal + 'borders: bottom hair;'
 
     _recall_style_item_normal = (
-        'font: name Arial, height 220;'
+        'font: name Arial, height 220;' + 'borders: top hair, bottom hair;'
     )
     _recall_style_item_single = _style_item_normal + 'borders: top thin, bottom thin;'
     _recall_style_item_start = _style_item_normal + 'borders: top thin, bottom hair;'
