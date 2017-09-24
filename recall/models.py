@@ -104,7 +104,8 @@ class User(db.Model):
             'pattern_binary': '',
             'pattern_decimals': '',
             'pattern_words': '',
-            'pattern_dates': ''
+            'pattern_dates': '',
+            'pattern_cards': ''
         }
         self.blocked = False
 
@@ -242,6 +243,9 @@ class MemoData(db.Model):
         elif d == 'spoken':
             cls = SpokenData
             discipline = Discipline.spoken
+        elif d == 'cards':
+            cls = CardData
+            discipline = Discipline.cards
         else:
             raise ValueError(f'Invalid discipline form form: "{d}"')
 

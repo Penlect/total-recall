@@ -33,9 +33,9 @@ import recall.models
 restart = True
 if localhost and restart:
     db.metadata.drop_all(db.engine, tables=[
-        #models.MemoData.__table__,
-        #models.RecallData.__table__,
         #models.Correction.__table__,
+        #models.RecallData.__table__,
+        #models.MemoData.__table__,
         #models.User.__table__,
         #models.AlmostCorrectWord.__table__,
     ])

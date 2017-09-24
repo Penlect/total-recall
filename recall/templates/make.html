@@ -123,9 +123,9 @@
                 <h1>Cards</h1>
                 <div class="well cards">
                     <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
-                        <fieldset disabled="disabled">
+                        <fieldset>
                         <input name="discipline" type="hidden" value="cards">
-                        {{ nr_items(max=20000) }}
+                        {{ nr_items(max=1000) }}
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <select name="time" class="form-control">
@@ -267,11 +267,11 @@
                 <h1>Cards</h1>
                 <div class="well cards">
                     <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
-                    <fieldset disabled="disabled">
+                    <fieldset>
                         <input name="discipline" type="hidden" value="cards">
                           <div class="form-group">
                             <div class="col-sm-12">
-                                <textarea class="form-control" name="data" rows="10" placeholder="Not implemented"></textarea>
+                                <textarea class="form-control" name="data" rows="10"></textarea>
                             </div>
                           </div>
                         <div class="form-group">
