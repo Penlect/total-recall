@@ -81,6 +81,7 @@ class Table:
         self.nr_header_rows = nr_header_rows
         self.nr_item_rows = nr_item_rows
         self.nr_page_rows = nr_page_rows
+        self.nr_empty_tail_rows = nr_page_rows - (nr_header_rows + nr_item_rows)
 
         assert nr_page_cols >= left_padding + nr_item_cols
         self.left_padding = left_padding
@@ -148,6 +149,7 @@ class Table:
 
     @property
     def y_header(self):
+        """Index to first row of header in current page"""
         return self.page*self.nr_page_rows
 
     def next_pos(self, direction='horizontal'):
@@ -185,68 +187,88 @@ class Table:
         else:
             raise ValueError(f'Invalid direction: {direction}')
 
+        if self.new_page is True:
+            # Set row heights of trailing empty rows
+            # of last page
+            for i in range(self.nr_empty_tail_rows):
+                index = self.y_header - (i + 1)
+                if index >= 0:
+                    self._set_row_height(index, height=0.45)
+
     def write_header(self, header):
-            # Write header
-            style_title = xlwt.easyxf(
-                'font: name Arial, height 220;'
-                'alignment: horizontal center;'
+        # Write header
+
+        for i in range(self.nr_header_rows):
+            if i == 0:
+                height = 0.50
+            else:
+                height = 0.45
+            self._set_row_height(self.y_header + i, height)
+
+        style_title = xlwt.easyxf(
+            'font: name Arial, height 220;'
+            'alignment: horizontal center;'
+        )
+        style_normal = xlwt.easyxf(
+            'font: name Arial, height 180;'
+            'alignment: horizontal left;'
+        )
+        for sheet in (self.sheet_memo, self.sheet_recall):
+            # Write top Title row
+            sheet.write_merge(
+                # Y-range
+                self.y_header,
+                self.y_header,
+                # X-range
+                header.left_offset,
+                header.left_offset + self.nr_page_cols - 1,
+                # Content
+                header.title,
+                style_title
             )
-            style_normal = xlwt.easyxf(
-                'font: name Arial, height 180;'
-                'alignment: horizontal left;'
+            # Write second header row
+            sheet.write(
+                self.y_header + 1, header.left_offset,
+                f'{header.description}',
+                style_normal
             )
-            for sheet in (self.sheet_memo, self.sheet_recall):
-                # Write top Title row
-                sheet.write_merge(
-                    # Y-range
-                    self.y_header,
-                    self.y_header,
-                    # X-range
-                    header.left_offset,
-                    header.left_offset + self.nr_page_cols - 1,
-                    # Content
-                    header.title,
-                    style_title
-                )
-                # Write second header row
-                sheet.write(
-                    self.y_header + 1, header.left_offset,
-                    f'{header.description}',
-                    style_normal
-                )
-                sheet.write(
-                    self.y_header + 1,
-                    header.left_offset + self.nr_page_cols + header.right_offset,
-                    f'Recall key: {header.recall_key}',
-                    style_normal
-                )
-                # Write third header row
-                sheet.write(
-                    self.y_header + 2, header.left_offset,
-                    f'Memo. time: {header.memo_time} Min',
-                    style_normal
-                )
-                sheet.write(
-                    self.y_header + 2,
-                    header.left_offset + self.nr_page_cols + header.right_offset,
-                    f'Recall time: {header.recall_time} Min',
-                    style_normal
-                )
+            sheet.write(
+                self.y_header + 1,
+                header.left_offset + self.nr_page_cols + header.right_offset,
+                f'Memo id: {header.recall_key}',
+                style_normal
+            )
+            # Write third header row
+            sheet.write(
+                self.y_header + 2, header.left_offset,
+                f'Memo. time: {header.memo_time} Min',
+                style_normal
+            )
+            sheet.write(
+                self.y_header + 2,
+                header.left_offset + self.nr_page_cols + header.right_offset,
+                f'Recall time: {header.recall_time} Min',
+                style_normal
+            )
 
     def set_column_widths(self, widths):
         for i, width in enumerate(widths):
             self.sheet_memo.col(i).width = convert_row_width(width)
             self.sheet_recall.col(i).width = convert_row_width(width)
 
-    def set_row_height(self, height):
-        self.sheet_memo.row(self.y_cell).height_mismatch = True
-        self.sheet_recall.row(self.y_cell).height_mismatch = True
-        self.sheet_memo.row(self.y_cell).height = convert_row_height(height)
-        self.sheet_recall.row(self.y_cell).height = convert_row_height(height)
+    def set_item_row_height(self, height):
+        """Set height of row containing items (self.y_cell used)"""
+        self._set_row_height(self.y_cell, height)
+
+    def _set_row_height(self, row_index, height):
+        self.sheet_memo.row(row_index).height_mismatch = True
+        self.sheet_recall.row(row_index).height_mismatch = True
+        self.sheet_memo.row(row_index).height = convert_row_height(height)
+        self.sheet_recall.row(row_index).height = convert_row_height(height)
+
 
     def save(self, filename):
         self.book.save(filename)
-
 
 
 class NumberTable(Table):
@@ -276,22 +298,25 @@ class NumberTable(Table):
         # The last page_column need to be wider to fit "Row 23"
         self.set_column_widths([0.361]*(self.nr_page_cols - 1) + [2])
 
-
     def add_item(self, item):
         assert 0 <= int(item) <= 9
         item = str(item)
 
         # Check for newline action
         if self.new_row is True:
-            self.set_row_height(height=0.79)
+            self.set_item_row_height(height=0.79)
 
             # Write "Row Nr" on the rightmost side
             style_row_enumeration = xlwt.easyxf(
                 'font: name Arial, height 180;'
                 'alignment: horizontal left, vertical center;'
             )
-            self.sheet_memo.write(self.y_cell, self.nr_page_cols - 1, f'Row {self.y_item + self.page*self.nr_item_rows + 1}', style_row_enumeration)
-            self.sheet_recall.write(self.y_cell, self.nr_page_cols - 1, f'Row {self.y_item + self.page*self.nr_item_rows + 1}', style_row_enumeration)
+            self.sheet_memo.write(self.y_cell, self.nr_page_cols - 1,
+                                  f'Row {self.y_item + self.page*self.nr_item_rows + 1}',
+                                  style_row_enumeration)
+            self.sheet_recall.write(self.y_cell, self.nr_page_cols - 1,
+                                    f'Row {self.y_item + self.page*self.nr_item_rows + 1}',
+                                    style_row_enumeration)
 
         # Check for new page action
         if self.new_page is True:
@@ -346,13 +371,12 @@ class WordTable(Table):
         self.sheet_memo.portrait = False
         self.sheet_recall.portrait = False
 
-
     def add_item(self, item):
         item = str(item)
 
         # Check for newline action
         if self.new_row is True:
-            self.set_row_height(height=0.65)
+            self.set_item_row_height(height=0.65)
 
         # Check for new page action
         if self.new_page is True:
@@ -368,8 +392,6 @@ class WordTable(Table):
         self.sheet_recall.write(self.y_cell, self.x_cell + 1, '', style_B)
         self.sheet_recall.write(self.y_cell, self.x_cell + 2, '', style_C)
         self.next_pos(direction='vertical')
-
-
 
 
 class DatesTable(Table):
@@ -393,7 +415,7 @@ class DatesTable(Table):
 
         # Check for newline action
         if self.new_row is True:
-            self.set_row_height(height=0.55)
+            self.set_item_row_height(height=0.55)
 
         # Check for new page action
         if self.new_page is True:
@@ -531,10 +553,12 @@ if __name__ == '__main__':
     dates = itertools.cycle([('2017', 'Katter kan flyga'),
                              ('2008', 'Hunda vill bli katt'),
                              ('2008', 'Åäö tas bort från svenskan')])
-    for _ in range(1234):
+    for _ in range(12340):
         d.add_item(random.randint(0, 9))
         b.add_item(random.randint(0, 1))
+    for _ in range(1234):
         w.add_item(next(words))
+    for _ in range(300):
         h.add_item(next(dates))
     d.save('Decimal.xls')
     b.save('Binary.xls')
