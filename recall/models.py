@@ -18,6 +18,7 @@ import io
 import math
 import random
 import collections
+import itertools
 
 import sqlalchemy.orm
 from passlib.hash import sha256_crypt
@@ -593,7 +594,14 @@ class CardData(MemoData):
 
     @staticmethod
     def random(nr_items, *args):
-        return tuple(random.randint(0, 51) for _ in range(nr_items))
+
+        def get_card():
+            cards = list(range(52))
+            while True:
+                random.shuffle(cards)
+                yield from cards
+
+        return tuple(c for c in itertools.islice(get_card(), nr_items))
 
     @staticmethod
     def from_text(text):
