@@ -1,0 +1,60 @@
+{% extends "recall.html" %}
+
+{% block css_discipline_specific %}
+<link href="{{ url_for('static', filename='css/recall_numbers.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block subheader %}
+<h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.recall_time }} min Recall</h3>
+{% endblock %}
+
+<!-- This part defines the recall table layout -->
+{% block table_logic %}
+<table border="1px" class="recall_table">
+{% for row_i in range(2) %}
+    <tr class="recall_row">
+        {% for col_i in range(24) %}
+            <td>
+                <input class="recall_cell"
+                       id="recall_cell_{{ row_i*24 + col_i }}"
+                       name="r_{{ row_i*24 + col_i }}"
+                       type="text"
+                       maxlength="1"
+                       size="1"
+                       autocomplete="off"
+                       {% if view is defined %}
+                            value="{{ recall.data[row_i*24 + col_i] }}">
+                       {% else %}
+                            value="">
+                       {% endif %}
+            </td>
+        {% endfor %}
+        <td class="row_enumeration">Row {{ row_i + 1 }}</td>
+    </tr>
+{% if (row_i + 1)%50 == 0%}
+    </table>
+<table border="1px" class="recall_table">
+{% endif %}
+{% endfor %}
+</table>
+{% endblock table_logic %}
+
+{% block instructions %}
+<h3>Controls</h3>
+<dl class="dl-horizontal">
+  <dt></dt>
+  <dd></dd>
+    {% if memo.discipline.name == 'base2' %}
+  <dt><kbd>0</kbd>, <kbd>1</kbd></dt>
+    {% else %}
+  <dt><kbd>0</kbd>, <kbd>1</kbd>, ..., <kbd>8</kbd>, <kbd>9</kbd></dt>
+    {% endif %}
+  <dd>Enter digit to active cell and advance focus to next cell.</dd>
+  <dt><kbd>Backspace</kbd></dt>
+  <dd>Clear active cell and focus previous cell.</dd>
+</dl>
+{% endblock %}
+
+<!-- This part handles what will happen when a key is pressed -->
+{% block keydown%}
+{% endblock keydown%}

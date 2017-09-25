@@ -7,6 +7,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 import math
 import collections
 import json
+import functools
 
 import sqlalchemy.orm
 from passlib.hash import sha256_crypt
@@ -283,6 +284,7 @@ def _user(username, delete_column=False):
     if request.method == 'POST':
         settings = dict(current_user.settings)  # Must have new id
         # Verify patterns
+        settings['card_colors'] = request.form.get('card_colors') == 'on'
         for key in request.form:
             if key.startswith('pattern_'):
                 pattern = request.form[key]
@@ -355,6 +357,13 @@ def download_xls(memo_id: int):
 
     if memo.discipline == models.Discipline.spoken:
         return 'Not possible for discipline Spoken Numbers'
+    elif memo.discipline == models.Discipline.cards:
+        card_colors = request.args.get('card_colors')
+        card_colors = (card_colors == 'True')
+        memo.get_xls_filedata = functools.partial(memo.get_xls_filedata,
+                                                  card_colors=card_colors)
+    else:
+        card_colors = False
 
     # If the current user doesn't own the memorization,
     # he/she is only allowed to download xls if it is
@@ -363,7 +372,7 @@ def download_xls(memo_id: int):
         if memo.state != models.State.public:
             return 'Download not allowed.'
 
-    filename = memo.get_xls_filename(pattern)
+    filename = memo.get_xls_filename(pattern, card_colors)
     fullfile = os.path.join(app.root_path, f'xls/{filename}')
     if not os.path.isfile(fullfile):
         filedata = memo.get_xls_filedata(pattern)
@@ -450,8 +459,12 @@ def recall_(memo_id):
                                data=sorted(memo.data, key=lambda x: x[2]),
                                nr_dates_in_column=NR_DATES_IN_COLUMN,
                                seconds_remaining=seconds_remaining)
+    elif memo.discipline == models.Discipline.cards:
+        return render_template('recall_cards.html', memo=memo,
+                               nr_decks=math.ceil(nr_items/52),
+                               seconds_remaining=seconds_remaining)
     else:
-        return 'Recall not implemented yet: ' + memo.discipline
+        return 'Recall not implemented yet: ' + memo.discipline.name
 
 
 @app.route('/arbeiter', methods=['POST'])

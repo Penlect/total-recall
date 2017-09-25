@@ -105,7 +105,8 @@ class User(db.Model):
             'pattern_decimals': '',
             'pattern_words': '',
             'pattern_dates': '',
-            'pattern_cards': ''
+            'pattern_cards': '',
+            'card_colors': False
         }
         self.blocked = False
 
@@ -308,7 +309,7 @@ class MemoData(db.Model):
                 raw_score += math.ceil(c[Item.correct]/2)
         return raw_score
 
-    def get_xls_filedata(self, pattern):
+    def get_xls_filedata(self, pattern, **kwargs):
         """Take relevant data of memo and create table
 
         The table can later be saved to disk as .xls file
@@ -330,7 +331,7 @@ class MemoData(db.Model):
             recall_time=self.recall_time
         )
         # Create table
-        t = self.xls_table(header=header, pattern=pattern)
+        t = self.xls_table(header=header, pattern=pattern, **kwargs)
         # Update the table with data
         for n in self.data:
             t.add_item(n)
@@ -340,9 +341,12 @@ class MemoData(db.Model):
         filedata.seek(0)
         return filedata
 
-    def get_xls_filename(self, pattern):
+    def get_xls_filename(self, pattern, card_colors):
         filename_fmt = ('{id}_{discipline}_{memo_time}-{recall_time}min'
                         '_{language}_{nr}st_p{pattern_str}.xls')
+        if card_colors:
+            # Used for Cards
+            filename_fmt = filename_fmt.replace('.xls', '_c.xls')
         filename = filename_fmt.format(
             id=self.id,
             discipline=self.discipline.value.replace(' ', '_'),

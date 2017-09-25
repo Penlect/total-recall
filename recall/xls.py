@@ -514,52 +514,48 @@ class StandardDeck:
         return self.card_values[value], self.card_suites[suite]
 
 
+def _card_styles(left, right):
+
+    value = (
+        'font: name Arial, height 260, bold true, color {color};'
+        'alignment: horizontal center, vertical top;'
+        'borders: left {left}, right {right}, top thin;'
+    )
+    suite = (
+        'font: name Arial, height 360, color {color};'
+        'alignment: horizontal center;'
+        'borders: left {left}, right {right}, bottom thin;'
+    )
+
+    return (
+        (
+            # Value styles
+            xlwt.easyxf(value.format(color='black', left=left, right=right)),
+            xlwt.easyxf(value.format(color='red', left=left, right=right)),
+            xlwt.easyxf(value.format(color='blue', left=left, right=right)),
+            xlwt.easyxf(value.format(color='green', left=left, right=right)),
+        ),
+        (
+            # Suite styles
+            xlwt.easyxf(suite.format(color='black', left=left, right=right)),
+            xlwt.easyxf(suite.format(color='red', left=left, right=right)),
+            xlwt.easyxf(suite.format(color='blue', left=left, right=right)),
+            xlwt.easyxf(suite.format(color='green', left=left, right=right)),
+        )
+    )
+
+
 class CardTable(Table):
 
-    normal_value_black = (
-        'font: name Arial, height 260, bold true;'
-        'alignment: horizontal center, vertical top;'
-    )
-    normal_suite_black = (
-        'font: name Arial, height 360;'
-        'alignment: horizontal center;'
-    )
-    normal_value_red = (
-        'font: name Arial, height 260, bold true, color red;'
-        'alignment: horizontal center, vertical top;'
-    )
-    normal_suite_red = (
-        'font: name Arial, height 360, color red;'
-        'alignment: horizontal center;'
-    )
-    style_item_single = (
-        xlwt.easyxf(normal_value_black + 'borders: left thin, right thin, top thin;'),
-        xlwt.easyxf(normal_value_red + 'borders: left thin, right thin, top thin;'),
-        xlwt.easyxf(normal_suite_black + 'borders: left thin, right thin, bottom thin;'),
-        xlwt.easyxf(normal_suite_red + 'borders: left thin, right thin, bottom thin;'),
-    )
+    style_item_single = _card_styles('thin', 'thin')
     style_item_normal = style_item_single
-    style_item_start = (
-        xlwt.easyxf(normal_value_black + 'borders: left thin, right hair, top thin;'),
-        xlwt.easyxf(normal_value_red + 'borders: left thin, right hair, top thin;'),
-        xlwt.easyxf(normal_suite_black + 'borders: left thin, right hair, bottom thin;'),
-        xlwt.easyxf(normal_suite_red + 'borders: left thin, right hair, bottom thin;'),
-    )
-    style_item_middle = (
-        xlwt.easyxf(normal_value_black + 'borders: left hair, right hair, top thin;'),
-        xlwt.easyxf(normal_value_red + 'borders: left hair, right hair, top thin;'),
-        xlwt.easyxf(normal_suite_black + 'borders: left hair, right hair, bottom thin;'),
-        xlwt.easyxf(normal_suite_red + 'borders: left hair, right hair, bottom thin;'),
-    )
-    style_item_stop = (
-        xlwt.easyxf(normal_value_black + 'borders: left hair, right thin, top thin;'),
-        xlwt.easyxf(normal_value_red + 'borders: left hair, right thin, top thin;'),
-        xlwt.easyxf(normal_suite_black + 'borders: left hair, right thin, bottom thin;'),
-        xlwt.easyxf(normal_suite_red + 'borders: left hair, right thin, bottom thin;'),
-    )
+    style_item_start = _card_styles('thin', 'hair')
+    style_item_middle = _card_styles('hair', 'hair')
+    style_item_stop = _card_styles('hair', 'thin')
 
-    def __init__(self, header, **kwargs):
+    def __init__(self, header, card_colors, **kwargs):
         self.header = header
+        self.card_colors = card_colors
         super().__init__(**kwargs)
         self.nr_items = 0
         # The last page_column need to be wider to fit "Row 23"
@@ -586,15 +582,17 @@ class CardTable(Table):
             self.write_header(self.header)
 
         self.nr_items += 1
-        (value_style_black, value_style_red,
-         suite_style_black, suite_style_red) = next(self.item_styles)
+        (value_styles, suite_styles) = next(self.item_styles)
 
-        if item//13 == 0 or item//13 == 3:
-            value_style = value_style_black
-            suite_style = suite_style_black
+        if self.card_colors is True:
+            # Black, Red, Blue, Green
+            value_style = value_styles[item//13]
+            suite_style = suite_styles[item//13]
         else:
-            value_style = value_style_red
-            suite_style = suite_style_red
+            # Black, Red, Red, Black
+            value_style = value_styles[1 if 1 <= item//13 <= 2 else 0]
+            suite_style = suite_styles[1 if 1 <= item//13 <= 2 else 0]
+
         self.sheet_memo.write(self.y_cell, self.x_cell, value, value_style)
         self.sheet_memo.write(self.y_cell + 1, self.x_cell, suite, suite_style)
         self.sheet_memo.write(self.y_cell + 2, self.x_cell, '')
@@ -671,10 +669,11 @@ def get_dates_table(header, pattern):
                     )
 
 
-def get_card_table(header, pattern):
+def get_card_table(header, pattern, card_colors=True):
     header.right_offset = -5
     return CardTable(
                     header=header,
+                    card_colors=card_colors,
                     pattern=pattern,
                     nr_header_rows=7,
                     nr_item_rows=3*4,
