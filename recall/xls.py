@@ -518,7 +518,7 @@ class CardTable(Table):
 
     normal_value_black = (
         'font: name Arial, height 260, bold true;'
-        'alignment: horizontal center, vertical bottom;'
+        'alignment: horizontal center, vertical top;'
     )
     normal_suite_black = (
         'font: name Arial, height 360;'
@@ -526,7 +526,7 @@ class CardTable(Table):
     )
     normal_value_red = (
         'font: name Arial, height 260, bold true, color red;'
-        'alignment: horizontal center, vertical bottom;'
+        'alignment: horizontal center, vertical top;'
     )
     normal_suite_red = (
         'font: name Arial, height 360, color red;'
@@ -573,12 +573,12 @@ class CardTable(Table):
 
         # Check for newline action
         if self.new_row is True:
-            self._set_row_height(self.y_cell, 0.75)
+            self._set_row_height(self.y_cell, 0.55)
             self._set_row_height(self.y_cell + 1, 0.6)
             if self.nr_items%52 == 48:
-                height = 0.6
+                height = 1
             else:
-                height = 0.35
+                height = 0.4
             self._set_row_height(self.y_cell + 2, height)
 
         # Check for new page action
@@ -678,7 +678,7 @@ def get_card_table(header, pattern):
                     pattern=pattern,
                     nr_header_rows=7,
                     nr_item_rows=3*4,
-                    nr_page_rows=50,
+                    nr_page_rows=49,
                     nr_item_cols=24,
                     nr_page_cols=30,
                     item_width=1,
