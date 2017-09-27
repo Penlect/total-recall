@@ -327,8 +327,9 @@ def make_discipline():
     elif request.method == 'POST':
         try:
             memo = models.MemoData.from_request(request, current_user)
-        except models.InvalidHistoricalDate as error:
+        except (models.InvalidHistoricalDate, ValueError) as error:
             return 'Failed to create discipline: ' + str(error)
+
         if len(memo.data) == 0:
             if memo.language is None:
                 return 'Failed to create discipline!'
@@ -573,11 +574,15 @@ def recorrect(recall_id):
 @login_required
 def view_recall(recall_id):
     """View recall"""
-    # Todo: Make sure user is allowed to do this
     try:
         recall = models.RecallData.query.filter_by(id=recall_id).one()
     except sqlalchemy.orm.exc.NoResultFound:
         return f'Does not exists'
+
+    if recall.memo.user_id != current_user.id:
+        if recall.user_id != current_user.id:
+            if recall.memo.state.value != 'Public':
+                return 'Not allowed to view recall!'
 
     # If we reach here, the user is allowed to view recall
     app.logger.info(

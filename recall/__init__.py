@@ -1,8 +1,12 @@
 
 import os
+import json
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+
+with open('score.json', 'r') as score_file:
+    SCORE = json.load(score_file)
 
 app = Flask(__name__)
 # Todo: hide secrets from git
@@ -27,7 +31,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-import recall.views  # Has to be here
+import recall.views
 import recall.models
 
 restart = True
@@ -41,9 +45,3 @@ if localhost and restart:
     ])
 db.create_all()
 
-if False:
-    u1 = models.User('sm2017', 'secret', 'hej@email.se', 'Daniel Andersson', 'Sweden')
-    u2 = models.User('penlect', '123abc', 'email@email.com', 'Kalle Anka', 'Sweden')
-    db.session.add(u1)
-    db.session.add(u2)
-    db.session.commit()

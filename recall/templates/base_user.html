@@ -105,7 +105,7 @@
 
             {% endblock configure_user %}
             {% if user.memos.all()|length > 0 %}
-            <h3>Memorizations</h3>
+            <h3>Disciplines</h3>
             <table class="table table-condensed table-bordered">
                 <thead>
                   <tr>
@@ -130,7 +130,9 @@
                 {% for memo in user.memos %}
                       <tr>
                         <td>{{ memo.id }}</td>
+                          <!-- Discipline -->
                         <td>{{ memo.discipline.value }}</td>
+                          <!-- Memo/recall time -->
                           {% if memo.discipline.name == 'spoken' %}
                             <td>~{{ (memo.data|length/60)|round(2) }} / {{memo.recall_time }}</td>
                           {% else %}
@@ -142,10 +144,9 @@
                           {% else %}
                         <td>-</td>
                           {% endif %}
-
+                          <!-- Memorization units count -->
                         <td>{{ memo.data|length }}</td>
-
-                          <!-- Discipline -->
+                          <!-- Recall Link -->
                         {% if users_home_page or (not users_home_page and memo.state.value == 'Public')%}
                           {% if memo.discipline.name == 'base2' %}
                           <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=user.settings.pattern_binary) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
@@ -166,32 +167,39 @@
 
                           <!-- Recall -->
                           <!-- And if competition, you should only be able to do recall once (if not memo_owner) -->
-                        {% if users_home_page or (not users_home_page and memo.state.value != 'Private')%}
+                        {% if users_home_page or memo.state.value != 'Private'%}
                             {% if memo.discipline.name != 'cards' %}
                                 <td><a href="{{ url_for('recall_', memo_id=memo.id) }}" target="_blank">{{ memo.id }}</a></td>
                             {% else %}
+                                 <!-- Recall of Cards not implemented yet -->
                                  <td>-</td>
                             {% endif %}
                         {% else %}
-                         <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                                <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
                         {% endif %}
 
-                          <!-- State -->
+                      <!-- State -->
                       {% if users_home_page %}
                           {% if memo.state.name == 'private' %}
-                        <td><a href="{{ url_for('change_state', memo_id=memo.id, state='competition') }}" onclick="return confirm('Are you sure?');"> &lt;</a>
+                            <td><a href="{{ url_for('change_state', memo_id=memo.id, state='competition') }}"
+                               onclick="return confirm('Are you sure?');"> &lt;</a>
                             {{ memo.state.value }}</td>
                           {% elif memo.state.name == 'competition' %}
-                        <td><a href="{{ url_for('change_state', memo_id=memo.id, state='public') }}" onclick="return confirm('Are you sure?');"> &lt;</a>
+                            <td><a href="{{ url_for('change_state', memo_id=memo.id, state='public') }}"
+                               onclick="return confirm('Are you sure?');"> &lt;</a>
                             {{ memo.state.value }}
-                            <a href="{{ url_for('change_state', memo_id=memo.id, state='private') }}" onclick="return confirm('Are you sure?');"> &gt;</a></td>
+                            <a href="{{ url_for('change_state', memo_id=memo.id, state='private') }}"
+                               onclick="return confirm('Are you sure?');"> &gt;</a></td>
                           {% elif memo.state.name == 'public' %}
-                        <td>{{ memo.state.value }}
-                            <a href="{{ url_for('change_state', memo_id=memo.id, state='competition') }}" onclick="return confirm('Are you sure?');"> &gt;</a></td>
+                            <td>{{ memo.state.value }}
+                            <a href="{{ url_for('change_state', memo_id=memo.id, state='competition') }}"
+                               onclick="return confirm('Are you sure?');"> &gt;</a></td>
                           {% else %}
-                          {% endif %}
+                          <td>Undefined</td>
+                      {% endif %}
 
-                        {% if delete_column %}
+                        {% if users_home_page and delete_column %}
+                          <!-- Date added-->
                         <td>{{ memo.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                           <!-- Delete -->
                           {% if memo.state.name == 'private' %}
@@ -249,7 +257,7 @@
 
                         <td><a href="{{ url_for('user', username=recall.user.username) }}">{{ recall.user.username }}</a></td>
 
-                          {% if users_home_page or (not users_home_page and (recall.memo.state.value == 'Public' or recall.user.id == current_user.id)) %}
+                          {% if users_home_page or (recall.memo.state.value == 'Public' or recall.user.id == current_user.id) %}
                             <td>{{ recall.correction.points }}</td>
                             <td>{{ recall.correction.raw_score }}</td>
                             <td>{{ recall.correction.correct }}</td>

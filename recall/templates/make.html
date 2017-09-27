@@ -16,7 +16,7 @@
 </div>
 {% endmacro %}
 
-{% macro common_fields(button_name) %}
+{% macro submit_button(button_name) %}
 <div class="form-group">
     <div class="col-sm-12">
         <button type="submit" type="button" class="btn btn-default btn-block">{{ button_name }}</button>
@@ -42,7 +42,7 @@
                 <h1>Binary Numbers</h1>
                 <div class="well binary">
                     <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
-                        <input name="discipline" type="hidden" value="binary">
+                        <input name="discipline" type="hidden" value="base2">
                         {{ nr_items(max=20000) }}
                         <div class="form-group">
                             <div class="col-sm-12">
@@ -52,7 +52,7 @@
                                 </select>
                             </div>
                         </div>
-                        {{ common_fields('Generate') }}
+                        {{ submit_button('Generate') }}
                     </form>
                 </div>
             </div>
@@ -60,7 +60,7 @@
                 <h1>Decimal Numbers</h1>
                 <div class="well decimals">
                     <form class="form-horizontal generate" action="{{ url_for('make_discipline') }}" method="post">
-                        <input name="discipline" type="hidden" value="decimals">
+                        <input name="discipline" type="hidden" value="base10">
                         {{ nr_items(max=10000) }}
                         <div class="form-group">
                             <div class="col-sm-12">
@@ -72,7 +72,7 @@
                                 </select>
                             </div>
                         </div>
-                        {{ common_fields('Generate') }}
+                        {{ submit_button('Generate') }}
                     </form>
                 </div>
             </div>
@@ -94,7 +94,7 @@
                             </div>
                         </div>
                         {{ languages_option() }}
-                        {{ common_fields('Generate') }}
+                        {{ submit_button('Generate') }}
                     </form>
                 </div>
             </div>
@@ -112,7 +112,7 @@
                             </div>
                         </div>
                         {{ languages_option() }}
-                        {{ common_fields('Generate') }}
+                        {{ submit_button('Generate') }}
                     </form>
                 </div>
             </div>
@@ -135,7 +135,7 @@
                                 </select>
                             </div>
                         </div>
-                        {{ common_fields('Generate') }}
+                        {{ submit_button('Generate') }}
                         </fieldset>
                     </form>
                 </div>
@@ -156,7 +156,7 @@
                                 </select>
                             </div>
                         </div>
-                        {{ common_fields('Generate') }}
+                        {{ submit_button('Generate') }}
                     </form>
                 </div>
             </div>
@@ -169,7 +169,7 @@
                 <h1>Binary Numbers</h1>
                 <div class="well binary">
                     <form class="form-horizontal create" action="{{ url_for('make_discipline') }}" method="post">
-                        <input name="discipline" type="hidden" value="binary">
+                        <input name="discipline" type="hidden" value="base2">
                           <div class="form-group">
                             <div class="col-sm-12">
                                 <textarea class="form-control" name="data" rows="10"></textarea>
@@ -183,7 +183,7 @@
                                 </select>
                             </div>
                         </div>
-                        {{ common_fields('Create') }}
+                        {{ submit_button('Create') }}
                     </form>
                 </div>
             </div>
@@ -191,7 +191,7 @@
                 <h1>Decimal Numbers</h1>
                 <div class="well decimals">
                     <form class="form-horizontal create" action="{{ url_for('make_discipline') }}" method="post">
-                        <input name="discipline" type="hidden" value="decimals">
+                        <input name="discipline" type="hidden" value="base10">
                           <div class="form-group">
                             <div class="col-sm-12">
                                 <textarea class="form-control" name="data" rows="10"></textarea>
@@ -207,7 +207,7 @@
                                 </select>
                             </div>
                         </div>
-                        {{ common_fields('Create') }}
+                        {{ submit_button('Create') }}
                     </form>
                 </div>
             </div>
@@ -233,7 +233,7 @@
                             </div>
                         </div>
                         {{ languages_option() }}
-                        {{ common_fields('Create') }}
+                        {{ submit_button('Create') }}
                     </form>
                 </div>
             </div>
@@ -255,7 +255,7 @@
                             </div>
                         </div>
                         {{ languages_option() }}
-                        {{ common_fields('Create') }}
+                        {{ submit_button('Create') }}
                     </form>
                 </div>
             </div>
@@ -283,7 +283,7 @@
                                 </select>
                             </div>
                         </div>
-                        {{ common_fields('Generate') }}
+                        {{ submit_button('Generate') }}
                     </fieldset>
                     </form>
                 </div>
@@ -308,7 +308,7 @@
                                 </select>
                             </div>
                         </div>
-                        {{ common_fields('Generate') }}
+                        {{ submit_button('Generate') }}
                     </form>
                 </div>
             </div>

@@ -1,14 +1,15 @@
-"""
+"""Defines Database table classes
 
-
-User
-MemoData -> User, Language
-RecallData -> User, MemoData
-Correction -> RecallData
-Language
-AlmostCorrectWord -> User, Language
-Word -> Language
-Story -> Language
+Dependency
+----------
+    User
+    MemoData -> User, Language
+    RecallData -> User, MemoData
+    Correction -> RecallData
+    Language
+    AlmostCorrectWord -> User, Language
+    Word -> Language
+    Story -> Language
 
 """
 import enum
@@ -23,20 +24,24 @@ import itertools
 import sqlalchemy.orm
 from passlib.hash import sha256_crypt
 
-from recall import db, app
+from recall import db, SCORE
 import recall.xls
 
 
 class Discipline(enum.Enum):
+    """Define valid disciplines and their official names"""
     base2 = 'Binary Numbers'
     base10 = 'Decimal Numbers'
     words = 'Words'
     dates = 'Historical Dates'
     spoken = 'Spoken Numbers'
     cards = 'Cards'
+    names = 'Names & Faces'
+    images = 'Images'
 
 
 class Item(enum.Enum):
+    """Status of a corrected item of information of a recall"""
     off_limits = 0
     gap = 1
     not_reached = 2
@@ -46,12 +51,14 @@ class Item(enum.Enum):
 
 
 class State(enum.Enum):
+    """State of Discipline"""
     private = 'Private'
     competition = 'Competition'
     public = 'Public'
 
 
 class WordClass(enum.Enum):
+    """Word class type of word"""
     concrete_noun = "Concrete Noun"
     abstract_noun = "Abstract Noun"
     infinitive_verb = "Infinitive Verb"
@@ -70,20 +77,24 @@ def unique_lines_in_textarea(data: str, lower=False):
 
 
 class RegisterUserError(Exception):
+    """User provides bad/invalid data during registration"""
     pass
 
 
 class User(db.Model):
+    # Fields
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
+    # Todo: email not used in any way
     email = db.Column(db.String(120))
     real_name = db.Column(db.String(120))
     country = db.Column(db.String(120))
     settings = db.Column(db.PickleType)
     blocked = db.Column(db.Boolean)
 
+    # Relationships
     memos = db.relationship('MemoData', backref="user",
                             cascade="save-update, merge, delete",
                             lazy='dynamic')
@@ -97,7 +108,7 @@ class User(db.Model):
     def __init__(self, username, password, email, real_name, country):
         self.datetime = datetime.utcnow()
         self.username = self._valid_username(username)
-        self.password = sha256_crypt.encrypt(self._valid_password(password))
+        self.password = sha256_crypt.hash(self._valid_password(password))
         self.email = self._verify_length(email, length=40)
         self.real_name = self._verify_length(real_name, length=30)
         self.country = self._verify_length(country, length=30)
@@ -110,16 +121,6 @@ class User(db.Model):
             'card_colors': False
         }
         self.blocked = False
-
-    @classmethod
-    def from_request(cls, request):
-        return cls(
-            username=request.form['username'].strip().lower(),
-            password=sha256_crypt.encrypt(request.form['password']),
-            email=request.form['email'],
-            real_name=request.form['real_name'],
-            country=request.form['country']
-        )
 
     # https://flask-login.readthedocs.io/en/latest/#your-user-class
     @property
@@ -156,7 +157,7 @@ class User(db.Model):
 
     @staticmethod
     def _valid_password(pwd):
-        """Make sure the username is OK to use as a username"""
+        """Make sure the password is OK to use as a password"""
         MIN_LENGTH = 8
         if len(pwd) < MIN_LENGTH:
             raise RegisterUserError(
@@ -230,10 +231,10 @@ class MemoData(db.Model):
         ip = request.remote_addr
 
         d = form['discipline'].strip().lower()
-        if d == 'binary':
+        if d == 'base2':
             cls = Base2Data
             discipline = Discipline.base2
-        elif d == 'decimals':
+        elif d == 'base10':
             cls = Base10Data
             discipline = Discipline.base10
         elif d == 'words':
@@ -251,7 +252,7 @@ class MemoData(db.Model):
         else:
             raise ValueError(f'Invalid discipline form form: "{d}"')
 
-        memo_time, recall_time = form['time'].strip().lower().split(',')
+        memo_time, recall_time = form['time'].strip().split(',')
         memo_time, recall_time = int(memo_time), int(recall_time)
         language = form.get('language')
         if language:
@@ -264,7 +265,8 @@ class MemoData(db.Model):
                 db.session.commit()
         data = form.get('data')
         nr_items = form.get('nr_items')
-        assert data or nr_items, "data or nr_items must be provided!"
+        if not (data or nr_items):
+            raise ValueError("data or nr_items must be provided!")
 
         generated = data is None
         if generated:
@@ -290,6 +292,7 @@ class MemoData(db.Model):
         return m
 
     def compare(self, guess: int, index: int):
+        """Check if guess match data at index"""
         if int(guess) == self.data[index]:
             return Item.correct
         else:
@@ -297,13 +300,17 @@ class MemoData(db.Model):
 
     @staticmethod
     def _raw_score_digits(cbc_r, row_len):
+        """Algorithm for correcting numerical disciplines
+
+        Trailing off_limits values in cbc_r are not allowed
+        """
         raw_score = 0
-        chunks = [cbc_r[0 + i:row_len + i]
+        rows = [cbc_r[0 + i:row_len + i]
                   for i in range(0, len(cbc_r), row_len)]
-        for i, chunk in enumerate(chunks, start=1):
-            if i == len(chunks):  # Last chunk
-                row_len = len(chunk)
-            c = collections.Counter(chunk)
+        for i, row in enumerate(rows, start=1):
+            if i == len(rows):  # Last chunk
+                row_len = len(row)
+            c = collections.Counter(row)
             if c[Item.correct] == row_len:
                 raw_score += c[Item.correct]
             elif c[Item.correct] == row_len - 1:
@@ -313,8 +320,7 @@ class MemoData(db.Model):
     def get_xls_filedata(self, pattern, **kwargs):
         """Take relevant data of memo and create table
 
-        The table can later be saved to disk as .xls file
-        with the .save() function.
+        The table can later be saved to disk as .xls file.
         """
         # The description include language if available
         nr_items = len(self.data)
@@ -343,6 +349,13 @@ class MemoData(db.Model):
         return filedata
 
     def get_xls_filename(self, pattern, card_colors):
+        """Compute filename of xls file
+
+        The filename must map uniquely to the xls content,
+        since the filename will be used to check if the xls
+        document already exists on the server filesystem,
+        so it should not be recreated.
+        """
         filename_fmt = ('{id}_{discipline}_{memo_time}-{recall_time}min'
                         '_{language}_{nr}st_p{pattern_str}.xls')
         if card_colors:
@@ -359,6 +372,20 @@ class MemoData(db.Model):
             pattern_str=pattern if pattern is not None else ''
         )
         return filename
+
+    def _points_coefficient(self):
+        min = ','.join((str(self.memo_time), str(self.recall_time)))
+        if self.discipline.name == 'spoken':
+            min = '0,0'
+        return SCORE[self.discipline.name][min]
+
+    def points(self, raw_score):
+        try:
+            k = self._points_coefficient()
+        except KeyError:
+            return -1
+        else:
+            return math.ceil(raw_score*1000/k)
 
 
 class Base2Data(MemoData):
@@ -378,14 +405,6 @@ class Base2Data(MemoData):
     def raw_score(self, cbc_r):
         return self._raw_score_digits(cbc_r, 30)
 
-    def points(self, raw_score):
-        if (self.memo_time, self.recall_time) == (5, 15):
-            return math.ceil(raw_score*1000/1178)
-        elif (self.memo_time, self.recall_time) == (30, 60):
-            return math.ceil(raw_score*1000/4673)
-        else:
-            return -1
-
 
 class Base10Data(MemoData):
     __mapper_args__ = {
@@ -403,18 +422,6 @@ class Base10Data(MemoData):
 
     def raw_score(self, cbc_r):
         return self._raw_score_digits(cbc_r, 40)
-
-    def points(self, raw_score):
-        if (self.memo_time, self.recall_time) == (5, 15):
-            return math.ceil(raw_score*1000/547)
-        elif (self.memo_time, self.recall_time) == (15, 30):
-            return math.ceil(raw_score*1000/1112)
-        elif (self.memo_time, self.recall_time) == (30, 60):
-            return math.ceil(raw_score*1000/1752)
-        elif (self.memo_time, self.recall_time) == (60, 120):
-            return math.ceil(raw_score*1000/3234)
-        else:
-            return -1
 
 
 class SpokenData(MemoData):
@@ -441,9 +448,14 @@ class SpokenData(MemoData):
                 break
         return consecutive
 
-    @staticmethod
-    def points(raw_score):
-        return round(math.sqrt(raw_score)*47.3)
+    def points(self, raw_score):
+        """Overrides default implementation"""
+        try:
+            k = self._points_coefficient()
+        except KeyError:
+            return -1
+        else:
+            return round(math.sqrt(raw_score)*k)
 
 
 class WordsData(MemoData):
@@ -499,17 +511,10 @@ class WordsData(MemoData):
         raw_score = math.ceil(raw_score)
         return raw_score
 
-    def points(self, raw_score):
-        if (self.memo_time, self.recall_time) == (5, 15):
-            return math.ceil(raw_score*1000/125)
-        elif (self.memo_time, self.recall_time) == (15, 30):
-            return math.ceil(raw_score*1000/312)
-        else:
-            return -1
-
 
 class InvalidHistoricalDate(Exception):
     pass
+
 
 class DatesData(MemoData):
     __mapper_args__ = {
@@ -527,15 +532,13 @@ class DatesData(MemoData):
     @staticmethod
     def random(nr_items, language):
         stories = [s.story for s in language.stories]
-        if len(stories) < nr_items:
-            nr_items = len(stories)
+        nr_items = min(nr_items, len(stories))
         random.shuffle(stories)
         stories = stories[0:nr_items]
         dates = random.sample(range(1000, 2100), len(stories))
         recall_order = list(range(nr_items))
         random.shuffle(recall_order)
         data = list(zip(dates, stories, recall_order))
-        random.shuffle(data)
         return data
 
     @staticmethod
@@ -581,10 +584,6 @@ class DatesData(MemoData):
         raw_score = max(0, raw_score)
         return raw_score
 
-    @staticmethod
-    def points(raw_score):
-        return math.ceil(raw_score*1000/125)
-
 
 class CardData(MemoData):
     __mapper_args__ = {
@@ -609,16 +608,6 @@ class CardData(MemoData):
 
     def raw_score(self, cbc_r):
         return self._raw_score_digits(cbc_r, 52)
-
-    def points(self, raw_score):
-        if (self.memo_time, self.recall_time) == (10, 30):
-            return math.ceil(raw_score*1000/436)
-        elif (self.memo_time, self.recall_time) == (30, 60):
-            return math.ceil(raw_score*1000/877)
-        elif (self.memo_time, self.recall_time) == (60, 120):
-            return math.ceil(raw_score*1000/1560)
-        else:
-            return -1
 
 
 class RecallData(db.Model):
@@ -691,7 +680,7 @@ class RecallData(db.Model):
         return raw_score, points, cbc_r
 
     def __repr__(self):
-        return f'<RecallData {self.memo_id}>'
+        return f'<RecallData of {self.memo_id}>'
 
 
 class Correction(db.Model):
@@ -703,7 +692,6 @@ class Correction(db.Model):
     correct = db.Column(db.Integer, nullable=False)
     wrong = db.Column(db.Integer, nullable=False)
     almost_correct = db.Column(db.Integer, nullable=False)
-
     consecutive = db.Column(db.Integer, nullable=False)
 
     raw_score = db.Column(db.Float, nullable=False)
@@ -713,7 +701,7 @@ class Correction(db.Model):
     # ForeignKeys
     recall_id = db.Column(db.Integer, db.ForeignKey('recall_data.id'))
 
-    def __init__(self, raw_score, points, cell_by_cell):  # update with __init__
+    def __init__(self, raw_score, points, cell_by_cell):
         c = collections.Counter(cell_by_cell)
 
         self.off_limits = c[Item.off_limits]
@@ -735,6 +723,7 @@ class Correction(db.Model):
         self.cell_by_cell = cell_by_cell
 
     def __iter__(self):
+        """Used for template access"""
         yield from (
             ('off_limits', self.off_limits),
             ('gap', self.gap),
