@@ -257,19 +257,24 @@
 
                         <td><a href="{{ url_for('user', username=recall.user.username) }}">{{ recall.user.username }}</a></td>
 
-                          {% if users_home_page or (recall.memo.state.value == 'Public' or recall.user.id == current_user.id) %}
+                          {% if users_home_page or recall.memo.state.value == 'Public' or recall.user_id == current_user.id or recall.memo.user_id == recall.user_id %}
                             <td>{{ recall.correction.points }}</td>
                             <td>{{ recall.correction.raw_score }}</td>
                             <td>{{ recall.correction.correct }}</td>
                             <td>{{ recall.correction.consecutive }}</td>
                             <td>{{ recall.time_remaining|round(1) }}</td>
-                            <td><a href="{{ url_for('view_recall', recall_id=recall.id) }}">{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</a></td>
                         {% else %}
                             <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
                             <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
                             <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
                             <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
                             <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
+                             <td>{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        {% endif %}
+
+                          {% if users_home_page or recall.memo.state.value == 'Public' or recall.user_id == current_user.id %}
+                            <td><a href="{{ url_for('view_recall', recall_id=recall.id) }}">{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</a></td>
+                        {% else %}
                              <td>{{ recall.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                         {% endif %}
 
