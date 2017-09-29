@@ -59,7 +59,7 @@
             </tr>
         </table>
 
-        {% if view is defined and recall.memo.user_id == current_user.id %}
+        {% if view is defined and recall.memo.user_id == current_user.id and recall.memo.discipline.name == 'words' %}
         <p>
             <a href="{{ url_for('recorrect', recall_id = recall.id) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Re-correct</a>
         </p>

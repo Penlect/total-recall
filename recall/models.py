@@ -562,8 +562,20 @@ class DatesData(MemoData):
             if not (1000 <= int(date) <= 2099):
                 raise InvalidHistoricalDate(
                     f'Date out of range: 1000 <= {date} <= 2099')
-            stories.append(story.strip())
-            dates.append(date)
+            if date in dates:
+                raise InvalidHistoricalDate(
+                    f'Date "{date}" occurs twice.'
+                )
+            else:
+                dates.append(date)
+            story = story.strip()
+            if story in stories:
+                raise InvalidHistoricalDate(
+                    f'Story "{story}" occurs twice.'
+                )
+            else:
+                stories.append(story)
+
         recall_order = list(range(len(stories)))
         random.shuffle(recall_order)
         data = list(zip(dates, stories, recall_order))
@@ -762,6 +774,18 @@ class Language(db.Model):
     def __repr__(self):
         return f'<Language {self.language}>'
 
+    @staticmethod
+    def find_or_add(language):
+        """Find and matching language - add first if does not exist"""
+        try:
+            language = Language.query.filter_by(language=language).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            # Add the language to the database
+            language = Language(language=language)
+            db.session.add(language)
+            db.session.commit()
+        return language
+
 
 class AlmostCorrectWord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -807,6 +831,7 @@ class Word(db.Model):
         self.word_class = word_class
 
     def __str__(self):
+        """Used when exporting as csv"""
         return '{lang},{cls},{word}'.format(
             lang=self.language.language,
             cls=self.word_class.name,
@@ -842,6 +867,7 @@ class Story(db.Model):
         self.story = story
 
     def __str__(self):
+        """Used when exporting as csv"""
         return f'{self.language.language},{self.story}'
 
     def __repr__(self):

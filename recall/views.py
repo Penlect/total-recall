@@ -1,6 +1,5 @@
 
 import os
-import re
 from flask import (render_template, request, jsonify, url_for,
                    flash, redirect, send_from_directory)
 from flask_login import login_user, logout_user, current_user, login_required
@@ -160,10 +159,10 @@ def delete_memo(memo_id):
     memo = models.MemoData.query.get(memo_id)
     if memo is None:
         flash('Can\'t delete memo, not found in database', 'danger')
-    elif memo.user.id != current_user.id:
+    elif memo.user_id != current_user.id:
         flash('You can only delete your own memos', 'danger')
     else:
-        flash(f'Deleted memo {memo_id}', 'success')
+        flash(f'Deleted memo {memo_id}', 'danger')
         db.session.delete(memo)
         db.session.commit()
     return redirect(url_for('user_delete_column', username=current_user.username))
@@ -174,7 +173,7 @@ def delete_memo(memo_id):
 def delete_all_memos():
     for memo in current_user.memos:
         db.session.delete(memo)
-    flash(f'Deleted all memos', 'success')
+    flash(f'Deleted all memos', 'danger')
     db.session.commit()
     return redirect(url_for('user', username=current_user.username))
 
@@ -189,7 +188,7 @@ def delete_recall(recall_id):
         flash('You can only delete recalls for which you own the memorization',
               'danger')
     else:
-        flash(f'Deleted recall {recall_id}', 'success')
+        flash(f'Deleted recall {recall_id}', 'danger')
         db.session.delete(recall)
         db.session.commit()
     return redirect(url_for('user_delete_column', username=current_user.username))
@@ -198,11 +197,12 @@ def delete_recall(recall_id):
 @app.route('/delete/all_recalls')
 @login_required
 def delete_all_recalls():
+    """Delete recalls of (memorizations the user owns)"""
     for memo in current_user.memos:
         for recall in memo.recalls:
             if recall.user_id == current_user.id:
                 db.session.delete(recall)
-    flash(f'Deleted recalls', 'success')
+    flash(f'Deleted recalls', 'danger')
     db.session.commit()
     return redirect(url_for('user', username=current_user.username))
 
@@ -212,7 +212,6 @@ def delete_all_recalls():
 def delete_story():
     story_id = int(request.args.get('story_id'))
     story = models.Story.query.get(story_id)
-    # Todo: only admin users should be able to delete?
     if story is None:
         flash('Can\'t delete story, not found in database', 'danger')
     else:
@@ -227,7 +226,6 @@ def delete_story():
 def delete_word():
     story_id = int(request.args.get('word_id'))
     word = models.Word.query.get(story_id)
-    # Todo: only admin users should be able to delete?
     if word is None:
         flash('Can\'t delete word, not found in database', 'danger')
     else:
@@ -244,6 +242,8 @@ def delete_almost_correct_word():
     mapping = models.AlmostCorrectWord.query.get(story_id)
     if mapping is None:
         flash('Can\'t delete almost-correct-word, not found in database', 'danger')
+    elif mapping.user_id != current_user.id:
+        flash('Not allowed to delete', 'danger')
     else:
         flash(f'Deleted almost-correct-word "{mapping.almost_correct}".', 'danger')
         db.session.delete(mapping)
@@ -255,7 +255,7 @@ def delete_almost_correct_word():
 @login_required
 def change_state(memo_id, state):
     memo = models.MemoData.query.filter_by(id=memo_id).one()
-    if memo.user.id != current_user.id:
+    if memo.user_id != current_user.id:
         return 'Not authorized.'
     state = state.strip().lower()
     for s in models.State:
@@ -361,15 +361,15 @@ def download_xls(memo_id: int):
     elif memo.discipline == models.Discipline.cards:
         card_colors = request.args.get('card_colors')
         card_colors = (card_colors == 'True')
-        memo.get_xls_filedata = functools.partial(memo.get_xls_filedata,
-                                                  card_colors=card_colors)
+        memo.get_xls_filedata = functools.partial(
+            memo.get_xls_filedata, card_colors=card_colors)
     else:
         card_colors = False
 
     # If the current user doesn't own the memorization,
     # he/she is only allowed to download xls if it is
     # public.
-    if memo.user.id != current_user.id:
+    if memo.user_id != current_user.id:
         if memo.state != models.State.public:
             return 'Download not allowed.'
 
@@ -392,7 +392,7 @@ def play_spoken(memo_id: int):
         memo = models.MemoData.query.filter_by(id=memo_id).one()
     except sqlalchemy.orm.exc.NoResultFound:
         return f'Could not find memo for key={memo_id}'
-    if memo.user.id != current_user.id:
+    if memo.user_id != current_user.id:
         if memo.state != models.State.public:
             return 'Play not allowed.'
     app.logger.info(f'{current_user.username} plays {memo}')
@@ -415,7 +415,7 @@ def recall_(memo_id):
         memo = models.MemoData.query.filter_by(id=memo_id).one()
     except sqlalchemy.orm.exc.NoResultFound:
         return f'Does not exists'
-    if memo.user.id != current_user.id:
+    if memo.user_id != current_user.id:
         if memo.state != models.State.competition:
             return 'This memorization is not in Competition-state'
         elif memo.recalls.filter_by(user_id=current_user.id).first():
@@ -560,7 +560,7 @@ def recorrect(recall_id):
         recall = models.RecallData.query.filter_by(id=recall_id).one()
     except sqlalchemy.orm.exc.NoResultFound:
         return f'Does not exists'
-    if recall.memo.user.id != current_user.id:
+    if recall.memo.user_id != current_user.id:
         return 'Not allowed. This user do not own the memorization'
     raw_score, points, cbc_r = recall.correct()
     old = recall.correction
@@ -636,7 +636,7 @@ def view_recall(recall_id):
                                recall=recall,
                                result=json.dumps(dict(recall.correction)))
     else:
-        return 'Recall not implemented yet: ' + recall.memo.discipline
+        return f'Recall not yet implemented for {recall.memo.discipline.value}'
 
 
 @app.route('/database/stories', methods=['GET', 'POST'])
@@ -650,9 +650,9 @@ def db_stories():
 @app.route('/database/stories/csv', methods=['GET'])
 @login_required
 def db_stories_csv():
-    """Words database dashboard"""
+    """Dump stories database as csv"""
     if request.method == 'GET':
-        rows = (str(w) for w in models.Story.query.order_by(
+        rows = (str(s) for s in models.Story.query.order_by(
             models.Story.language_id).all())
         return '<br>'.join(rows)
 
@@ -660,10 +660,12 @@ def db_stories_csv():
 @app.route('/database/stories/table', methods=['GET', 'POST'])
 @login_required
 def table_stories():
-    """Words database dashboard"""
+    """Stories database table"""
     if request.method == 'GET':
+        # User wants to view table of stories
         language = request.args.get('language')
         if language and language.strip().lower() != 'all':
+            # Get all stories of this language
             try:
                 language = models.Language.query.filter_by(
                     language=language.strip().lower()).one()
@@ -672,19 +674,22 @@ def table_stories():
             else:
                 stories = language.stories.order_by(models.Story.story).all()
         else:
+            # Get all stories no matter language
             stories = models.Story.query.order_by(models.Story.story).all()
         return render_template('table_stories.html', stories=stories)
 
     elif request.method == 'POST':
-        language = request.form['language'].strip().lower()
+        # User wants to add stories to the database
         try:
-            language = models.Language.query.filter_by(language=language).one()
-        except sqlalchemy.orm.exc.NoResultFound:
-            language = models.Language(language=language)
-            db.session.add(language)
-            db.session.commit()
-        text_area = request.form['data']
+            language = request.form['language'].strip().lower()
+            text_area = request.form['data']
+        except KeyError as error:
+            flash(f'Failed to get expected form fields: {error}', 'danger')
+            return 'Failed'
+        language = models.Language.find_or_add(language)
         nr_success = 0
+        # Loop over non-empty lines in the text area and interpret
+        # them as historical date stories.
         for line in text_area.split('\n'):
             line = line.strip()
             if line:
@@ -711,6 +716,9 @@ def table_stories():
         elif nr_success > 1:
             flash(f'{nr_success} stories successfully added to the database.',
                   'success')
+        app.logger.info(
+            f'User {current_user.username} submitted stories: '
+            f'nr_success={nr_success}.')
         return 'Done'
 
 
@@ -737,8 +745,10 @@ def db_words_csv():
 def table_words():
     """Words database dashboard"""
     if request.method == 'GET':
+        # User wants to view table of words
         language = request.args.get('language')
         if language and language.strip().lower() != 'all':
+            # Get all words of this Language
             try:
                 language = models.Language.query.filter_by(
                     language=language.strip().lower()).one()
@@ -747,24 +757,27 @@ def table_words():
             else:
                 words = language.words.order_by(models.Word.word).all()
         else:
+            # Get all words no matter language
             words = models.Word.query.order_by(models.Word.word).all()
         distribution = collections.Counter(w.word_class.value for w in words)
         return render_template('table_words.html', words=words,
                                distribution=distribution, nr_words=len(words))
 
     elif request.method == 'POST':
-        language = request.form['language'].strip().lower()
-        word_class = request.form['word_class'].strip().lower()
+        # User wants to add words to the database
         try:
-            language = models.Language.query.filter_by(language=language).one()
-        except sqlalchemy.orm.exc.NoResultFound:
-            language = models.Language(language=language)
-            db.session.add(language)
-            db.session.commit()
-        text_area = request.form['data']
+            language = request.form['language'].strip().lower()
+            word_class = request.form['word_class'].strip().lower()
+            text_area = request.form['data']
+        except KeyError as error:
+            flash(f'Failed to get expected form fields: {error}', 'danger')
+            return 'Failed'
+        language = models.Language.find_or_add(language)
         nr_exist = 0
         nr_added = 0
         nr_updated = 0
+        # Loop over non-empty lines in the text area and interpret
+        # them as words, unique and lower case.
         for line in text_area.split('\n'):
             line = line.strip().lower()
             if line:
@@ -773,11 +786,16 @@ def table_words():
                     if db_word.word_class.name == word_class:
                         nr_exist += 1
                     else:
+                        # Already exist, but different word class - update
                         for wc in models.WordClass:
                             if wc.name == word_class:
                                 db_word.word_class = wc
                                 nr_updated += 1
                                 break
+                        else:
+                            flash(f'Failed to update to word class '
+                                  f'"{word_class}" of "{line}"', 'danger')
+                            return 'Failed'
                     continue
                 try:
                     w = models.Word(
@@ -798,11 +816,15 @@ def table_words():
             flash(f'{nr_exist} word{plural} already exist in database. Not added',
                   'warning')
         if nr_updated > 0:
-            plural = 's' if nr_exist > 1 else ''
+            plural = 's' if nr_updated > 1 else ''
             flash(f'{nr_updated} word{plural} updated in database.', 'success')
         if nr_added > 0:
-            plural = 's' if nr_exist > 1 else ''
+            plural = 's' if nr_added > 1 else ''
             flash(f'{nr_added} word{plural} added to the database.', 'success')
+        app.logger.info(
+            f'User {current_user.username} submitted words: '
+            f'nr_exists={nr_exist}, nr_updated={nr_updated}, '
+            f'nr_added={nr_added}')
         return 'Done'
 
 
@@ -816,8 +838,9 @@ def db_almost_correct_words():
 @app.route('/database/almostcorrectwords/table', methods=['GET', 'POST'])
 @login_required
 def table_almost_correct_words():
-    """Words database dashboard"""
+    """Almost Correct Words database dashboard"""
     if request.method == 'GET':
+        # User wants to view table of almost correct words
         language = request.args.get('language')
         if language and language.strip().lower() != 'all':
             try:
@@ -834,21 +857,20 @@ def table_almost_correct_words():
         return render_template('table_almost_correct_words.html', mappings=mappings)
 
     elif request.method == 'POST':
-        language = request.form['language'].strip().lower()
-        word = request.form['word'].strip().lower()
-        almost_correct = request.form['almost_correct'].strip().lower()
+        # User wants to add almost-correct-word to table
         try:
-            language = models.Language.query.filter_by(language=language).one()
-        except sqlalchemy.orm.exc.NoResultFound:
-            language = models.Language(language=language)
-            db.session.add(language)
-            db.session.commit()
+            language = request.form['language'].strip().lower()
+            word = request.form['word'].strip().lower()
+            almost_correct = request.form['almost_correct'].strip().lower()
+        except KeyError as error:
+            flash(f'Failed to get expected form fields: {error}', 'danger')
+            return 'Failed'
         m = models.AlmostCorrectWord(
             ip=request.remote_addr,
             word=word,
             almost_correct=almost_correct
         )
-        m.language = language
+        m.language = models.Language.find_or_add(language)
         m.user = current_user
         db.session.commit()
         return 'Done'

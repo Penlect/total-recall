@@ -105,7 +105,7 @@
 
             {% endblock configure_user %}
             {% if user.memos.all()|length > 0 %}
-            <h3>Disciplines</h3>
+            <h3>Memos</h3>
             <table class="table table-condensed table-bordered">
                 <thead>
                   <tr>
@@ -182,18 +182,18 @@
                       {% if users_home_page %}
                           {% if memo.state.name == 'private' %}
                             <td><a href="{{ url_for('change_state', memo_id=memo.id, state='competition') }}"
-                               onclick="return confirm('Are you sure?');"> &lt;</a>
+                               onclick="return confirm('Change state to Competition?');"> &lt;</a>
                             {{ memo.state.value }}</td>
                           {% elif memo.state.name == 'competition' %}
                             <td><a href="{{ url_for('change_state', memo_id=memo.id, state='public') }}"
-                               onclick="return confirm('Are you sure?');"> &lt;</a>
+                               onclick="return confirm('Change state to Public?');"> &lt;</a>
                             {{ memo.state.value }}
                             <a href="{{ url_for('change_state', memo_id=memo.id, state='private') }}"
-                               onclick="return confirm('Are you sure?');"> &gt;</a></td>
+                               onclick="return confirm('Change state to Private?');"> &gt;</a></td>
                           {% elif memo.state.name == 'public' %}
                             <td>{{ memo.state.value }}
                             <a href="{{ url_for('change_state', memo_id=memo.id, state='competition') }}"
-                               onclick="return confirm('Are you sure?');"> &gt;</a></td>
+                               onclick="return confirm('Change state to Competition?');"> &gt;</a></td>
                           {% else %}
                           <td>Undefined</td>
                       {% endif %}
