@@ -643,9 +643,28 @@ def view_recall(recall_id):
 @app.route('/database/stories', methods=['GET', 'POST'])
 @login_required
 def db_stories():
-    """Words database dashboard"""
+    """Stories database dashboard"""
     if request.method == 'GET':
         return render_template('db_stories.html')
+
+
+@app.route('/database/stories/capitalize', methods=['GET'])
+@login_required
+def db_stories_capitalize():
+    """Capitalize all stories in the database"""
+    if request.method == 'GET':
+        stories = models.Story.query.all()
+        nr_modified = 0
+        for story in stories:
+            s = story.story
+            new_s = s.capitalize()
+            if s != new_s:
+                story.story = new_s
+                nr_modified += 1
+                db.session.add(story)
+        db.session.commit()
+        flash(f'Nr of stories modified: {nr_modified}', 'success')
+        return redirect(url_for('db_stories'))
 
 
 @app.route('/database/stories/csv', methods=['GET'])
