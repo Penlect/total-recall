@@ -385,7 +385,7 @@ class MemoData(db.Model):
         except KeyError:
             return -1
         else:
-            return math.ceil(raw_score*1000/k)
+            return round(raw_score*1000/k)
 
 
 class Base2Data(MemoData):
