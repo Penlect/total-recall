@@ -21,6 +21,7 @@
                            id="recall_cell_{{ table.index0*100 + col_i*nr_words_in_column + row_i }}"
                            name="r_{{ table.index0*100 + col_i*nr_words_in_column + row_i }}"
                            type="text"
+                           spellcheck="false"
                            autocomplete="off"
                            {% if view is defined %}
                                 value="{{ recall.data[table.index0*100 + col_i*nr_words_in_column + row_i] }}">
