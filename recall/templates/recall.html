@@ -1,4 +1,5 @@
-{% extends "base.html" %}
+
+{% extends "base_navigation.html" %}
 
 {% block css %}
 <link href="{{ url_for('static', filename='css/recall.css') }}" rel="stylesheet">
@@ -9,11 +10,30 @@
 
 {% block body %}
 
+    {% if view is defined %}
+    <!--Only view will have menu-->
+    {{ super() }}
+    {% endif %}
+
+    <div id="recallbody">
+
     <div class="page-header">
-        <h1>{{ current_user.username }}: Recall of memo id={{ memo.id }}</h1>
+        <h1>
+    {% if view is not defined %}
+        {{ current_user.username }}'s
+    {% else %}
+        {{ recall.user.username }}'s
+    {% endif %}
+            recall of memo id =
+    {% if view is not defined %}
+        {{ memo.id }}
+    {% else %}
+        <a href="{{ url_for('user', username=memo.user.username) }}">{{ memo.id }}</a></h1>
+    {% endif %}
+
     </div>
     {% block subheader %}
-    <h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.recall_time }} min Recall</h3>
+    <h3>{{ memo.discipline.value }}, {{ memo.data|length }} st, {{ memo.recall_time }} min</h3>
     {% endblock %}
 
     {% if view is not defined %}
@@ -69,6 +89,8 @@
     <div id="instructions">
         {% block instructions %}
         {% endblock %}
+    </div>
+
     </div>
 
 {% endblock body %}

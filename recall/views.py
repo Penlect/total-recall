@@ -267,7 +267,7 @@ def change_state(memo_id, state):
         return f'Unknown state {state}'
 
 
-@app.route('/users')
+@app.route('/competitions')
 @login_required
 def users():
     users = models.User.query.all()
@@ -540,9 +540,9 @@ def arbeiter():
         correction.recall = recall
         db.session.add(correction)
 
-    app.logger.info(recall.correction)
-
     db.session.commit()
+
+    app.logger.info(recall.correction)
 
     app.logger.info(f'Arbeiter has corrected {recall.user.username}\'s '
                     f'recall of memo {recall.memo.id}')
@@ -574,6 +574,7 @@ def recorrect(recall_id):
 @login_required
 def view_recall(recall_id):
     """View recall"""
+    # Todo: make viewable without being logged in
     try:
         recall = models.RecallData.query.filter_by(id=recall_id).one()
     except sqlalchemy.orm.exc.NoResultFound:
@@ -581,7 +582,7 @@ def view_recall(recall_id):
 
     if recall.memo.user_id != current_user.id:
         if recall.user_id != current_user.id:
-            if recall.memo.state.value != 'Public':
+            if recall.memo.state.value != 'Public' or not recall.locked:
                 return 'Not allowed to view recall!'
 
     # If we reach here, the user is allowed to view recall
