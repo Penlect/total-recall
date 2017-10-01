@@ -458,6 +458,7 @@ swedish,Pojke väljs till ny kung
 swedish,Senator förbjuder abort
 swedish,Uppfinnare
 swedish,Indianfolk visar sig vara utomjordingar
+swedish,Jupiters måne beboelig för människor
 swedish,Olympier vinner rockringar
 swedish,Drottning kröns naken
 swedish,Solvind ger extra ström
@@ -493,9 +494,6 @@ swedish,Äldsta trädet dör
 swedish,Landmärke flyttas
 swedish,Zebras ränder borta
 swedish,Första människan 200 år
-swedish,Dator med två skärmar födds
-swedish,Bin bakar pumpa-paj
-swedish,Skolbuss kör barn till kasino
 swedish,Minnesbank öppnar tillslut
 swedish,Solpaneler svettas
 swedish,Fotbollspelare sparkar domare
@@ -745,168 +743,168 @@ swedish,Häxa räddar delfin
 swedish,Disco stänger vid midnatt
 swedish,Tomten äter renar
 swedish,Mickey Mus skiljer sig
-swedish,bin gör honung
-swedish,floder flödar baklänges
-swedish,solen stiger upp i väst
-swedish,jätteblommor växer
-swedish,nytt hotell i New York
-swedish,ko äter tjur
-swedish,fest i parlamentet
-swedish,unge flyger flygplan
-swedish,första minneslektionen
-swedish,björn lärare i skola
-swedish,snabbköp öppnar i centrum
-swedish,restaurang på månen
+swedish,Bin gör honung
+swedish,Floder flödar baklänges
+swedish,Solen stiger upp i väst
+swedish,Jätteblommor växer
+swedish,Nytt hotell i New York
+swedish,Ko äter tjur
+swedish,Fest i parlamentet
+swedish,Unge flyger flygplan
+swedish,Första minneslektionen
+swedish,Björn lärare i skola
+swedish,Snabbköp öppnar i centrum
+swedish,Restaurang på månen
 swedish,Kinesiska muren faller sönder
-swedish,mus flyttar sekulärt träd
-swedish,apa mins 15 siffror
-swedish,fånge flyr
-swedish,mobiltelefon med ändlöst batteri
-swedish,alla kineser blir veganer
-swedish,äppleträd skördar morötter
-swedish,hundar leker med katter
-swedish,fotbollsspelare med ögonbindel gör mål
-swedish,krokodil studerar geografi
-swedish,präst städar i kyrkan
+swedish,Mus flyttar sekulärt träd
+swedish,Apa mins 15 siffror
+swedish,Fånge flyr
+swedish,Mobiltelefon med ändlöst batteri
+swedish,Alla kineser blir veganer
+swedish,Äppleträd skördar morötter
+swedish,Hundar leker med katter
+swedish,Fotbollsspelare med ögonbindel gör mål
+swedish,Krokodil studerar geografi
+swedish,Präst städar i kyrkan
 swedish,TV slår på sig själv
 swedish,Frihetsgudinnan flyger
-swedish,ny bok om minne
-swedish,apelsiner blir vattenmeloner
-swedish,fiskar går på bergspromenad
-swedish,kanot sjunker i damm
-swedish,motorcykeltrehjuling välter
-swedish,ångmaskin uppfinns
-swedish,häst lider av matsmältningsbesvär
-swedish,snickare tappar bort hammare
-swedish,olympisk pool i trädgård
+swedish,Ny bok om minne
+swedish,Apelsiner blir vattenmeloner
+swedish,Fiskar går på bergspromenad
+swedish,Kanot sjunker i damm
+swedish,Motorcykeltrehjuling välter
+swedish,Ångmaskin uppfinns
+swedish,Häst lider av matsmältningsbesvär
+swedish,Snickare tappar bort hammare
+swedish,Olympisk pool i trädgård
 swedish,Mars slutar rotera
-swedish,pc sänder e-post själv
-swedish,cyklist cyklar jorden runt
-swedish,modell tappar en sko
-swedish,indian åker utomlands
-swedish,faraon återuppstår
-swedish,skatt hittas
-swedish,doktor blir sjuk
-swedish,träd gifter sig
-swedish,barn lägger sig aldrig
-swedish,orm äter en val
+swedish,Pc sänder e-post själv
+swedish,Cyklist cyklar jorden runt
+swedish,Modell tappar en sko
+swedish,Indian åker utomlands
+swedish,Faraon återuppstår
+swedish,Skatt hittas
+swedish,Doktor blir sjuk
+swedish,Träd gifter sig
+swedish,Barn lägger sig aldrig
+swedish,Orm äter en val
 swedish,UFO landar på flygplats
-swedish,överviktig blir olympisk mästare
-swedish,kängurur blir förkyld
-swedish,skådis uppträder i skola
-swedish,lärare glömmer multiplikationstabellen
-swedish,blomstercigarett uppfunnen
-swedish,tempel svämmar över
-swedish,man vinner 1.000.000 dollar
-swedish,självtvättande kläder uppfinns
-swedish,pingvin går på semester
-swedish,mamut rakar sig
-swedish,lamm klagar på påsken
-swedish,solen byter färg
-swedish,kaktus dör uttorkad
-swedish,räv stjäl kycklingar
-swedish,taxin jobbar gratis
-swedish,bowling spelas på kontor
-swedish,fjärilssamling säljs
-swedish,havet torkar ut
-swedish,ny dinosaurie funnen
-swedish,schackparti spelas på Venus
-swedish,tecknad film obligatorisk i skolan
-swedish,kortlek memorerad på mars
-swedish,flygande båt uppfinns
-swedish,papegoja läser dikter
-swedish,grönt hår obligatorisk
+swedish,Överviktig blir olympisk mästare
+swedish,Kängurur blir förkyld
+swedish,Skådis uppträder i skola
+swedish,Lärare glömmer multiplikationstabellen
+swedish,Blomstercigarett uppfunnen
+swedish,Tempel svämmar över
+swedish,Man vinner 1.000.000 dollar
+swedish,Självtvättande kläder uppfinns
+swedish,Pingvin går på semester
+swedish,Mamut rakar sig
+swedish,Lamm klagar på påsken
+swedish,Solen byter färg
+swedish,Kaktus dör uttorkad
+swedish,Räv stjäl kycklingar
+swedish,Taxin jobbar gratis
+swedish,Bowling spelas på kontor
+swedish,Fjärilssamling säljs
+swedish,Havet torkar ut
+swedish,Ny dinosaurie funnen
+swedish,Schackparti spelas på Venus
+swedish,Tecknad film obligatorisk i skolan
+swedish,Kortlek memorerad på mars
+swedish,Flygande båt uppfinns
+swedish,Papegoja läser dikter
+swedish,Grönt hår obligatorisk
 swedish,Cicero lär sig franska
-swedish,shejk blir vegetarian
-swedish,urin blir bilbränsle
-swedish,vänligen gå upp och ner
-swedish,floder blir salta
-swedish,flygplan på motorvägen
-swedish,utomjordingar ställer upp i val
-swedish,första klädesplagget helt i hår
-swedish,flaska korkas upp på Saturnus
+swedish,Shejk blir vegetarian
+swedish,Urin blir bilbränsle
+swedish,Vänligen gå upp och ner
+swedish,Floder blir salta
+swedish,Flygplan på motorvägen
+swedish,Utomjordingar ställer upp i val
+swedish,Första klädesplagget helt i hår
+swedish,Flaska korkas upp på Saturnus
 swedish,Nordpolen inviger tunnelbana
-swedish,rosa isbjörn upptäcks
-swedish,fågel stor som en b747:a
-swedish,nyfödd blir president
-swedish,katter förflyttar sig cyklandes enbart
-swedish,shrek dubbas till riddare
-swedish,babian dansar på teater
-swedish,månen ramlar i havet
-swedish,blinkande stjärnor
-swedish,man med två hjärnor hittad
-swedish,skatter förbjuds
-swedish,man spelar på glas
-swedish,värdinna kränker passagerare
-swedish,pilot sover under flygning
-swedish,fabrikshammare uppfinns
-swedish,drake spottar såpbubblor
-swedish,apa använder nagellack
-swedish,svarta tänder på modet
-swedish,nytt Eiffeltorn i Rom
-swedish,påven dansar twist
-swedish,skidåkning i tofflor
+swedish,Rosa isbjörn upptäcks
+swedish,Fågel stor som en b747:a
+swedish,Nyfödd blir president
+swedish,Katter förflyttar sig cyklandes enbart
+swedish,Shrek dubbas till riddare
+swedish,Babian dansar på teater
+swedish,Månen ramlar i havet
+swedish,Blinkande stjärnor
+swedish,Man med två hjärnor hittad
+swedish,Skatter förbjuds
+swedish,Man spelar på glas
+swedish,Värdinna kränker passagerare
+swedish,Pilot sover under flygning
+swedish,Fabrikshammare uppfinns
+swedish,Drake spottar såpbubblor
+swedish,Apa använder nagellack
+swedish,Svarta tänder på modet
+swedish,Nytt Eiffeltorn i Rom
+swedish,Påven dansar twist
+swedish,Skidåkning i tofflor
 swedish,Bigfoot flyttar till centrum
-swedish,första skyskrapan på hjul
-swedish,fotbollsspelare kränker domare
-swedish,sköldpadda vinner tävlingsrace
-swedish,snigel tappar sitt saliv
-swedish,loppa slår höjdhoppsrekord
-swedish,mask gifter sig med kameleont
-swedish,kyckling tar examen från Harvard
-swedish,första 3D iPaden
-swedish,myra korsar Atlanten
-swedish,första flygande ubåten
-swedish,elefanter migrerar till London
-swedish,studenter strejkar
-swedish,struts slåss i rink
-swedish,första resan genom teleportering
-swedish,ingenjörer uppfinner flygande tefat
-swedish,utomjordingar borstar sig
-swedish,hundar cyklar till parken
-swedish,barberare använder motorsåg
-swedish,kamel passerar genom Alaska
-swedish,det regnar champinjoner
-swedish,kudduppror
+swedish,Första skyskrapan på hjul
+swedish,Fotbollsspelare kränker domare
+swedish,Sköldpadda vinner tävlingsrace
+swedish,Snigel tappar sitt saliv
+swedish,Loppa slår höjdhoppsrekord
+swedish,Mask gifter sig med kameleont
+swedish,Kyckling tar examen från Harvard
+swedish,Första 3D iPaden
+swedish,Myra korsar Atlanten
+swedish,Första flygande ubåten
+swedish,Elefanter migrerar till London
+swedish,Studenter strejkar
+swedish,Struts slåss i rink
+swedish,Första resan genom teleportering
+swedish,Ingenjörer uppfinner flygande tefat
+swedish,Utomjordingar borstar sig
+swedish,Hundar cyklar till parken
+swedish,Barberare använder motorsåg
+swedish,Kamel passerar genom Alaska
+swedish,Det regnar champinjoner
+swedish,Kudduppror
 swedish,Morotsmaskin uppfunnen
-swedish,lärare fallerar
-swedish,makak tar körkort
-swedish,pyjamasparty på kontor
-swedish,staty mediterar
-swedish,begravning i vardagsrum
-swedish,strippa blir nunna
-swedish,socka tar en dusch
-swedish,smed träffar städ
-swedish,blackout i savannah
-swedish,pengar växer på träd
-swedish,bisonoxe möter mentalatlet
-swedish,berg går till havet
-swedish,barn blir flintskalliga
-swedish,paraply röker cigarett
-swedish,penna vägrar skriva
-swedish,bord öppnar kontor
+swedish,Lärare fallerar
+swedish,Makak tar körkort
+swedish,Pyjamasparty på kontor
+swedish,Staty mediterar
+swedish,Begravning i vardagsrum
+swedish,Strippa blir nunna
+swedish,Socka tar en dusch
+swedish,Smed träffar städ
+swedish,Blackout i savannah
+swedish,Pengar växer på träd
+swedish,Bisonoxe möter mentalatlet
+swedish,Berg går till havet
+swedish,Barn blir flintskalliga
+swedish,Paraply röker cigarett
+swedish,Penna vägrar skriva
+swedish,Bord öppnar kontor
 swedish,Osynlighetsformel upptäcks
-swedish,karamell kväver krokodil
-swedish,moskit krossar elefant
-swedish,bly förvandlas till guld
-swedish,samuraj tappar sitt svärd
-swedish,bensinstation delar ut Nutella
-swedish,fred mellan utomjordingar och människor
-swedish,babian slarvar bort husnycklar
-swedish,stor smurf vaxar sina ben
-swedish,skilsmässa mellan ekorre och räv
-swedish,dinosaur upptäcker behandling mot cancer
-swedish,jordmask paralyserad
-swedish,första människan klonas
-swedish,tunnelbana mellan Paris – New York
+swedish,Karamell kväver krokodil
+swedish,Moskit krossar elefant
+swedish,Bly förvandlas till guld
+swedish,Samuraj tappar sitt svärd
+swedish,Bensinstation delar ut Nutella
+swedish,Fred mellan utomjordingar och människor
+swedish,Babian slarvar bort husnycklar
+swedish,Stor smurf vaxar sina ben
+swedish,Skilsmässa mellan ekorre och räv
+swedish,Dinosaur upptäcker behandling mot cancer
+swedish,Jordmask paralyserad
+swedish,Första människan klonas
+swedish,Tunnelbana mellan Paris – New York
 swedish,TV blir förkyld
-swedish,siamesiska tvillingar delas
-swedish,banan får nobelpriset
-swedish,tangerin tar semester
-swedish,bok börjar flyga
-swedish,skräptiggeri på gatan
-swedish,glassförsäljare kör en vagn
-swedish,ny minnesdrink
+swedish,Siamesiska tvillingar delas
+swedish,Banan får nobelpriset
+swedish,Tangerin tar semester
+swedish,Bok börjar flyga
+swedish,Skräptiggeri på gatan
+swedish,Glassförsäljare kör en vagn
+swedish,Ny minnesdrink
 swedish,Drottning besöker Legoland
 swedish,Banan används som boomerang
 swedish,Minnesträning blir olagligt
@@ -1001,6 +999,9 @@ swedish,Radioreporter intervjuar fotbollsspelare
 swedish,Basketboll ny nationalsport
 swedish,GPS systemet stängs ner
 swedish,Landkrabba lär sig simma
+swedish,Kycklingar utan fjädrar föds
+swedish,Ägg ny diet
+swedish,Botemedel för diabetes
 swedish,Vindkraft täcker all energibehov
 swedish,Kiwi ger superkrafter
 swedish,Minnesimplantat möjliga
@@ -1154,9 +1155,6 @@ swedish,Tunnel stängs
 swedish,Ö med talande djur upptäcks
 swedish,Ödlor flyttar till havet
 swedish,Bilar med fyrkantiga hjul
-swedish,Kycklingar utan fjädrar föds
-swedish,Ägg ny diet
-swedish,Botemedel för diabetes
 swedish,Skatt på socker införs
 swedish,TV-spels VM hålls i Köpenhamn
 swedish,Thailand får ny kung
@@ -1165,7 +1163,6 @@ swedish,Opera spelar hårdrock
 swedish,Lastbil lastar för mycket
 swedish,Flygplan landar på månen
 swedish,Bemannad resa till Mars
-swedish,Jupiters måne beboelig för människor
 swedish,Pluto lämnar solsystemet
 swedish,Kvantfysiken visar sig vara lögn
 swedish,Universum upptäcks vara en hallucination
@@ -1679,6 +1676,9 @@ swedish,Världens största pizza bakas
 swedish,Präst konverterar till Buddism
 swedish,Party på kontor
 swedish,Hundra år gammalt träd berättar sagor
+swedish,Dator med två skärmar födds
+swedish,Bin bakar pumpa-paj
+swedish,Skolbuss kör barn till kasino
 swedish,Bröllop i kyrkan förbjuds
 swedish,Delfiner visar sig vara smartast
 swedish,Oliksinnade tvingas tänka lika
@@ -1994,9 +1994,6 @@ swedish,Forskare fångad av terrorist
 swedish,Ryskt drama blir Hollywood succé
 swedish,Norrsken upphör att existera
 swedish,Appa kör bil
-english,Surgeon operates on gnomes
-english,Chinese becomes world language
-english,Wolf attacks cheetah
 english,Missing ducks found again
 english,Plague of leeches strikes town
 english,Sheep with tartan wool bred
@@ -2230,7 +2227,7 @@ english,TV reporter resigns
 english,Water polo World Cup on land
 english,Fairy princess tired of pink
 english,God revealed
-english,fairy-tale prince falls off horse
+english,Fairy-tale prince falls off horse
 english,Female president in China
 english,Snow White gets a cold
 english,Prince rides home
@@ -2313,127 +2310,130 @@ english,Analogue cameras scrapped
 english,Cats stop eating fish
 english,Santa eats a reindeer
 english,Mickey Mouse divorces
-english,bees make chocolate
-english,rivers flow backwards
-english,sun rises in the West
-english,giant flowers grow
-english,new hotel in New York
-english,cow eats bull
-english,party at the parliament
-english,kid pilots a plane
-english,first memory lesson
-english,bear teaches at school
-english,supermarket open downtown
-english,restaurant on the moon
+english,Bees make chocolate
+english,Rivers flow backwards
+english,Sun rises in the West
+english,Giant flowers grow
+english,New hotel in New York
+english,Cow eats bull
+english,Party at the parliament
+english,Kid pilots a plane
+english,First memory lesson
+english,Bear teaches at school
+english,Supermarket open downtown
+english,Restaurant on the moon
 english,Chinese Great Wall falls down
-english,mouse mows secular tree
-english,monkey remembers 15 numbers
-english,prisoner escapes
-english,endless battery cell phones
-english,all Chinese become vegan
-english,apple tree gives carrots
-english,dogs play with cats
-english,football player scores blindfolded
-english,crocodile studies geography
-english,priest cleans the church up
+english,Mouse mows secular tree
+english,Monkey remembers 15 numbers
+english,Prisoner escapes
+english,Endless battery cell phones
+english,All Chinese become vegan
+english,Apple tree gives carrots
+english,Dogs play with cats
+english,Football player scores blindfolded
+english,Crocodile studies geography
+english,Priest cleans the church up
 english,TV switches on by itself
 english,Statue of Liberty flies
-english,new book on memory
-english,oranges become watermelons
-english,fishes go on mountain trip
-english,canoe sinks in a puddle
+english,New book on memory
+english,Oranges become watermelons
+english,Fishes go on mountain trip
+english,Canoe sinks in a puddle
 english,3-wheel motorbike tips over
-english,steam machine invented
-english,horse suffers from indigestion
-english,carpenter looses his hammer
-english,olympic pool in the garden
+english,Steam machine invented
+english,Horse suffers from indigestion
+english,Carpenter looses his hammer
+english,Olympic pool in the garden
 english,Mars stops rotating
-english,pc sends email by itself
-english,cyclist makes world tour
-english,model looses a shoe
+english,Pc sends email by itself
+english,Cyclist makes world tour
+english,Model looses a shoe
 english,Indian goes abroad
 english,Pharaoh revives
-english,treasure founded out
-english,doctor gets sick
-english,trees get married
-english,kids never go to bed
-english,snake eats a whale
+english,Treasure founded out
+english,Doctor gets sick
+english,Trees get married
+english,Kids never go to bed
+english,Snake eats a whale
 english,UFO lands at the airport
-english,obese become Olympic champion
-english,kangaroo catches a cold
-english,actor performs at school
-english,teacher forgets multiplication table
-english,flower cigarette invented
-english,temple gets flooded
-english,man wins 1.000.000 dollars
-english,self-cleaning clothes invented
-english,penguin goes on holidays
-english,mammoth shaves
-english,lambs complain for Easter
-english,sun changes colour
-english,cactus dies dehydrated
-english,fox steals chickens
-english,taxis work for free
-english,bowling is played at the office
-english,butterflies collection sold
-english,sea dries off
-english,new dinosaur founded out
-english,chess match on Venus
-english,cartoons compulsory at school
-english,card deck memorized on Mars
-english,flying boat invented
-english,parrot says poems
-english,green hair compulsory
+english,Obese become Olympic champion
+english,Kangaroo catches a cold
+english,Actor performs at school
+english,Teacher forgets multiplication table
+english,Flower cigarette invented
+english,Temple gets flooded
+english,Man wins 1.000.000 dollars
+english,Self-cleaning clothes invented
+english,Penguin goes on holidays
+english,Mammoth shaves
+english,Lambs complain for Easter
+english,Sun changes colour
+english,Cactus dies dehydrated
+english,Fox steals chickens
+english,Taxis work for free
+english,Bowling is played at the office
+english,Butterflies collection sold
+english,Sea dries off
+english,New dinosaur founded out
+english,Chess match on Venus
+english,Cartoons compulsory at school
+english,Card deck memorized on Mars
+english,Flying boat invented
+english,Parrot says poems
+english,Green hair compulsory
 english,Cicero learns French
-english,shake becomes vegetarian
-english,pee as car fuel
-english,please walk upside down
-english,rivers become salted
-english,planes on the highway
-english,aliens candidate for elections
-english,first clothes made of hair
-english,fizz uncorked on Saturn
+english,Shake becomes vegetarian
+english,Pee as car fuel
+english,Please walk upside down
+english,Rivers become salted
+english,Planes on the highway
+english,Aliens candidate for elections
+english,First clothes made of hair
+english,Fizz uncorked on Saturn
 english,North Pole inaugurates new underground
-english,pink polar bear discovered
-english,bird big as a b747
-english,new born for president
-english,cats only move by bike
-english,shrek appointed knight
-english,baboon dancing at the theatre
-english,moon falls in the sea
-english,blinking stars
+english,Pink polar bear discovered
+english,Bird big as a b747
+english,New born for president
+english,Cats only move by bike
+english,Shrek appointed knight
+english,Baboon dancing at the theatre
+english,Moon falls in the sea
+english,Blinking stars
 english,2-brain man discovered
-english,taxes banished
-english,man plays glasses
-english,hostess offends passenger
-english,pilot sleeps while driving
-english,fabric hammer invented
-english,dragoon spits soap bubbles
-english,monkey uses nail polish
-english,black teeth in fashion
-english,new Eiffel tower in Rome
+english,Taxes banished
+english,Man plays glasses
+english,Hostess offends passenger
+english,Pilot sleeps while driving
+english,Fabric hammer invented
+english,Dragoon spits soap bubbles
+english,Monkey uses nail polish
+english,Black teeth in fashion
+english,New Eiffel tower in Rome
 english,Pope dancing twist
-english,skiing in slippers
+english,Skiing in slippers
 english,Big Foot moves downtown
-english,first skyscraper on wheels
-english,football player offend referee
-english,tortoise wins speed race
-english,snail looses saliva
-english,flea makes highest jump ever
-english,grass snake marries chameleon
-english,chicken graduates at Harvard
-english,first 3D iPad
-english,ant crosses the Atlantic
-english,first flying submarine
-english,elephants migrate to London
-english,students on strike
-english,ostrich fights on the ring
-english,first trip with teleportation
-english,engineers design a flying saucer
-english,alien brushes
-english,dogs biking to the park
-english,barbers using chainsaw
-english,camel passing through Alaska
+english,First skyscraper on wheels
+english,Football player offend referee
+english,Tortoise wins speed race
+english,Snail looses saliva
+english,Flea makes highest jump ever
+english,Grass snake marries chameleon
+english,Chicken graduates at Harvard
+english,First 3D iPad
+english,Ant crosses the Atlantic
+english,First flying submarine
+english,Elephants migrate to London
+english,Students on strike
+english,Ostrich fights on the ring
+english,First trip with teleportation
+english,Engineers design a flying saucer
+english,Alien brushes
+english,Dogs biking to the park
+english,Barbers using chainsaw
+english,Camel passing through Alaska
+english,It snows mushrooms
+english,Queen steps down
+english,Pillow insurrection
 english,Construction Worker strike
 english,Cars with square wheels
 english,Counterfeit banknotes detected
@@ -2653,6 +2653,9 @@ english,Pilot afraid of flying
 english,Farmer grows GMO rapeseed
 english,Cows give cream
 english,Opera via video link
+english,Painter paints king
+english,Solar wind gives extra power
+english,Northern Lights cease to exist
 english,Nose starts runninng
 english,Robot learns speaking
 english,Martians attack the Venus
@@ -2718,7 +2721,7 @@ english,Bull jumps on audience tribune
 english,Burqa ban rejected
 english,Cancer can be healed
 english,Woman phones 700 hours continuously
-english,iPad production suspended
+english,IPad production suspended
 english,Bus collides with rubbish cart
 english,Musician falls off the stage
 english,Death sentence abolished in US
@@ -2791,48 +2794,45 @@ english,Monthly bus ticket los
 english,Welder prevents pipe burst
 english,World map is redrawn
 english,Carrots stimulate hair growth
-english,it snows mushrooms
-english,queen steps down
-english,pillow insurrection
-english,carrot machine invented
-english,teacher fails
-english,macaque has driving licence
-english,pyjama party at the office
-english,statue on meditation
-english,funeral in the living room
-english,stripper becomes nun
-english,sock gets a shower
-english,blacksmith hits the anvil
-english,blackout in the savannah
-english,money growing on trees
-english,bison faces mental athlete
-english,mountain goes to the seaside
-english,kids becomes bald
-english,umbrella smokes a cigarette
-english,pen refuses writing
-english,table opens a company
-english,invisibility formula discovered
-english,candy smothers crocodile
-english,mosquito squashes elephant
-english,lead transformed in gold
-english,samurai looses his sword
-english,gas station hands out Nutella
-english,peace between aliens and humans
-english,baboon looses house keys
-english,big smurf waxes his legs
-english,divorce between squirrel and fox
-english,dinosaur discovers treatment against cancer
-english,earthworm paralyzed
-english,first human cloning
+english,Carrot machine invented
+english,Teacher fails
+english,Macaque has driving licence
+english,Pyjama party at the office
+english,Statue on meditation
+english,Funeral in the living room
+english,Stripper becomes nun
+english,Sock gets a shower
+english,Blacksmith hits the anvil
+english,Blackout in the savannah
+english,Money growing on trees
+english,Bison faces mental athlete
+english,Mountain goes to the seaside
+english,Kids becomes bald
+english,Umbrella smokes a cigarette
+english,Pen refuses writing
+english,Table opens a company
+english,Invisibility formula discovered
+english,Candy smothers crocodile
+english,Mosquito squashes elephant
+english,Lead transformed in gold
+english,Samurai looses his sword
+english,Gas station hands out Nutella
+english,Peace between aliens and humans
+english,Baboon looses house keys
+english,Big smurf waxes his legs
+english,Divorce between squirrel and fox
+english,Dinosaur discovers treatment against cancer
+english,Earthworm paralyzed
+english,First human cloning
 english,Paris-New York underground tunnel
 english,TV gets a cold
 english,Siamese twins divided
-english,noble prize to a banana
-english,tangerine goes on holidays
-english,book starts to fly
-english,rubbish begging on the street
-english,ice cream man drives a hand-cart
-english,new memory drink
+english,Noble prize to a banana
+english,Tangerine goes on holidays
+english,Book starts to fly
+english,Rubbish begging on the street
+english,Ice cream man drives a hand-cart
+english,New memory drink
 english,Queen visits Legoland
 english,Banana used as boomerang
 english,Memory training made illegal
@@ -2988,9 +2988,6 @@ english,President re-elected for 5th time
 english,Transparent door invented
 english,Most poisonous spider poisons itself
 english,Grocery shop stops selling food
-english,Painter paints king
-english,Solar wind gives extra power
-english,Northern Lights cease to exist
 english,Gymnastics in school considered dangerous
 english,Auction of painting breaks record
 english,President tap dances at prom
@@ -3130,6 +3127,9 @@ english,Photographer takes picture of princess
 english,Postman sings opera
 english,Artist is lost in jungle
 english,Footballer saves penalty
+english,Surgeon operates on gnomes
+english,Chinese becomes world language
+english,Wolf attacks cheetah
 english,Dog learns to speak
 english,Cat appears in circus
 english,Parrot wins World Memory Championship
@@ -3614,156 +3614,162 @@ german,Mann springt von einer Klippe
 german,Zeltlager wird aufgebrochen
 german,Salsa Tänzer tanzen Samba
 german,Internet wird wieder langsam
-german,honden leren spreken
-german,kat verschijnt in circus
-german,papegaai wint wereldgeheugenkampioenschap
-german,aap vliegt in raket
-german,mammoet opnieuw geboren
-german,vogels stoppen met vliegen
-german,laatste blauwe walvis overlijdt
-german,vis gevonden op Jupiter
-german,pluto krijgt nieuwe naam
-german,nieuwe reuzen planeet gevonden
-german,kopie van aarde ontdekt
-german,aliens landen op antarticia
-german,start van nieuwe ijstijd
-german,koolzuurgas niveau in atmosfeer gezakt
-german,temperatuur stijgt 5 graden
-german,langste mens overlijdt
-german,wereldtaal geintroduceerd
-german,warmste zomer ooit in Zweden
-german,eerste breintransplantatie operatie
-german,gekloonde preseident overlijdt
-german,verkiezing afgelast
-german,democratisch land introduceert dictatorschap
-german,geheugenkampioen wordt president
-german,clown wint wereldkampioenschap dansen
-german,kappen verboden
-german,verraders vluchten van aarde
-german,eerste geslachtsverandering
-german,organen groeien in laboratorium
-german,leraren gaan staken
-german,alleen rode appels groeien
-german,watermeloen wordt zuur
-german,fruitboom wordt 1000 jaar
-german,wolkenkrabber wordt boos
-german,vliegtuig vliegt zelf
-german,baby wordt doctorandus
-german,smarttelefoons verboden
-german,jongen verkozen tot president
-german,koning staat voor verkiezing
-german,koning publiekelijk geexecuteerd
-german,nieuwe koning stap van troon
-german,koningin neemt deel aan olympische spelen
-german,afgezette koningin krijgt macht
-german,koningin zwemt over Engels kanaal
-german,broer van prins beraamt staatsgreep
-german,storm duurt 100 dagen
-german,piloot verdwaalt
-german,vliegtuig landt op water
-german,stewardessen staken
-german,naar middelpunt van de aarde
+german,Handy läutet nicht mehr
+german,Platon wird zum Räuber
+german,Neue Obstsorte „Apfelange“ gezüchtet
+german,Honden leren spreken
+german,Kat verschijnt in circus
+german,Papegaai wint wereldgeheugenkampioenschap
+german,Aap vliegt in raket
+german,Mammoet opnieuw geboren
+german,Vogels stoppen met vliegen
+german,Laatste blauwe walvis overlijdt
+german,Vis gevonden op Jupiter
+german,Pluto krijgt nieuwe naam
+german,Nieuwe reuzen planeet gevonden
+german,Kopie van aarde ontdekt
+german,Aliens landen op antarticia
+german,Start van nieuwe ijstijd
+german,Koolzuurgas niveau in atmosfeer gezakt
+german,Temperatuur stijgt 5 graden
+german,Langste mens overlijdt
+german,Wereldtaal geintroduceerd
+german,Warmste zomer ooit in Zweden
+german,Eerste breintransplantatie operatie
+german,Gekloonde preseident overlijdt
+german,Verkiezing afgelast
+german,Democratisch land introduceert dictatorschap
+german,Geheugenkampioen wordt president
+german,Clown wint wereldkampioenschap dansen
+german,Kappen verboden
+german,Verraders vluchten van aarde
+german,Eerste geslachtsverandering
+german,Organen groeien in laboratorium
+german,Leraren gaan staken
+german,Alleen rode appels groeien
+german,Watermeloen wordt zuur
+german,Fruitboom wordt 1000 jaar
+german,Wolkenkrabber wordt boos
+german,Vliegtuig vliegt zelf
+german,Baby wordt doctorandus
+german,Smarttelefoons verboden
+german,Jongen verkozen tot president
+german,Koning staat voor verkiezing
+german,Koning publiekelijk geexecuteerd
+german,Nieuwe koning stap van troon
+german,Koningin neemt deel aan olympische spelen
+german,Afgezette koningin krijgt macht
+german,Koningin zwemt over Engels kanaal
+german,Broer van prins beraamt staatsgreep
+german,Storm duurt 100 dagen
+german,Piloot verdwaalt
+german,Vliegtuig landt op water
+german,Stewardessen staken
+german,Naar middelpunt van de aarde
 german,Amazone groet terug
-german,alle woestijnen overstroomd
-german,het regent voor drie maanden
-german,hele wereld bedekt met wolken
-german,vulkanisch uitbarsting op Ijsland
-german,lessen voor pilgrimstocht
-german,ontwerp kampioenschap gewonnen door chimpansee
-german,dieren experimenten verboden bij wet
-german,voetbalwedstrijd op Mars
-german,nieuwe universum ontdekt
-german,quantum fysica gaat mis
-german,peer valt op wetenschapper
-german,roze bananen gecultiveerd
-german,suiker in de ban
-german,senator verbiedt voetbal
-german,president verkozen als koning
-german,mier verhuisd naar nieuw huis
-german,sprekende computer geintroduceerd
-german,android wordt dictator
-german,internet afgesloten
-german,stroomstoring in New York
+german,Alle woestijnen overstroomd
+german,Het regent voor drie maanden
+german,Hele wereld bedekt met wolken
+german,Vulkanisch uitbarsting op Ijsland
+german,Lessen voor pilgrimstocht
+german,Ontwerp kampioenschap gewonnen door chimpansee
+german,Dieren experimenten verboden bij wet
+german,Voetbalwedstrijd op Mars
+german,Nieuwe universum ontdekt
+german,Quantum fysica gaat mis
+german,Peer valt op wetenschapper
+german,Roze bananen gecultiveerd
+german,Suiker in de ban
+german,Senator verbiedt voetbal
+german,President verkozen als koning
+german,Mier verhuisd naar nieuw huis
+german,Sprekende computer geintroduceerd
+german,Android wordt dictator
+german,Internet afgesloten
+german,Stroomstoring in New York
 german,Uitvinder
-german,paus treedt af
-german,non eindigt celibaat
-german,monnik gaat trouwen
-german,smart telefoons worden te slim
-german,eerste 200 jaar oude mens
-german,nieuw land ontdekt
-german,eiland verschijnt in pacifisch oceaan
+german,Paus treedt af
+german,Non eindigt celibaat
+german,Monnik gaat trouwen
+german,Smart telefoons worden te slim
+german,Eerste 200 jaar oude mens
+german,Nieuw land ontdekt
+german,Eiland verschijnt in pacifisch oceaan
 german,Verenigde Staten valt uit elkaar
 german,VN creeren vrede op aarde
-german,kolen worden verboden
+german,Kolen worden verboden
 german,Sweden gebruikt uitsluitend zonne-energie
-german,alle kleding gemaakt van plastic
-german,baas ontslaat al zijn personeel
-german,ondernemers beginnen opnieuw
-german,schaakcomputer verliest van grootmeester
-german,tweelingen ontmoeten elkaar in worstelwedstrijd
-german,sumo worstelen olympische sport
+german,Alle kleding gemaakt van plastic
+german,Baas ontslaat al zijn personeel
+german,Ondernemers beginnen opnieuw
+german,Schaakcomputer verliest van grootmeester
+german,Tweelingen ontmoeten elkaar in worstelwedstrijd
+german,Sumo worstelen olympische sport
 german,Kernenergie verboden in Japan
-german,computerbedrijf maakt electrische auto
-german,museum gesloten
-german,mummies komen tot leven
-german,pyramides zijn in werkelijkheid ruimteschepen
-german,helicopter verongelukt
-german,automatische gecontroleerde auto rijdt uit zichzelf
-german,stuiterbal stuitert op ritme van muziek
-german,autofabrikant gaat failliet
-german,slagveld wordt oorlogs gedenkplaats
-german,nieuw paardenras gefokt
-german,hond gekruist met kat
-german,nieuwe wetenschap ontdekt
-german,nationaal team verliest wereldcup
-german,universiteit gesloten
-german,trein ontspoort
-german,student heeft alles goed
-german,geheugengymnastiek verplicht in scholen
-german,verplichte scholing verlengt met 3 jaar
-german,matriach beeft voor patriach
-german,locale leider reist naar Jupiter
+german,Computerbedrijf maakt electrische auto
+german,Museum gesloten
+german,Mummies komen tot leven
+german,Pyramides zijn in werkelijkheid ruimteschepen
+german,Helicopter verongelukt
+german,Automatische gecontroleerde auto rijdt uit zichzelf
+german,Stuiterbal stuitert op ritme van muziek
+german,Autofabrikant gaat failliet
+german,Slagveld wordt oorlogs gedenkplaats
+german,Nieuw paardenras gefokt
+german,Hond gekruist met kat
+german,Nieuwe wetenschap ontdekt
+german,Nationaal team verliest wereldcup
+german,Universiteit gesloten
+german,Trein ontspoort
+german,Student heeft alles goed
+german,Geheugengymnastiek verplicht in scholen
+german,Verplichte scholing verlengt met 3 jaar
+german,Matriach beeft voor patriach
+german,Locale leider reist naar Jupiter
 german,Velen hebben de film Thor gezien
-german,bliksem schakelt hele stad uit
-german,kaasmes verboden
-german,diamanten mes in museum
-german,schedel sleutel naar paradijs
-german,blauwe boom gecultiveerd
-german,genetische verminking ontdekt
-german,havermelk geserveerd op school
-german,wereldhonger uitgeroeid
-german,malaria ontdekt in Zweden
-german,landschap geplet
+german,Bliksem schakelt hele stad uit
+german,Kaasmes verboden
+german,Diamanten mes in museum
+german,Schedel sleutel naar paradijs
+german,Blauwe boom gecultiveerd
+german,Genetische verminking ontdekt
+german,Havermelk geserveerd op school
+german,Wereldhonger uitgeroeid
+german,Malaria ontdekt in Zweden
+german,Landschap geplet
 german,Denemarken bouwt nieuwe berg
-german,zware goederenvoertuig loopt op elektriciteit
-german,autofabrikant belazert de boel weer
-german,andere mening ongewoon
+german,Zware goederenvoertuig loopt op elektriciteit
+german,Autofabrikant belazert de boel weer
+german,Andere mening ongewoon
 german,Vikingen gestrand in America
 german,Inuit emigreren naar de Malidiven
 german,Polar beren zwemmen naar Zuidpool
-german,boekenbeurs verkoopt geen boeken meer
-german,ziekenhuisboot vaart rond de wereld
-german,spaanse vaart naar de Pacific
-german,nieuw wetenschapsveld in medicijnen
-german,geen antibiotica meer
-german,multi-residente bacterie uitgeroeid
-german,laseroperatie wordt standaard
-german,nieuwe extra snelheidstrein geintroduceerd
-german,teleporteren verboden
-german,boeren weigeren gewassen te groeien
-german,bionische oog uitgevonden
-german,man bevalt van kind
-german,preventieve medicijn is verplicht
-german,ren kampioenschap verbreekt record
-german,tennisspeler wint laatste set
-german,industrieterrein verontreinigd
-german,houten huizen niet toegestaan na brand
-german,ontdekking van onzichtbare condooms
-german,racistische partij beschuldigd van haatmisdrijf
-german,schandaal schokt parlement
-german,hoogspringer springt onder lat
-german,kikker wint middenafstandswedstrijd
-german,nieuw wereldrecord
+german,Boekenbeurs verkoopt geen boeken meer
+german,Ziekenhuisboot vaart rond de wereld
+german,Spaanse vaart naar de Pacific
+german,Nieuw wetenschapsveld in medicijnen
+german,Geen antibiotica meer
+german,Multi-residente bacterie uitgeroeid
+german,Laseroperatie wordt standaard
+german,Nieuwe extra snelheidstrein geintroduceerd
+german,Teleporteren verboden
+german,Boeren weigeren gewassen te groeien
+german,Bionische oog uitgevonden
+german,Man bevalt van kind
+german,Preventieve medicijn is verplicht
+german,Ren kampioenschap verbreekt record
+german,Tennisspeler wint laatste set
+german,Industrieterrein verontreinigd
+german,Houten huizen niet toegestaan na brand
+german,Ontdekking van onzichtbare condooms
+german,Racistische partij beschuldigd van haatmisdrijf
+german,Schandaal schokt parlement
+german,Hoogspringer springt onder lat
+german,Kikker wint middenafstandswedstrijd
+german,Nieuw wereldrecord
+german,Auserirdische landen auf Erde
+german,Ausserirdische fliehen von Erde
+german,Tötliche Krankheit entdeckt
 german,Königin besucht Legoland
 german,Banane als Boomerang verwendet
 german,Gedächtnistraining wird illegalisiert
@@ -3981,7 +3987,6 @@ german,Neue Inselgruppe wird entdeckt
 german,Griechenland im Konkurs
 german,Hausaufgaben werden verboten
 german,Klonen von Menschen wird legalisiert
-german,Tötliche Krankheit entdeckt
 german,Gefangerner züchtet Kanarienvögel
 german,Kindergarten auf Mond eröffnet
 german,Vulkan bricht aus
@@ -3989,7 +3994,7 @@ german,Leben auf anderen Planeten ein Bluff
 german,Manhattan muss versetzt werden
 german,Politiker hören auf
 german,König stirbt auf Pferderücken
-german,FussballWM wird eingestellt
+german,Fussballwm wird eingestellt
 german,Strauss lernt fliegen
 german,Schimpanze fliegt zu Venus
 german,Alle Autos sind Elektroautos
@@ -4022,7 +4027,6 @@ german,Gehirngymnastik in Unterkünften
 german,Die letzte Goldmine schliesst
 german,Bienen sind ausgerottet
 german,Französische Piloten streiken
-german,Auserirdische landen auf Erde
 german,Weltfrieden wird wieder geschlossen
 german,Rennen um die Welt OS Disziplin
 german,Rentner weigern sich aufzuhören zu arbeiten
@@ -4031,7 +4035,6 @@ german,Diamantenasteroid wird gefunden
 german,Die strengste Lehrerin in Pension
 german,Jungenschulen werden geschlossen
 german,Spinnenmann wird von Grille gebissen
-german,Ausserirdische fliehen von Erde
 german,Alle Tiere sterben aus
 german,Schulkinder weigern sich zu lesen
 german,Katapult hört auf zu funktionieren
@@ -4081,16 +4084,13 @@ german,Ältester Baum stirbt
 german,Wahrzeichen zieht um
 german,Zebrastreifen weg
 german,Erster Mensch 200 Jahre alt
-german,Handy läutet nicht mehr
-german,Platon wird zum Räuber
-german,Neue Obstsorte „Apfelange“ gezüchtet
 german,Blinder kann wieder sehen
 german,Geldbörse wird gestohlen
 german,Stier springt auf die Zuschauertribüne
 german,Burka-Verbot abgelehnt
 german,Krebs kann geheilt werden
 german,Frau telefoniert 700 Stunden durchgehend
-german,iPad Produktion wird eingestellt
+german,IPad Produktion wird eingestellt
 german,Bus kollidiert mit Müllwagen
 german,Musiker fällt von der Bühne
 german,Todesurteil in den USA abgeschafft
@@ -4318,42 +4318,42 @@ german,Madagaskar unter Meeresspiegel
 german,Fahrräder verbannt
 german,Analoge Kameras werden geschrottet
 german,Katzen essen keinen Fisch mehr
-italian,regina si sposa
+italian,Regina si sposa
 italian,Politici lottano in Parlamento
 italian,Wimbledon chiuso
-italian,portaaerei affonda
+italian,Portaaerei affonda
 italian,Cancellata Coppa del Mondo FIFA
 italian,La Terra ha un nuovo ecosistema
 italian,Telegiornale si blocca
 italian,Nuotatore fa il giro della terra
-italian,trovato supereroe
+italian,Trovato supereroe
 italian,Nuove elezioni in Svezia
 italian,Albero più vecchio brucia completamente
-italian,cani volano attorno al mondo
+italian,Cani volano attorno al mondo
 italian,Celebrità fotografata
 italian,Giove prende nuova Luna
 italian,Salmone impara a parlare
 italian,Personaggio dei fumetti eletto presidente
 italian,Mohamed si trasferisce in montagna
-italian,energia idrica smette di funzionare
+italian,Energia idrica smette di funzionare
 italian,Mangiate rane danzanti
 italian,USA separati
-italian,trovato nuovo colore
+italian,Trovato nuovo colore
 italian,Scoperta l'isola dei dinosauri
 italian,Hello Kitty non più gatto
 italian,Pandemia bloccata
-italian,scimmione impara a ballare
+italian,Scimmione impara a ballare
 italian,Nuovo media inventato
 italian,Politico promette troppo
 italian,Capo annette isola
-italian,trovato lago sottomarino
+italian,Trovato lago sottomarino
 italian,Ricreato Rio delle Amazzoni
 italian,Presidente fa chirurgia estetica
 italian,Scoperta nuova malattia
 italian,Castello in rovina restaurato
 italian,Leoni smettono di ruggire
 italian,Trovata nuova galassia
-italian,sole splende 2 volte più brillante
+italian,Sole splende 2 volte più brillante
 italian,Tutti i supereroi esiliati
 italian,Record del Mondo di tuffi
 italian,Inventato nuovo supereroe
@@ -4368,15 +4368,15 @@ italian,Mosé attraversa a nuoto il mare
 italian,Fotografo coinvolto in uno scandalo
 italian,Plutone diventa di nuovo pianeta
 italian,Celebrità adotta figlia
-italian,bambino rivendica i suoi diritti
+italian,Bambino rivendica i suoi diritti
 italian,Atleta della Memoria vince giochi olimpici
 italian,Carta abolita come materiale
 italian,Drago finisce fuoco
-italian,doping diventa legale
+italian,Doping diventa legale
 italian,Tempesta distrugge città
-italian,inventato teletrasporto
+italian,Inventato teletrasporto
 italian,Ultimo quotidiano stampato
-italian,sollevatore di pesi solleva se stesso
+italian,Sollevatore di pesi solleva se stesso
 italian,Cani parlano ai gatti
 italian,Festa della risata attorno al mondo
 italian,Trovata nuova specie di dinosauro
@@ -4391,15 +4391,15 @@ italian,Principessa delle fiabe cade da cavallo
 italian,Presidente donna in Cina
 italian,Biancaneve prende raffreddore
 italian,Principe torna a casa
-italian,inizia turismo spaziale
+italian,Inizia turismo spaziale
 italian,Stipendio insegnanti portato a 0
-italian,re mente sulla sua età
+italian,Re mente sulla sua età
 italian,Mai più scuola
 italian,Città in rovina risorta
-italian,macchine funzionanti con elettricità
+italian,Macchine funzionanti con elettricità
 italian,Zio Paperino diventa persona
 italian,Inventata nuova religione
-italian,verme lascia la Terra
+italian,Verme lascia la Terra
 italian,Rapunzel si tinge i capelli
 italian,Danimarca si separa
 italian,Allarme tsunami cancellato
@@ -4408,50 +4408,53 @@ italian,Scimmioni guidano le macchine
 italian,Madonna lascia la Terra
 italian,Cielo di Venere si sgombera
 italian,Pallacanestro nuovo sport mondiale
-italian,stella esplode
-italian,coppia divorzia
-italian,aquile diventano vegetariane
+italian,Stella esplode
+italian,Coppia divorzia
+italian,Aquile diventano vegetariane
 italian,Nata principessa
 italian,Politico divorzia
 italian,Vulcano distrugge Venezuela
 italian,Pianta a energia nucleare esplode
 italian,Germania alimentata da energia pulita
-italian,scoperto ragno a 9 zampe
+italian,Scoperto ragno a 9 zampe
 italian,Cani atterrano sulla Luna
 italian,Animali imbalsamati risorgono
-italian,uccelli smettono di cantare
+italian,Uccelli smettono di cantare
 italian,Politici maschi aboliti
 italian,Gesù ritorna
 italian,Gorilla impara il linguaggio dei segni
 italian,Computer fatti solo di plastica
 italian,Principessa risulta principe
-italian,corridore corre troppo veloce
+italian,Corridore corre troppo veloce
 italian,Rifugiati rifiutano di scappare
-italian,elettricità diventa una rarità
+italian,Elettricità diventa una rarità
 italian,Abbattuta ultima foresta
 italian,Pace terminata
 italian,Febbre tropicale in Norvegia
-italian,aereo atterra all'indietro
+italian,Aereo atterra all'indietro
 italian,Zebra fugge da zoo
-italian,camion fa il giro del mondo
-italian,olio finisce
-italian,prato verde diventa blu
+italian,Camion fa il giro del mondo
+italian,Olio finisce
+italian,Prato verde diventa blu
 italian,Quiz televisivi diventano materia scolastica
 italian,Caldo tropicale ovunque sulla terra
 italian,Marte lascia il sistema solare
 italian,Superman si scioglie
 italian,Star del cinema fa nuovo film
-italian,coppia si sposa
+italian,Coppia si sposa
 italian,3 gemelli si sposano
-italian,ciclista coinvolto in scandalo doping
+italian,Ciclista coinvolto in scandalo doping
 italian,Mare inondato
 italian,Nuova notizia è vecchia
 italian,Politico si dimette
 italian,Terminato sciopero della rabbia
 italian,Giochi Olimpici sulla Luna
 italian,Preside avvia nuova scuola
-italian,internet si ferma
+italian,Internet si ferma
 italian,Calcio proibito
+italian,Alieni passano sulla Terra
+italian,Freddo percepibile
+italian,Elezioni cancellate
 italian,Evitata epidemia mondiale
 italian,Luna di Marte abitabile
 italian,Champions League a Marzo
@@ -4604,16 +4607,13 @@ italian,Secca l’albero più vecchio
 italian,Rimossa pietra miliare
 italian,Zebra perde le strisce
 italian,Prima donna di 200 anni
-italian,Alieni passano sulla Terra
-italian,Freddo percepibile
-italian,Elezioni cancellate
 italian,Uomo Ragno si dimette
-italian,prima medaglia di diamante
+italian,Prima medaglia di diamante
 italian,Primo uomo su Marte
 italian,Chiude zoo
 italian,Manifesto elettorale pura bugia
 italian,Lupo diventa mansueto
-italian,costruite biciclette volanti
+italian,Costruite biciclette volanti
 italian,Cina torna di nuovo comunista
 italian,Madagascar sotto il livello del mare
 italian,Bici abolite
@@ -4621,170 +4621,167 @@ italian,Macchine fotografiche analogiche rottamate
 italian,Gatti smettono di mangiare pesci
 italian,Babbo Natale mangia renna
 italian,Mikey Mouse divorzia
-italian,le api fanno il cioccolato
-italian,fiumi scorrono al contrario
-italian,il sole soge a Occidente
-italian,nascono fiori giganti
-italian,nuovo hotel a New York
-italian,mucca mangia toro
-italian,festa in parlamento
-italian,bambino pilota aereo
-italian,prima lezione di memoria
-italian,orso insegna a scuola
-italian,aperto supermercato in centro
-italian,ristorante sulla luna
-italian,crolla la muraglia cinese
-italian,topo abbatte albero secolare
-italian,scimmia ricorda 15 numeri
-italian,carcerato evade
-italian,cellulari con batteria infinita
-italian,cinesi tutti vegani
-italian,albero di mele fa carote
-italian,cani giocano con i gatti
-italian,calciatore segna a occhi chiusi
-italian,coccodrillo studia geografia
-italian,prete pulisce chiesa
-italian,televisore si accende da solo
-italian,statua della libertà vola
-italian,nuovo libro sulla memoria
-italian,arance diventano angurie
-italian,pesci fanno escursioni in montagna
-italian,canoa affonda in una pozzanghera
-italian,moto a 3 ruote si ribalta
-italian,inventata macchina a vapore
-italian,cavallo fa indigestione
-italian,falegname perde martello
-italian,piscina olimpionica in giardino
-italian,marte smette di ruotare
-italian,computer invia mail da solo
-italian,ciclista fa giro del mondo
-italian,modella perde scarpa
-italian,indiano si trasferisce
-italian,faraone risorge
-italian,trovato tesoro
-italian,dottore si ammala
-italian,alberi si sposano
-italian,bambini non vanno mai a dormire
-italian,serpente mangia balena
-italian,atterraggio ufo in aeroporto
-italian,obeso diventa atleta olimpionico
-italian,canguro prende raffreddore
-italian,attore fa recita a scuola
-italian,maestro dimentica le tabelline
-italian,inventata sigaretta di fiori
-italian,tempio si allaga
-italian,vincita di 1.000.000 di dollari
-italian,inventati vestiti autopulenti
-italian,pinguino va in vacanza
-italian,mammuth si rade
-italian,protesta di agnelli per la Pasqua
-italian,sole cambia colore
-italian,cactus muore disidratato
-italian,volpe ruba galline
-italian,taxi lavorano gratis
-italian,si gioca a bowling in ufficio
-italian,venduta collezione di farfalle
-italian,mare evapora
-italian,trovato uovo di dinosauro
-italian,partita di scacchi su venere
-italian,cartoni animati obbligatori a scuola
-italian,memorizzato mazzo di carte su marte
-italian,inventata barca volante
-italian,pappagallo recita poesie
-italian,capelli verdi obbligatori
-italian,cicerone impara francese
-italian,squalo diventa vegetariano
-italian,pipì come carburante automobile
-italian,obbligo camminare a testa in giù
-italian,fiumi diventano salati
-italian,aerei in autostrada
-italian,alieni si candidano elezioni
-italian,primi vestiti fatti di capelli
-italian,stappato spumante su saturno
-italian,inaugurata metro al polo nord
-italian,scoperti orsi polari rosa
-italian,uccello grande come b747
-italian,eletto presidente neonato
-italian,gatti si spostano solo in bici
-italian,shrek nominato cavaliere
-italian,babbuino balla a teatro
-italian,luna cade nel mare
-italian,stelle lampeggiano
-italian,trovato uomo con 2 cervelli
-italian,bandite le tasse
-italian,uomo suona bicchieri
-italian,hostess insulta passeggero
-italian,pilota si addormenta in quota
-italian,inventato martello di stoffa
-italian,drago sputa bolle di sapone
-italian,asino si dipinge le unghie
-italian,denti neri di moda
-italian,nuova torre Eiffel a Roma
+italian,Le api fanno il cioccolato
+italian,Fiumi scorrono al contrario
+italian,Il sole soge a Occidente
+italian,Nascono fiori giganti
+italian,Nuovo hotel a New York
+italian,Mucca mangia toro
+italian,Festa in parlamento
+italian,Bambino pilota aereo
+italian,Prima lezione di memoria
+italian,Orso insegna a scuola
+italian,Aperto supermercato in centro
+italian,Ristorante sulla luna
+italian,Crolla la muraglia cinese
+italian,Topo abbatte albero secolare
+italian,Scimmia ricorda 15 numeri
+italian,Carcerato evade
+italian,Cellulari con batteria infinita
+italian,Cinesi tutti vegani
+italian,Albero di mele fa carote
+italian,Cani giocano con i gatti
+italian,Calciatore segna a occhi chiusi
+italian,Coccodrillo studia geografia
+italian,Prete pulisce chiesa
+italian,Televisore si accende da solo
+italian,Statua della libertà vola
+italian,Nuovo libro sulla memoria
+italian,Arance diventano angurie
+italian,Pesci fanno escursioni in montagna
+italian,Canoa affonda in una pozzanghera
+italian,Moto a 3 ruote si ribalta
+italian,Inventata macchina a vapore
+italian,Cavallo fa indigestione
+italian,Falegname perde martello
+italian,Piscina olimpionica in giardino
+italian,Marte smette di ruotare
+italian,Computer invia mail da solo
+italian,Ciclista fa giro del mondo
+italian,Modella perde scarpa
+italian,Indiano si trasferisce
+italian,Faraone risorge
+italian,Trovato tesoro
+italian,Dottore si ammala
+italian,Alberi si sposano
+italian,Bambini non vanno mai a dormire
+italian,Serpente mangia balena
+italian,Atterraggio ufo in aeroporto
+italian,Obeso diventa atleta olimpionico
+italian,Canguro prende raffreddore
+italian,Attore fa recita a scuola
+italian,Maestro dimentica le tabelline
+italian,Inventata sigaretta di fiori
+italian,Tempio si allaga
+italian,Vincita di 1.000.000 di dollari
+italian,Inventati vestiti autopulenti
+italian,Pinguino va in vacanza
+italian,Mammuth si rade
+italian,Protesta di agnelli per la Pasqua
+italian,Sole cambia colore
+italian,Cactus muore disidratato
+italian,Volpe ruba galline
+italian,Taxi lavorano gratis
+italian,Si gioca a bowling in ufficio
+italian,Venduta collezione di farfalle
+italian,Mare evapora
+italian,Trovato uovo di dinosauro
+italian,Partita di scacchi su venere
+italian,Cartoni animati obbligatori a scuola
+italian,Memorizzato mazzo di carte su marte
+italian,Inventata barca volante
+italian,Pappagallo recita poesie
+italian,Capelli verdi obbligatori
+italian,Cicerone impara francese
+italian,Squalo diventa vegetariano
+italian,Pipì come carburante automobile
+italian,Obbligo camminare a testa in giù
+italian,Fiumi diventano salati
+italian,Aerei in autostrada
+italian,Alieni si candidano elezioni
+italian,Primi vestiti fatti di capelli
+italian,Stappato spumante su saturno
+italian,Inaugurata metro al polo nord
+italian,Scoperti orsi polari rosa
+italian,Uccello grande come b747
+italian,Eletto presidente neonato
+italian,Gatti si spostano solo in bici
+italian,Shrek nominato cavaliere
+italian,Babbuino balla a teatro
+italian,Luna cade nel mare
+italian,Stelle lampeggiano
+italian,Trovato uomo con 2 cervelli
+italian,Bandite le tasse
+italian,Uomo suona bicchieri
+italian,Hostess insulta passeggero
+italian,Pilota si addormenta in quota
+italian,Inventato martello di stoffa
+italian,Drago sputa bolle di sapone
+italian,Asino si dipinge le unghie
+italian,Denti neri di moda
+italian,Nuova torre Eiffel a Roma
 italian,Papa balla twist
-italian,si scia in pantofole
+italian,Si scia in pantofole
 italian,Big foot si trasferisce in città
-italian,primo grattacielo su rotelle
-italian,calciatore insulta arbitro
-italian,tartaruga vince gara di velocità
-italian,lumaca perde bava
-italian,biscia si sposa con camaleonte
-italian,gallina si laurea ad Harvard
-italian,primo IPad 3D
-italian,formica attraversa l'atlantico
-italian,primo sottomarino volante
-italian,elefanti migrano a Londra
-italian,struzzi combattono sul ring
-italian,primo viaggio col teletrasporto
-italian,ingegneri progettano discovolante
-italian,alieno si pettina
-italian,cani vanno al parco in moto
-italian,barbieri usano motoseghe
-italian,cammelli attraversano Alaska
-italian,nevicano funghi
-italian,regina si dimette
-italian,rivolta dei cuscini
-italian,inventata macchina a carote
-italian,insegnante bocciato
-italian,macaco prende patente
-italian,pigiama party in ufficio
-italian,statua fa meditazione
-italian,funerali in salotto
-italian,spogliarellista si fa suora
-italian,calzino si fa la doccia
-italian,fabbro picchia incudine
-italian,blackout nella savana
-italian,soldi crescono sugli alberi
-italian,bisonte sfida mental athlete
-italian,montagna va al mare
-italian,bambino perde capelli
-italian,ombrello fuma sigaretta
-italian,penna si rifiuta di scrivere
-italian,tavolino apre società
-italian,scoperta formula invisibilità
-italian,caramella soffoca coccodrillo
-italian,moscerino schiaccia elefante
-italian,trasformato piombo in oro
-italian,samurai perde spada
-italian,benzinaio fa pieno di Nutella
-italian,pace tra alieni e terrestri
-italian,babbuino perde chiavi di casa
-italian,grande puffo si fa la ceretta
-italian,divorzio tra scoiattolo e volpe
-italian,dinosauro trova cura al cancro
-italian,lombrico in paralisi
-italian,prima clonazione umana
-italian,tunnel sotterraneo Parigi-New York
-italian,televisore prende influenza
-italian,divisione gemelli siamesi
-italian,premio nobel ad una banana
-italian,mandarino va in ferie
-italian,libro prende il volo
-italian,spazzatura fa elemosina
-italian,gelataio guida un carriola
-italian,nuova bibita per memoria
-danish,Cancer udryddet
-danish,Professionel atlet på stoffer
-danish,Guld erstatter pengeseddler
+italian,Primo grattacielo su rotelle
+italian,Calciatore insulta arbitro
+italian,Tartaruga vince gara di velocità
+italian,Lumaca perde bava
+italian,Biscia si sposa con camaleonte
+italian,Gallina si laurea ad Harvard
+italian,Primo IPad 3D
+italian,Formica attraversa l'atlantico
+italian,Primo sottomarino volante
+italian,Elefanti migrano a Londra
+italian,Struzzi combattono sul ring
+italian,Primo viaggio col teletrasporto
+italian,Ingegneri progettano discovolante
+italian,Alieno si pettina
+italian,Cani vanno al parco in moto
+italian,Barbieri usano motoseghe
+italian,Cammelli attraversano Alaska
+italian,Nevicano funghi
+italian,Regina si dimette
+italian,Rivolta dei cuscini
+italian,Inventata macchina a carote
+italian,Insegnante bocciato
+italian,Macaco prende patente
+italian,Pigiama party in ufficio
+italian,Statua fa meditazione
+italian,Funerali in salotto
+italian,Spogliarellista si fa suora
+italian,Calzino si fa la doccia
+italian,Fabbro picchia incudine
+italian,Blackout nella savana
+italian,Soldi crescono sugli alberi
+italian,Bisonte sfida mental athlete
+italian,Montagna va al mare
+italian,Bambino perde capelli
+italian,Ombrello fuma sigaretta
+italian,Penna si rifiuta di scrivere
+italian,Tavolino apre società
+italian,Scoperta formula invisibilità
+italian,Caramella soffoca coccodrillo
+italian,Moscerino schiaccia elefante
+italian,Trasformato piombo in oro
+italian,Samurai perde spada
+italian,Benzinaio fa pieno di Nutella
+italian,Pace tra alieni e terrestri
+italian,Babbuino perde chiavi di casa
+italian,Grande puffo si fa la ceretta
+italian,Divorzio tra scoiattolo e volpe
+italian,Dinosauro trova cura al cancro
+italian,Lombrico in paralisi
+italian,Prima clonazione umana
+italian,Tunnel sotterraneo Parigi-New York
+italian,Televisore prende influenza
+italian,Divisione gemelli siamesi
+italian,Premio nobel ad una banana
+italian,Mandarino va in ferie
+italian,Libro prende il volo
+italian,Spazzatura fa elemosina
+italian,Gelataio guida un carriola
+italian,Nuova bibita per memoria
 danish,Præsident danser step til bal
 danish,Griraf løsladt fra Zoologisk have
 danish,Soldater strejker
@@ -5084,10 +5081,9 @@ danish,Alle dyr udryddet
 danish,Skolebørn nægter at læse
 danish,Katapult svigter
 danish,Elefanter får på afveje
-norwegian,Ny religion blir laget
-norwegian,Romvesener lever blant menneskene
-norwegian,Smarttelefoner blir for smarte
-norwegian,Første 200 år gamle menneske
+danish,Cancer udryddet
+danish,Professionel atlet på stoffer
+danish,Guld erstatter pengeseddler
 norwegian,Nytt land oppdaget
 norwegian,Øy oppstår i Stillehavet
 norwegian,USA deles opp
@@ -5238,3 +5234,7 @@ norwegian,Oppfinner finner opp hjulet
 norwegian,Paven abdiserer
 norwegian,Nonne avslutter sølibat
 norwegian,Munk gifter seg
+norwegian,Ny religion blir laget
+norwegian,Romvesener lever blant menneskene
+norwegian,Smarttelefoner blir for smarte
+norwegian,Første 200 år gamle menneske
