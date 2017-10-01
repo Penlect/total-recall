@@ -657,7 +657,7 @@ def db_stories_capitalize():
         nr_modified = 0
         for story in stories:
             s = story.story
-            new_s = s.capitalize()
+            new_s = s[0].upper() + s[1:]
             if s != new_s:
                 story.story = new_s
                 nr_modified += 1
@@ -665,6 +665,37 @@ def db_stories_capitalize():
         db.session.commit()
         flash(f'Nr of stories modified: {nr_modified}', 'success')
         return redirect(url_for('db_stories'))
+
+
+@app.route('/database/stories/reloadcase', methods=['GET'])
+@login_required
+def db_stories_reloadcase():
+    """Restore stores to the same case as in the database backup txt file"""
+    file = os.path.join(os.path.dirname(app.root_path), 'db', 'stories.txt')
+    case_map = dict()
+    with open(file, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    language, story = line.split(',', maxsplit=1)
+                except ValueError:
+                    return f'Faild to split line: "{line}"'
+                case_map.setdefault(language, dict())[story.lower()] = story
+    nr_modified = 0
+    for language in models.Language.query.all():
+        for story in language.stories:
+            try:
+                s_new = case_map[language.language][story.story.lower()]
+            except KeyError:
+                continue
+            if story.story != s_new:
+                story.story = s_new
+                nr_modified += 1
+                db.session.add(story)
+    db.session.commit()
+    flash(f'Nr of stories modified: {nr_modified}', 'success')
+    return redirect(url_for('db_stories'))
 
 
 @app.route('/database/stories/csv', methods=['GET'])
