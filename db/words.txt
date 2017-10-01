@@ -81,7 +81,7 @@ swedish,infinitive_verb,klippa
 swedish,infinitive_verb,koka
 swedish,infinitive_verb,krocka
 swedish,infinitive_verb,köpa
-swedish,concrete_noun,laga
+swedish,infinitive_verb,laga
 swedish,infinitive_verb,leta
 swedish,infinitive_verb,ligga
 swedish,infinitive_verb,lyssna
@@ -1034,9 +1034,9 @@ swedish,concrete_noun,hö
 swedish,concrete_noun,hök
 swedish,infinitive_verb,improvisera
 swedish,concrete_noun,industri
-swedish,concrete_noun,inspektera
+swedish,infinitive_verb,inspektera
 swedish,concrete_noun,internet
-swedish,concrete_noun,intervjua
+swedish,infinitive_verb,intervjua
 swedish,concrete_noun,iphone
 swedish,concrete_noun,is
 swedish,concrete_noun,iskub
@@ -1092,7 +1092,7 @@ swedish,concrete_noun,landa
 swedish,concrete_noun,larv
 swedish,concrete_noun,lastbil
 swedish,concrete_noun,leguan
-swedish,concrete_noun,leka
+swedish,infinitive_verb,leka
 swedish,concrete_noun,linjal
 swedish,concrete_noun,linne
 swedish,concrete_noun,lins
