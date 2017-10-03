@@ -32,7 +32,7 @@
         {% endfor %}
         <td class="row_enumeration">Row {{ row_i + 1 }}</td>
     </tr>
-{% if (row_i + 1)%nr_digits_in_column == 0%}
+{% if (row_i + 1)%nr_digits_in_column == 0 and row_i + 1 !=  nr_rows %}
     </table>
 <table border="1px" class="recall_table">
 {% endif %}

@@ -4,30 +4,27 @@
     margin-left: 20px;
 }
 
-#recallsheet table {
+.recall_table {
 	border-collapse: collapse;
 	margin-top: 10px;
-	margin-bottom: 10px;
+	margin-bottom: 30px;
 }
-#recallsheet tr, #recallsheet td {
+.recall_table tr, .recall_table td {
 	padding:0px;
 	margin:0px;
 	white-space: nowrap;
 	border: 1px solid;
 }
-#recallsheet .row_enumeration {
+.recall_table .row_enumeration {
     padding-left:20px;
     padding-right:10px;
     border-left: 1px solid;
 }
+
 #score_table tr, #score_table td {
 	padding-left:10px;
 	padding-right:10px;
 	border: 1px solid;
-}
-
-#recall_submit_button {
-    margin-top: 10px;
 }
 
 #instructions {
