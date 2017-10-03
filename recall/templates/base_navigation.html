@@ -22,7 +22,7 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li id="home"><a href="{{ url_for('user', username=current_user.username)}}">Home</a></li>
+        <li id="home"><a href="{{ url_for('user', username=current_user.username)}}">{{ current_user.username }}</a></li>
         <li id="make"><a href="{{ url_for('make_discipline') }}">Make</a></li>
         <li id="users"><a href="{{ url_for('users') }}">Competitions</a></li>
       </ul>

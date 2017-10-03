@@ -306,13 +306,13 @@ def _user(username, delete_column=False):
                            recalls=r, delete_column=delete_column)
 
 
-@app.route('/user/<string:username>', methods=['GET', 'POST'])
+@app.route('/competition/<string:username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
     return _user(username, delete_column=False)
 
 
-@app.route('/user/<string:username>/delete', methods=['GET', 'POST'])
+@app.route('/competition/<string:username>/delete', methods=['GET', 'POST'])
 @login_required
 def user_delete_column(username):
     return _user(username, delete_column=True)
