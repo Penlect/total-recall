@@ -440,6 +440,16 @@ class SpokenData(MemoData):
 
     @staticmethod
     def raw_score(cbc_r):
+        """Calculate raw score
+        1.  One point is awarded for every correct consecutive digit that the
+            competitor writes down from the first digit of the spoken
+            sequence.
+        2.  As soon as the competitor makes their first mistake, that is
+            where the marking stops. For example, if a competitor recalls
+            127 digits but makes a mistake at the 43 rd  digit, then the score
+            will be 42. If a competitor recalled 200 digits but made a
+            mistake on the first digit the score would be 0.
+        """
         consecutive = 0
         for cell in cbc_r:
             if cell == Item.correct:
@@ -459,6 +469,7 @@ class SpokenData(MemoData):
 
 
 class WordsData(MemoData):
+    """Represents Words data - tuple of strings"""
     __mapper_args__ = {
         'polymorphic_identity': Discipline.words,
     }
@@ -517,6 +528,25 @@ class InvalidHistoricalDate(Exception):
 
 
 class DatesData(MemoData):
+    """Represents Historical Dates data
+
+    A Historical Date is represented as a tuple with three elements:
+        (1000 <= date <=2099, Story of maximum six words, shuffle_index)
+        types: (int, str, int)
+    The shuffle_index is used to define how the list of stories will
+    be shuffled when printed during recall.
+
+    For example:
+        (2006, 'House burns down', 2)
+        (1998, 'Eternal love', 0)
+        (2009, 'Certain death prevented', 1)
+        (2003, 'Life never the same again', 3)
+    Will during recall be printed in this order:
+        (1998, 'Eternal love', 0)
+        (2009, 'Certain death prevented', 1)
+        (2006, 'House burns down', 2)
+        (2003, 'Life never the same again', 3)
+    """
     __mapper_args__ = {
         'polymorphic_identity': Discipline.dates,
     }
@@ -589,15 +619,44 @@ class DatesData(MemoData):
 
     @staticmethod
     def raw_score(cbc_r):
+        """Calculate raw score
+        1.  A point is awarded for every correctly assigned year.
+        2.  Half a mark is deducted for an incorrectly assigned year.
+        4.  There is no penalty for missing dates.
+        5.  The results are totalled. The Total Score is rounded up to the
+        nearest whole number, i.e. 45.5 is rounded up to 46.
+        6.  If the final score is a negative, it is rounded up to zero.
+
+        :param cbc_r: Cell by cell result
+        :return: Raw score
+        """
         raw_score = 0
         c = collections.Counter(cbc_r)
         raw_score += c[Item.correct]
         raw_score -= c[Item.wrong]/2
         raw_score = max(0, raw_score)
-        return raw_score
+        return math.ceil(raw_score)
 
 
 class CardData(MemoData):
+    """Represents Card data
+
+    Cards are represented as integers between 0 and 51.
+
+    The suite is computes as: suite = card_int // 13, where
+        suite = 0 => Spades
+        suite = 1 => Hearts
+        suite = 2 => Diamonds
+        suite = 3 => Clubs
+    The card value is computed as: value = card_int % 13, where
+        value = 0 => A
+        value = 1 => 2
+        ...
+        value = 9 => 10
+        value = 10 => J, Jack
+        value = 11 => Q, Queen
+        value = 12 => K, King
+    """
     __mapper_args__ = {
         'polymorphic_identity': Discipline.cards,
     }
