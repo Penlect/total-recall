@@ -14,21 +14,21 @@
 {% for row_i in range(2) %}
     <tr class="recall_row">
         {% for col_i in range(24) %}
-            <td>
-                <input class="recall_cell"
-                       id="recall_cell_{{ row_i*24 + col_i }}"
-                       name="r_{{ row_i*24 + col_i }}"
-                       type="text"
-                       maxlength="1"
-                       size="1"
-                       autocomplete="off"
-                       spellcheck="false"
-                       {% if view is defined %}
-                            value="{{ recall.data[row_i*24 + col_i] }}">
-                       {% else %}
-                            value="">
-                       {% endif %}
-            </td>
+<td>
+<input class="recall_cell"
+   id="recall_cell_{{ row_i*24 + col_i }}"
+   name="r_{{ row_i*24 + col_i }}"
+   type="text"
+   maxlength="1"
+   size="1"
+   autocomplete="off"
+   spellcheck="false"
+   {% if view is defined %}
+        value="{{ recall.data[row_i*24 + col_i] }}">
+   {% else %}
+        value="">
+   {% endif %}
+</td>
         {% endfor %}
         <td class="row_enumeration">Row {{ row_i + 1 }}</td>
     </tr>

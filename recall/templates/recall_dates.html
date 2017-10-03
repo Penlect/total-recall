@@ -13,20 +13,20 @@
 <table border="1px" class="recall_table">
 {% for date, story, order in data %}
     <tr class="recall_row">
-        <td><input class="recall_cell"
-                   id="recall_cell_{{ loop.index0 }}"
-                   name="r_{{ loop.index0 }}"
-                   type="text"
-                   maxlength="4"
-                   size="4"
-                   autocomplete="off"
-                   spellcheck="false"
-                   {% if view is defined %}
-                        value="{{ recall.data[loop.index0] }}">
-                   {% else %}
-                        value="">
-                   {% endif %}
-        </td>
+<td><input class="recall_cell"
+   id="recall_cell_{{ loop.index0 }}"
+   name="r_{{ loop.index0 }}"
+   type="text"
+   maxlength="4"
+   size="4"
+   autocomplete="off"
+   spellcheck="false"
+   {% if view is defined %}
+        value="{{ recall.data[loop.index0] }}">
+   {% else %}
+        value="">
+   {% endif %}
+</td>
         <td class="story">{{ story }}</td>
     </tr>
 {% if (loop.index0 + 1)%nr_dates_in_column == 0 and loop.index0 + 1 != (memo.data|length)%}
