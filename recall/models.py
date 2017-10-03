@@ -27,6 +27,7 @@ from passlib.hash import sha256_crypt
 from recall import db, SCORE
 import recall.xls
 
+NR_CARDS_IN_DECK = 52
 
 class Discipline(enum.Enum):
     """Define valid disciplines and their official names"""
@@ -299,23 +300,24 @@ class MemoData(db.Model):
             return Item.wrong
 
     @staticmethod
-    def _raw_score_digits(cbc_r, row_len):
-        """Algorithm for correcting numerical disciplines
+    def _raw_score_digits(cbc_r, length):
+        """Compute raw score of row or column based disciplines
 
-        Trailing off_limits values in cbc_r are not allowed
+        Trailing off_limits values in cbc_r are not allowed.
+        (must be removed before this call)
         """
         raw_score = 0
-        rows = [cbc_r[0 + i:row_len + i]
-                  for i in range(0, len(cbc_r), row_len)]
+        rows = [cbc_r[0 + i:length + i]
+                for i in range(0, len(cbc_r), length)]
         for i, row in enumerate(rows, start=1):
             if i == len(rows):  # Last chunk
-                row_len = len(row)
+                length = len(row)
             c = collections.Counter(row)
-            if c[Item.correct] == row_len:
+            if c[Item.correct] + c[Item.almost_correct] == length:
                 raw_score += c[Item.correct]
-            elif c[Item.correct] == row_len - 1:
-                raw_score += math.ceil(c[Item.correct]/2)
-        return raw_score
+            elif c[Item.correct] + c[Item.almost_correct] == length - 1:
+                raw_score += c[Item.correct]/2
+        return math.ceil(raw_score)
 
     def get_xls_filedata(self, pattern, **kwargs):
         """Take relevant data of memo and create table
@@ -487,7 +489,8 @@ class WordsData(MemoData):
         return tuple(unique_lines_in_textarea(text, lower=True))
 
     def compare(self, guess: str, index: int):
-        guess = str(guess)
+        # The competitor may use upper or lower case letters.
+        guess = str(guess).lower()
         if guess == self.data[index]:
             return Item.correct
         elif self._word_almost_correct(guess, index):
@@ -505,22 +508,9 @@ class WordsData(MemoData):
                     return True
         return False
 
-    @staticmethod
-    def raw_score(cbc_r):
-        column_len = 20
-        raw_score = 0
-        chunks = [cbc_r[0 + i:column_len + i]
-                  for i in range(0, len(cbc_r), column_len)]
-        for i, chunk in enumerate(chunks, start=1):
-            if i == len(chunks):  # last chunk
-                column_len = len(chunk)
-            c = collections.Counter(chunk)
-            if c[Item.correct] + c[Item.almost_correct] == column_len:
-                raw_score += c[Item.correct]
-            elif c[Item.correct] + c[Item.almost_correct] == column_len - 1:
-                raw_score += max(0, column_len / 2 - c[Item.almost_correct])
-        raw_score = math.ceil(raw_score)
-        return raw_score
+    def raw_score(self, cbc_r):
+        """Calculate raw score"""
+        return self._raw_score_digits(cbc_r, 20)
 
 
 class InvalidHistoricalDate(Exception):
@@ -664,9 +654,9 @@ class CardData(MemoData):
 
     @staticmethod
     def random(nr_items, *args):
-
+        """Create tuple with nr_items card-integers"""
         def get_card():
-            cards = list(range(52))
+            cards = list(range(NR_CARDS_IN_DECK))
             while True:
                 random.shuffle(cards)
                 yield from cards
@@ -675,10 +665,16 @@ class CardData(MemoData):
 
     @staticmethod
     def from_text(text):
-        return tuple(int(digit) for digit in text.split(',') if digit.strip())
+        """Parse card-integers from a text"""
+        cards = tuple(int(digit) for digit in text.split(',') if digit.strip())
+        for card in cards:
+            if not (0 <= card <= NR_CARDS_IN_DECK - 1):
+                raise ValueError(f'Card out of range: '
+                                 f'0 <= {card} <= {NR_CARDS_IN_DECK}')
+        return cards
 
     def raw_score(self, cbc_r):
-        return self._raw_score_digits(cbc_r, 52)
+        return self._raw_score_digits(cbc_r, NR_CARDS_IN_DECK)
 
 
 class RecallData(db.Model):
