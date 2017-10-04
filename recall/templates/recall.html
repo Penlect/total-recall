@@ -121,7 +121,7 @@ $(document).ready(function(){
     
     function sendRecallToServer(finalSubmit){
           // Post all the recall input data to the server
-          console.log('Posting recall data to server ...');
+          console.log('Posting recall data to server at time = ' + Date.now());
           var extraParams = {
             seconds_remaining: $('#seconds_remaining').text(),
             locked: finalSubmit
@@ -145,13 +145,15 @@ $(document).ready(function(){
                         console.log(textStatus);
                         console.log(errorThrown);
                     }
-          });  
-          console.log('Done posting recall data to server.');
+          });
+          console.log('Done posting recall data to server at = ' + Date.now());
     }
 
     // The timer is started when the Start-Recall button is clicked
    $('#start_recall').on('click', function(event){
         console.log('Recall start button pressed');
+        var offset = Math.floor(Math.random() * 3000);
+        console.log('Random submit delay: ' + offset);
         $(this).remove();
         $('#recallsheet').css("display", "block");
         recallTimer = setTimeout(getRecallTimer($('#seconds_remaining'), $('#recall_submit_button')), SECOND);
@@ -160,7 +162,7 @@ $(document).ready(function(){
             if($('fieldset').prop('disabled') == false){
                 sendRecallToServer(false);
             }
-        }, 5000);
+        }, 10000 + offset);
    })
 
    var nrRows = $('.recall_table .recall_row').length;
