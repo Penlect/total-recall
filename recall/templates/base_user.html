@@ -167,7 +167,7 @@
 
                           <!-- Recall -->
                           <!-- And if competition, you should only be able to do recall once (if not memo_owner) -->
-                        {% if users_home_page or memo.state.value != 'Private'%}
+                        {% if users_home_page or memo.state.value == 'Competition'%}
                             {% if memo.discipline.name != 'cards' %}
                                 <td><a href="{{ url_for('recall_', memo_id=memo.id) }}" target="_blank">{{ memo.id }}</a></td>
                             {% else %}
