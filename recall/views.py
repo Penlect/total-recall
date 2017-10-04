@@ -140,14 +140,19 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/delete/account')
+@app.route('/delete/account/<string:username>')
 @login_required
-def delete_account():
-    # Todo: figure out the correct order of doing things
-    username = current_user.username
-    db.session.delete(current_user)
+def delete_account(username):
+    """You can only delete an account as the Penlect user"""
+    username = username.strip().lower()
+    if current_user.username != 'penlect':
+        return 'Not allowed'
+    try:
+        user = models.User.query.filter_by(username=username).one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        return f'No such user "{username}"'
+    db.session.delete(user)
     db.session.commit()
-    logout_user()
     flash(f'Account "{username}" deleted.', 'danger')
     app.logger.info(f'User deleted account: {username}')
     return redirect(url_for('index'))
