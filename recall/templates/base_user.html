@@ -149,17 +149,17 @@
                           <!-- Recall Link -->
                         {% if users_home_page or (not users_home_page and memo.state.value == 'Public')%}
                           {% if memo.discipline.name == 'base2' %}
-                          <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=user.settings.pattern_binary) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
+                          <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=current_user.settings.pattern_binary) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
                           {% elif memo.discipline.name == 'base10' %}
-                          <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=user.settings.pattern_decimals) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
+                          <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=current_user.settings.pattern_decimals) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
                           {% elif memo.discipline.name == 'words' %}
-                          <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=user.settings.pattern_words) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
+                          <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=current_user.settings.pattern_words) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
                           {% elif memo.discipline.name == 'dates' %}
-                          <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=user.settings.pattern_dates) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
+                          <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=current_user.settings.pattern_dates) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
                           {% elif memo.discipline.name == 'spoken' %}
                           <td><a href="{{ url_for('play_spoken', memo_id=memo.id) }}"><span class="glyphicon glyphicon-volume-up" aria-hidden="true"></span></a></td>
                           {% elif memo.discipline.name == 'cards' %}
-                          <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=user.settings.pattern_cards, card_colors=user.settings.card_colors) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
+                          <td><a href="{{ url_for('download_xls', memo_id=memo.id, pattern=current_user.settings.pattern_cards, card_colors=current_user.settings.card_colors) }}"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a></td>
                           {% endif %}
                         {% else %}
                          <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
