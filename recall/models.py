@@ -29,6 +29,7 @@ import recall.xls
 
 NR_CARDS_IN_DECK = 52
 
+
 class Discipline(enum.Enum):
     """Define valid disciplines and their official names"""
     base2 = 'Binary Numbers'
@@ -602,6 +603,10 @@ class DatesData(MemoData):
         return data
 
     def compare(self, guess: int, index: int):
+        try:
+            guess = int(guess)
+        except ValueError:
+            return Item.wrong
         if int(guess) == self.lookup[index]:
             return Item.correct
         else:
