@@ -487,7 +487,15 @@ class WordsData(MemoData):
 
     @staticmethod
     def from_text(text):
-        return tuple(unique_lines_in_textarea(text, lower=True))
+        # Words might not be unique since different languages
+        # may use the same word for two different meanings
+        text = text.lower()
+        words = list()
+        for word in text.split('\n'):
+            word = word.strip()
+            if word:
+                words.append(word)
+        return tuple(words)
 
     def compare(self, guess: str, index: int):
         # The competitor may use upper or lower case letters.
