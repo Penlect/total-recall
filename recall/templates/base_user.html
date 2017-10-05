@@ -258,11 +258,11 @@
                         <td><a href="{{ url_for('user', username=recall.user.username) }}">{{ recall.user.username }}</a></td>
 
                           {% if users_home_page or recall.memo.user_id == recall.user_id or recall.memo.state.value == 'Public' or (recall.user_id == current_user.id and recall.locked) %}
-                            <td>{{ recall.correction.points }}</td>
-                            <td>{{ recall.correction.raw_score }}</td>
+                            <td>{{ recall.correction.points|int }}</td>
+                            <td>{{ recall.correction.raw_score|int }}</td>
                             <td>{{ recall.correction.correct }}</td>
                             <td>{{ recall.correction.consecutive }}</td>
-                            <td>{{ recall.time_remaining|round(1) }}</td>
+                            <td>{{ recall.time_remaining|int }}</td>
                         {% else %}
                             <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
                             <td><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></td>
