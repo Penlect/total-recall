@@ -331,7 +331,6 @@ swedish,concrete_noun,fläck
 swedish,concrete_noun,fläkt
 swedish,concrete_noun,flöjt
 swedish,concrete_noun,fnöske
-swedish,concrete_noun,fodon
 swedish,concrete_noun,fodral
 swedish,concrete_noun,fogsvans
 swedish,concrete_noun,fontän
@@ -508,6 +507,7 @@ swedish,concrete_noun,äpple
 swedish,concrete_noun,ärta
 swedish,concrete_noun,alm
 swedish,concrete_noun,amöba
+swedish,concrete_noun,anakonda
 swedish,concrete_noun,vattenfall
 swedish,concrete_noun,hink
 swedish,concrete_noun,hinna
@@ -688,7 +688,6 @@ swedish,concrete_noun,molekyl
 swedish,concrete_noun,moln
 swedish,concrete_noun,mossa
 swedish,concrete_noun,motorsåg
-swedish,concrete_noun,mingipa
 swedish,concrete_noun,munk
 swedish,concrete_noun,murbruk
 swedish,concrete_noun,mur
@@ -927,7 +926,9 @@ swedish,concrete_noun,ört
 swedish,concrete_noun,ögonfrans
 swedish,concrete_noun,krydda
 swedish,concrete_noun,timglas
-swedish,concrete_noun,anakonda
+swedish,concrete_noun,ägg
+swedish,concrete_noun,mungipa
+swedish,concrete_noun,fordon
 swedish,concrete_noun,ande
 swedish,concrete_noun,ansikte
 swedish,concrete_noun,antilop
@@ -1452,3 +1453,9 @@ english,concrete_noun,shoe
 english,concrete_noun,shirt
 english,concrete_noun,suit
 english,concrete_noun,hat
+german,concrete_noun,teppich
+german,concrete_noun,ventilator
+german,concrete_noun,motor
+german,concrete_noun,schmetterling
+german,concrete_noun,diamant
+german,concrete_noun,elefant
