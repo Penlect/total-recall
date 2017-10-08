@@ -399,6 +399,8 @@ class WordTable(Table):
 
 class DatesTable(Table):
 
+    # Todo: recall sheet is wrong, should not have same order as memo sheet
+
     _style_item_normal = (
         'font: name Arial, height 220;'
     )

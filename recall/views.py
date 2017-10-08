@@ -834,9 +834,11 @@ def table_words():
         nr_updated = 0
         # Loop over non-empty lines in the text area and interpret
         # them as words, unique and lower case.
+        unique_words = {''}
         for line in text_area.split('\n'):
             line = line.strip().lower()
-            if line:
+            if line not in unique_words:
+                unique_words.add(line)
                 db_word = language.words.filter(models.Word.word == line).first()
                 if db_word:
                     if db_word.word_class.name == word_class:
