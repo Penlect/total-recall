@@ -1,0 +1,41 @@
+\documentclass{article}
+\usepackage{array,makecell}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage[margin=1in, top=0.6in]{geometry}
+
+\newcommand*{\addheight}[2][0.5ex]{%
+  \raisebox{0pt}[\dimexpr\height+(#1)\relax]{#2}%
+}
+
+\renewcommand\arraystretch{1.5}
+
+\begin{document}
+
+\STATEMENT{ for page_nr, page in images }
+\begin{table}[htb]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}m{2.2cm}% instead of "p" is "m"
+    >{\centering\arraybackslash}m{2.2cm}
+    >{\centering\arraybackslash}m{2.2cm}
+    >{\centering\arraybackslash}m{2.2cm}
+    >{\centering\arraybackslash}m{2.2cm}
+    >{\centering\arraybackslash}m{1.5cm}
+    |}
+    \hline
+    \STATEMENT{ for chunk in page }
+    \addheight{\includegraphics[width=20mm]{\PRINT{ chunk[0] }}} &
+    \addheight{\includegraphics[width=20mm]{\PRINT{ chunk[1] }}} &
+    \addheight{\includegraphics[width=20mm]{\PRINT{ chunk[2] }}} &
+    \addheight{\includegraphics[width=20mm]{\PRINT{ chunk[3] }}} &
+    \addheight{\includegraphics[width=20mm]{\PRINT{ chunk[4] }}} &
+    \textbf{Row \PRINT{ 10*page_nr + loop.index }} \\
+    \STATEMENT{ endfor }
+    \hline
+\end{tabular}
+\end{table}
+
+\STATEMENT{ endfor }
+
+\end{document}

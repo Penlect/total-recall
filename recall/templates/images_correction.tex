@@ -1,0 +1,36 @@
+\documentclass{article}
+\usepackage{array,makecell}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+
+\renewcommand\arraystretch{1.5}
+
+\begin{document}
+
+\STATEMENT{ for page in images }
+\begin{table}[htb]
+\centering
+\begin{tabular}{|
+    >{\centering\arraybackslash}m{2.2cm}% instead of "p" is "m"
+    >{\centering\arraybackslash}m{2.2cm}
+    >{\centering\arraybackslash}m{2.2cm}
+    >{\centering\arraybackslash}m{2.2cm}
+    >{\centering\arraybackslash}m{2.2cm}
+    >{\centering\arraybackslash}m{1.5cm}
+    |}
+    \hline
+        \STATEMENT{ for answer in page }
+            \STATEMENT{ if answer }
+            \STATEMENT{ for digit in answer[1] }
+                \PRINT{ digit + 1 } &
+            \STATEMENT{ endfor }
+            \textbf{Row \PRINT{answer[0]}} \\  \hline
+            \STATEMENT{ endif }
+        \STATEMENT{ endfor }
+
+\end{tabular}
+\end{table}
+\STATEMENT{ endfor }
+
+\end{document}

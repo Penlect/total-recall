@@ -932,3 +932,13 @@ def table_almost_correct_words():
         m.user = current_user
         db.session.commit()
         return 'Done'
+
+
+@app.route('/images')
+def images_pdf():
+    root = os.path.join(app.root_path, f'static/images')
+    files = [f for f in os.listdir(root) if f.endswith('.pdf')]
+    files.sort()
+    return render_template('images_download_page.html',
+                           files=[files[i:i+3] for i in range(0, len(files), 3)]
+                           )
