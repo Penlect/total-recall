@@ -4,3 +4,8 @@ database/
 *.xls
 *.log
 *.db
+*.png
+*.jpg
+*.log
+*.aux
+*.pdf
