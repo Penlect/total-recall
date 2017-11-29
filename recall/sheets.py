@@ -1,6 +1,8 @@
 
 import random
 import itertools
+import time
+from collections import namedtuple
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -8,51 +10,36 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.collections import LineCollection
 import numpy as np
 
-pp = PdfPages('multipage.pdf')
-
 A4 = (8.267, 11.692)
-fig = plt.figure(figsize=A4)
+Margins = namedtuple('Margins', 'left right top bottom')
 
-LEFT_MARGIN, RIGHT_MARGIN = 0.1, 0.1
-TOP_MARGIN, BOTTOM_MARGIN = 0.1, 0.15
-H_LINES_ADJUSTMENT = 1/1.3
 
-left = LEFT_MARGIN
-right = RIGHT_MARGIN
-width = 1 - left - right
-height = 1 - TOP_MARGIN - BOTTOM_MARGIN
+def add_row_enumeration(ax, item_pos_y, pos_x, start=1, **kwargs):
+    for i, y in enumerate(item_pos_y, start=start):
+        ax.text(pos_x, y, f'Row {i}', **kwargs)
 
-ax = fig.add_axes([left, right, width, height])
 
-# ax.set_axis_off()
-# ax.plot([0, 1], [0, 1])
-ax.set_xlim(0, 1)
-ax.set_ylim(1, 0)
+def add_items(ax, item_pos_x, item_pos_y, data, direction, **kwargs):
+    if direction == 'horizontal':
+        x, y = item_pos_x, item_pos_y
+    elif direction == 'vertical':
+        x, y = item_pos_y, item_pos_x
+    else:
+        raise ValueError(f'Invalid direction: {direction}')
 
-BINARY = slice(5, -5)
-
-nr_rows = 25
-nr_cols = 40
-_pos_y = np.linspace(0, 1, nr_rows + 2)
-_pos_x = np.linspace(0, 0.9, nr_cols + 2)[BINARY]
-dy = abs(_pos_y[1] - _pos_y[0])
-dx = abs(_pos_x[1] - _pos_x[0])
-item_pos_y = _pos_y[1:-1]
-item_pos_x = _pos_x[1:-1]
-border_pos_y = _pos_y[0:-1] + H_LINES_ADJUSTMENT*dy/2
-border_pos_x = _pos_x[0:-1] + dx/2
-
-fp = FontProperties(family=['Arial'])
-row_count_font = FontProperties(family=['Arial'], size='small')
-
-# ROW ENUMERATION
-for i, y in enumerate(item_pos_y, start=1):
-    ax.text(max(_pos_x) + 0.015, y, f'Row {i}', fontproperties=row_count_font, ha='left')
-
-# ITEM DATA GRID
-for y in item_pos_y:
-    for x in item_pos_x:
-        ax.text(x, y, str(random.randint(0, 9)), fontproperties=fp, ha='center')
+    nr_rows = len(y)
+    nr_cols = len(x)
+    last_nonempty_pos = (0, 0)
+    for row_i, pos_y in enumerate(y):
+        for col_i, pos_x in enumerate(x):
+            cell_i = nr_cols * row_i + col_i
+            item = data(cell_i)
+            if item is None:
+                return last_nonempty_pos
+            else:
+                ax.text(pos_x, pos_y, item, **kwargs)
+                last_nonempty_pos = (row_i, col_i)
+    return nr_rows - 1, nr_cols - 1
 
 
 def pairs(seq, step=1):
@@ -71,39 +58,87 @@ def get_boundary_finder(pattern):
     return boundary
 
 
-def grid(border_pos_x, border_pos_y, pattern, size, direction='horizontal'):
+def grid(ax, grid_pos_x, grid_pos_y, pattern, size, direction, max_row, max_col):
     if direction == 'horizontal':
-        x, y = border_pos_x, border_pos_y
+        x, y = grid_pos_x, grid_pos_y
+        transform = np.array([[1, 0],
+                              [0, 1]], dtype=np.float64)
     elif direction == 'vertical':
-        x, y = border_pos_y, border_pos_x
+        x, y = grid_pos_y, grid_pos_x
+        transform = np.array([[0, 1],
+                              [1, 0]], dtype=np.float64)
     else:
         raise ValueError(f'Invalid direction: {direction}')
     boundary = get_boundary_finder(pattern)
     lines = list()
+    nr_cols = len(x)
     for row_i, (y0, y1) in enumerate(pairs(y, step=size), start=0):
         for col_i, (x0, x1) in enumerate(pairs(x, step=1), start=0):
-            cell_i = (len(x) - 1) * row_i + col_i
+            cell_i = (nr_cols - 1) * row_i + col_i
             if col_i == 0 and boundary(cell_i - 1):
-                lines.append(np.array([[x0, y0], [x0, y1]]))
+                lines.append(np.array([[x0, y0], [x0, y1]], dtype=np.float64))
             if boundary(cell_i):
-                lines.append(np.array([[x1, y0], [x1, y1]]))
-        if row_i == 0:
-            lines.append(np.array([[min(x), y0], [max(x), y0]]))
+                lines.append(np.array([[x1, y0], [x1, y1]], dtype=np.float64))
+        lines.append(np.array([[min(x), y0], [max(x), y0]]))
+    if (row_i + 1)*size == len(y) - 1:
         lines.append(np.array([[min(x), y1], [max(x), y1]]))
 
-    if direction == 'vertical':
-        transform = np.array([[0, 1],
-                              [1, 0]])
-        for index in range(len(lines)):
-            lines[index] = np.dot(lines[index], transform)
 
+
+    for index in range(len(lines)):
+        lines[index] = np.dot(lines[index], transform)
     ax.add_collection(LineCollection(lines, lw=0.1, color='black'))
 
-grid(border_pos_x, border_pos_y, [3], 3, 'vertical')
 
-pp.savefig(fig, figsize=(8.27, 11.69))
-fig.clear()
+def digits(digits, pattern, size, direction='horizontal'):
+    grid_y_adjustment = 1 / 1.3
+    nr_rows = 25
+    nr_cols = 40
+    _pos_y = np.linspace(0, 1, nr_rows + 2)
+    _pos_x = np.linspace(0, 0.9, nr_cols + 2)
+    dy = abs(_pos_y[1] - _pos_y[0])
+    dx = abs(_pos_x[1] - _pos_x[0])
+    item_pos_y = _pos_y[1:-1]
+    item_pos_x = _pos_x[1:-1]
+    grid_pos_y = _pos_y[0:-1] + grid_y_adjustment * dy / 2
+    grid_pos_x = _pos_x[0:-1] + dx / 2
 
-pp.savefig(fig, figsize=(8.27, 11.69))
+    pp = PdfPages('multipage.pdf')
+    fig = plt.figure(figsize=A4)
+    m = Margins(left=0.1, right=0.1, top=0.15, bottom=0.1)
+    ax = fig.add_axes([
+        m.left,  # Left
+        m.right,  # Right
+        1 - m.left - m.right,  # Width
+        1 - m.top - m.bottom  # Height
+    ])
+    ax.set_axis_off()
+    ax.set_xlim(0, 1)
+    ax.set_ylim(1, 0)
 
-pp.close()
+    BINARY = slice(5, -5)
+    def data(cell_i):
+        try:
+            return digits[cell_i]
+        except IndexError:
+            return None
+
+    item_fp = FontProperties(family=['Arial'])
+    row_enumeration_fp = FontProperties(family=['Arial'], size='small')
+
+    row_i, col_i = add_items(ax, item_pos_x, item_pos_y,
+              data=data, direction='horizontal',
+              fontproperties=item_fp, ha='center')
+    add_row_enumeration(ax, item_pos_y[:row_i + 1], max(_pos_x) + 0.015, start=1,
+                        fontproperties=row_enumeration_fp, ha='left')
+    grid(ax, grid_pos_x, grid_pos_y[:row_i + 2], pattern, size, direction, row_i, col_i)
+
+    pp.savefig(fig, figsize=(8.27, 11.69))
+    fig.clear()
+
+    pp.savefig(fig, figsize=(8.27, 11.69))
+    pp.close()
+
+
+if __name__ == '__main__':
+    digits([0,1,2,3,4,5,6,7,8,9]*68, [3], 6, 'vertical')
