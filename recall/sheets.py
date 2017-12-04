@@ -12,6 +12,8 @@ import numpy as np
 
 A4 = (8.267, 11.692)
 Margins = namedtuple('Margins', 'left right top bottom')
+FONT = ['Arial']
+c = ['C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9']
 
 
 def add_row_enumeration(ax, item_pos_y, pos_x, start=1, **kwargs):
@@ -19,31 +21,37 @@ def add_row_enumeration(ax, item_pos_y, pos_x, start=1, **kwargs):
         ax.text(pos_x, y, f'Row {i}', **kwargs)
 
 
-def add_items(ax, item_pos_x, item_pos_y, data, direction, **kwargs):
+def add_items(ax, item_pos_x, item_pos_y, data, direction, item_colors=None,
+              **kwargs):
     if direction == 'horizontal':
         x, y = item_pos_x, item_pos_y
     elif direction == 'vertical':
         x, y = item_pos_y, item_pos_x
     else:
         raise ValueError(f'Invalid direction: {direction}')
-
+    if item_colors is None:
+        item_colors = dict()
     nr_rows = len(y)
     nr_cols = len(x)
     last_nonempty_pos = (0, 0)
     for row_i, pos_y in enumerate(y):
         for col_i, pos_x in enumerate(x):
             cell_i = nr_cols * row_i + col_i
-            item = data(cell_i)
-            if item is None:
+            try:
+                item = data[cell_i]
+            except IndexError:
                 return last_nonempty_pos
             else:
-                ax.text(pos_x, pos_y, item, **kwargs)
+                ax.text(pos_x, pos_y, item,
+                        color=item_colors.get(item, 'black'),
+                        **kwargs)
                 last_nonempty_pos = (row_i, col_i)
     return nr_rows - 1, nr_cols - 1
 
 
 def pairs(seq, step=1):
     seq = list(seq)
+    step = int(step)
     for i in range(0, len(seq) - step, step):
         yield (seq[i], seq[i + step])
     if seq and seq[i + step] != seq[-1]:
@@ -58,7 +66,21 @@ def get_boundary_finder(pattern):
     return boundary
 
 
-def grid(ax, grid_pos_x, grid_pos_y, pattern, size, direction, max_row, max_col):
+def get_grid_color(pattern):
+    # Fixa här
+    pattern_sum = sum(pattern)
+    boundaries = {s - 1 for s in itertools.accumulate(pattern)}
+    def boundary(cell_i):
+        return cell_i < 0 or cell_i%pattern_sum in boundaries
+    return boundary
+
+
+def grid(ax, grid_pos_x, grid_pos_y, pattern, size, direction,
+         flip_horizontal=False, flip_vertical=False, **kwargs):
+    if flip_horizontal:
+        grid_pos_x = list(reversed(grid_pos_x))
+    if flip_vertical:
+        grid_pos_y = list(reversed(grid_pos_y))
     if direction == 'horizontal':
         x, y = grid_pos_x, grid_pos_y
         transform = np.array([[1, 0],
@@ -82,20 +104,51 @@ def grid(ax, grid_pos_x, grid_pos_y, pattern, size, direction, max_row, max_col)
         lines.append(np.array([[min(x), y0], [max(x), y0]]))
     if (row_i + 1)*size == len(y) - 1:
         lines.append(np.array([[min(x), y1], [max(x), y1]]))
-
-
-
     for index in range(len(lines)):
         lines[index] = np.dot(lines[index], transform)
-    ax.add_collection(LineCollection(lines, lw=0.1, color='black'))
+    ax.add_collection(LineCollection(lines, **kwargs))
 
 
-def digits(digits, pattern, size, direction='horizontal'):
+def header(ax, a, b, title='title', a1='a1', a2='a2', b1='b1', b2='b2'):
+    fp_title = FontProperties(family=FONT, size='large')
+    fp_header = FontProperties(family=FONT, size='medium')
+    ax.text(0.5, 1, title, fontproperties=fp_title, ha='center', va='top')
+    ax.text(0, a, a1, fontproperties=fp_header, ha='left')
+    ax.text(1, a, a2, fontproperties=fp_header, ha='right')
+    ax.text(0, b, b1, fontproperties=fp_header, ha='left')
+    ax.text(1, b, b2, fontproperties=fp_header, ha='right')
+
+
+def digits(digits, pattern=None, size=0, direction='horizontal', nr_cols=40,
+           nr_rows=25, wide=False, example=False, item_colors=None,
+           bold=False, filename='digits.pdf',
+           header_kwargs=None, grid_kwargs=None):
+    digits = list(digits)
+    if pattern is None:
+        pattern = [0]
+    if not len(digits) % nr_cols == 0:
+        raise ValueError('Nr digits must be a multiple of nr_cols')
+    max_nr_cols = 40
+    if not 0 < nr_cols <= max_nr_cols:
+        raise ValueError(f'Invalid nr_cols: 0 < {nr_cols} <= {max_nr_cols}')
+    size = int(size)
+
+    grid_x_start = 0
+    grid_x_end = 0.89
+    enumeration_offset = 0.03
+    m = Margins(left=0.1, right=0.1, top=0.18, bottom=0.1)
+    header_m = Margins(left=0.085, right=0.085, top=0.05, bottom=1 - m.top)
+    # footer_m = Margins(left=0, right=0, top=0.9, bottom=0)
+
     grid_y_adjustment = 1 / 1.3
-    nr_rows = 25
-    nr_cols = 40
     _pos_y = np.linspace(0, 1, nr_rows + 2)
-    _pos_x = np.linspace(0, 0.9, nr_cols + 2)
+    if wide:
+        _pos_x = np.linspace(grid_x_start, grid_x_end, nr_cols + 2)
+    else:
+        x = max_nr_cols - nr_cols
+        nr_cols_slice = slice(x // 2 + x % 2, - x // 2 if x >= 2 else None)
+        _pos_x = np.linspace(grid_x_start, grid_x_end,
+                             max_nr_cols + 2)[nr_cols_slice]
     dy = abs(_pos_y[1] - _pos_y[0])
     dx = abs(_pos_x[1] - _pos_x[0])
     item_pos_y = _pos_y[1:-1]
@@ -103,42 +156,90 @@ def digits(digits, pattern, size, direction='horizontal'):
     grid_pos_y = _pos_y[0:-1] + grid_y_adjustment * dy / 2
     grid_pos_x = _pos_x[0:-1] + dx / 2
 
-    pp = PdfPages('multipage.pdf')
+    item_fp = FontProperties(family=FONT,
+                             size='medium',
+                             weight='bold' if bold else 'normal')
+    row_enumeration_fp = FontProperties(family=FONT, size='small')
+
+    pp = PdfPages(filename)
     fig = plt.figure(figsize=A4)
-    m = Margins(left=0.1, right=0.1, top=0.15, bottom=0.1)
-    ax = fig.add_axes([
-        m.left,  # Left
-        m.right,  # Right
-        1 - m.left - m.right,  # Width
-        1 - m.top - m.bottom  # Height
-    ])
-    ax.set_axis_off()
-    ax.set_xlim(0, 1)
-    ax.set_ylim(1, 0)
 
-    BINARY = slice(5, -5)
-    def data(cell_i):
-        try:
-            return digits[cell_i]
-        except IndexError:
-            return None
+    multipage = len(digits) > nr_rows*nr_cols
+    for page_i, i in enumerate(range(0, len(digits), nr_rows*nr_cols)):
 
-    item_fp = FontProperties(family=['Arial'])
-    row_enumeration_fp = FontProperties(family=['Arial'], size='small')
+        header_ax = fig.add_axes([
+            header_m.left,                # Left
+            header_m.bottom,              # Bottom
+            1 - header_m.left - header_m.right,  # Width
+            1 - header_m.top - header_m.bottom   # Height
+        ])
+        header(header_ax, a=0.7, b=0.55, **header_kwargs)
+        header_ax.set_axis_off()
 
-    row_i, col_i = add_items(ax, item_pos_x, item_pos_y,
-              data=data, direction='horizontal',
-              fontproperties=item_fp, ha='center')
-    add_row_enumeration(ax, item_pos_y[:row_i + 1], max(_pos_x) + 0.015, start=1,
-                        fontproperties=row_enumeration_fp, ha='left')
-    grid(ax, grid_pos_x, grid_pos_y[:row_i + 2], pattern, size, direction, row_i, col_i)
+        ax = fig.add_axes([
+            m.left,                # Left
+            m.bottom,              # Bottom
+            1 - m.left - m.right,  # Width
+            1 - m.top - m.bottom   # Height
+        ])
+        ax.set_axis_off()
+        ax.set_xlim(0, 1)
+        ax.set_ylim(1, 0)
 
-    pp.savefig(fig, figsize=(8.27, 11.69))
-    fig.clear()
+        row_i, col_i = add_items(
+            ax, item_pos_x, item_pos_y,
+            data=digits[i:i + nr_rows*nr_cols],
+            direction='horizontal',
+            item_colors=item_colors,
+            fontproperties=item_fp,
+            horizontalalignment='center'
+        )
+        item_pos_y = item_pos_y[:row_i + 1]
+        add_row_enumeration(
+            ax, item_pos_y, max(_pos_x) + enumeration_offset,
+            start=1 + page_i*nr_rows,
+            fontproperties=row_enumeration_fp,
+            horizontalalignment='left'
+        )
+        if sum(pattern) > 0 and size > 0:
+            grid(ax, grid_pos_x, grid_pos_y[:row_i + 2],
+                 pattern, size, direction, **grid_kwargs)
 
-    pp.savefig(fig, figsize=(8.27, 11.69))
+        if multipage:
+            ax.text(0.5, 1.05, str(page_i + 1),
+                    fontproperties=item_fp,
+                    ha="center")
+
+        if example:
+            example_x_pos = (max(item_pos_x) + min(item_pos_x))/2
+            example_y_pos = (max(item_pos_y) + min(item_pos_y))/2
+            example_y_pos = max(example_y_pos, min(item_pos_y) + dy*6)
+            ax.text(
+                example_x_pos, example_y_pos, "Example",
+                size=70, rotation=45,
+                ha="center", va="center", alpha=0.3,
+                bbox=dict(boxstyle="round", ec='black', fc='silver', alpha=0.2)
+            )
+
+        pp.savefig(fig, figsize=A4)
+        fig.clear()
+
     pp.close()
 
-
 if __name__ == '__main__':
-    digits([0,1,2,3,4,5,6,7,8,9]*68, [3], 6, 'vertical')
+
+    x = [random.randint(0, 9) for _ in range(40*100)]
+    header_kwargs = dict(title='Svenska Minnesförbundet',
+                         a1='Decimal Numbers; 2320',
+                         a2='Memo id: 78',
+                         b1='Memo. time: 30 Min',
+                         b2='Recall time: 60 Min')
+    grid_kwargs = dict(flip_horizontal=True,
+                       flip_vertical=False,
+                       linewidth=0.1,
+                       color='black')
+    item_colors = {0: 'black', 1: 'red', 2: 'blue', 3: 'brown', 4: 'green'}
+
+    digits(x, [3], 2, 'horizontal', nr_cols=40, example=False,
+           item_colors=item_colors,
+           header_kwargs=header_kwargs, grid_kwargs=grid_kwargs)
