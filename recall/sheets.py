@@ -14,14 +14,12 @@ import numpy as np
 A4 = (8.267, 11.692)
 Margins = namedtuple('Margins', 'left right top bottom')
 FONT = ['Arial']
-c = ['C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9']
 
 class InvalidPattern(Exception):
     pass
 
 
 class Pattern:
-
     def __init__(self, pattern, size=1, color=''):
         if isinstance(pattern, str):
             try:
@@ -52,7 +50,7 @@ class Pattern:
     def __str__(self):
         pc = ', '.join(f'{p}:{c}' if c else str(p)
                        for p, c in zip(self.pattern, self.color))
-        return f'<Pattern size={self.size}; {pc}>'
+        return f'Pattern([{pc}]; size={self.size})'
 
     @classmethod
     def from_string(cls, pattern_with_colors, size=1):
@@ -68,41 +66,39 @@ class Pattern:
             return False
         return cell_i < 0 or cell_i%self._sum in self._endpoints
 
-    def get_pattern_index(self, nr_cols, nr_rows, direction,
-                          flip_horizontal, flip_vertical):
-        def index(row_i, col_i):
+    def get_index_color(self, nr_cols, nr_rows, direction, flip_horizontal,
+                        flip_vertical):
+        def index_color(row_i, col_i):
             if flip_horizontal:
                 col_i = nr_cols - 1 - col_i
             if flip_vertical:
                 row_i = nr_rows - 1 - row_i
             if direction == 'horizontal':
-                row_i //= abs(self.size)
+                row_i //= max(abs(self.size), 1)
             elif direction == 'vertical':
-                col_i //= abs(self.size)
+                col_i //= max(abs(self.size), 1)
+            else:
+                raise ValueError(f'Invalid direction: {direction}')
             if direction == 'horizontal':
                 cell_i = nr_cols*row_i + col_i
             elif direction == 'vertical':
                 cell_i = nr_rows*col_i + row_i
+            else:
+                raise ValueError(f'Invalid direction: {direction}')
             pos = cell_i%self._sum
             if pos == 0:
-                return 0
+                return self.color[0]
             for i, (b0, b1) in self._boundary_pairs:
                 if b0 < pos <= b1:
-                    return i
-        return index
-
-
-def get_boundary_finder(pattern):
-    pattern_sum = sum(pattern)
-    boundaries = {s - 1 for s in itertools.accumulate(pattern)}
-    def boundary(cell_i):
-        return cell_i < 0 or cell_i%pattern_sum in boundaries
-    return boundary
+                    return self.color[i]
+        return index_color
 
 
 def pairs(seq, step=1):
     seq = list(seq)
     step = int(step)
+    if step >= len(seq):
+        return (seq[0], seq[-1])
     for i in range(0, len(seq) - step, step):
         yield (seq[i], seq[i + step])
     if seq and seq[i + step] != seq[-1]:
@@ -138,7 +134,7 @@ def add_items(ax, item_pos_x, item_pos_y, data, direction, item_colorer=None,
                         **kwargs)
 
 
-def grid(ax, grid_pos_x, grid_pos_y, pattern, direction,
+def add_grid(ax, grid_pos_x, grid_pos_y, direction, pattern=None,
          flip_horizontal=False, flip_vertical=False, **kwargs):
     if flip_horizontal:
         grid_pos_x = list(reversed(grid_pos_x))
@@ -156,8 +152,8 @@ def grid(ax, grid_pos_x, grid_pos_y, pattern, direction,
         raise ValueError(f'Invalid direction: {direction}')
     lines = list()
     nr_cols = len(x) - 1
-
-    for row_i, (y0, y1) in enumerate(pairs(y, step=max(abs(pattern.size), 1)), start=0):
+    step_size = max(abs(pattern.size), 1)
+    for row_i, (y0, y1) in enumerate(pairs(y, step=step_size), start=0):
         for col_i, (x0, x1) in enumerate(pairs(x, step=1), start=0):
             cell_i = nr_cols * row_i + col_i
             if col_i == 0 and pattern.is_at_boundary(cell_i - 1):
@@ -171,9 +167,8 @@ def grid(ax, grid_pos_x, grid_pos_y, pattern, direction,
     for index in range(len(lines)):
         lines[index] = np.dot(lines[index], transform)
     ax.add_collection(LineCollection(lines, **kwargs))
-
-    return pattern.get_pattern_index(len(grid_pos_x) - 1, len(grid_pos_y) - 1,
-                                     direction, flip_horizontal, flip_vertical)
+    return pattern.get_index_color(len(grid_pos_x) - 1, len(grid_pos_y) - 1,
+                                   direction, flip_horizontal, flip_vertical)
 
 
 def header(ax, a, b, title='title', a1='a1', a2='a2', b1='b1', b2='b2'):
@@ -186,16 +181,18 @@ def header(ax, a, b, title='title', a1='a1', a2='a2', b1='b1', b2='b2'):
     ax.text(1, b, b2, fontproperties=fp_header, ha='right')
 
 
-def digits(digits, pattern, direction='horizontal', nr_cols=40,
-           nr_rows=25, wide=False, example=False, item_colors=None,
-           bold=False, filename='digits.pdf',
-           header_kwargs=None, grid_kwargs=None):
+def digits(digits, direction='horizontal', nr_cols=40, nr_rows=25, wide=False,
+           example=False, item_colors=None, bold=False, filename='digits',
+           header_kwargs=None, grid_kwargs=None, print_parameters=False,
+           target='pdf'):
     digits = list(digits)
     if not len(digits) % nr_cols == 0:
         raise ValueError('Nr digits must be a multiple of nr_cols')
     max_nr_cols = 40
     if not 0 < nr_cols <= max_nr_cols:
         raise ValueError(f'Invalid nr_cols: 0 < {nr_cols} <= {max_nr_cols}')
+    if target not in {'pdf', 'png'}:
+        raise ValueError(f'Invalid target: "{target}"')
 
     grid_x_start = 0
     grid_x_end = 0.89
@@ -219,24 +216,37 @@ def digits(digits, pattern, direction='horizontal', nr_cols=40,
     grid_pos_y = _pos_y[0:-1] + grid_y_adjustment * dy / 2
     grid_pos_x = _pos_x[0:-1] + dx / 2
 
-    item_fp = FontProperties(family=FONT,
-                             size='medium',
+    item_fp = FontProperties(family=FONT, size='medium',
                              weight='bold' if bold else 'normal')
     row_enumeration_fp = FontProperties(family=FONT, size='small')
 
-    pp = PdfPages(filename)
+    if target == 'pdf':
+        pp = PdfPages(f'{filename}.pdf')
     fig = plt.figure(figsize=A4)
 
     multipage = len(digits) > nr_rows*nr_cols
     for page_i, i in enumerate(range(0, len(digits), nr_rows*nr_cols)):
 
         header_ax = fig.add_axes([
-            header_m.left,                # Left
-            header_m.bottom,              # Bottom
+            header_m.left,                       # Left
+            header_m.bottom,                     # Bottom
             1 - header_m.left - header_m.right,  # Width
             1 - header_m.top - header_m.bottom   # Height
         ])
         header(header_ax, a=0.7, b=0.55, **header_kwargs)
+
+        if print_parameters:
+            x = min(item_pos_x)
+            header_ax.text(x, 0.35,
+            f'direction={direction}, nr_cols={nr_cols}, nr_rows={nr_rows}, '
+            f'wide={wide}, example={example}, bold={bold}', size='small')
+            header_ax.text(x, 0.25, str(item_colors), size='small')
+            header_ax.text(x, 0.15, str(grid_kwargs['pattern']), size='small')
+            header_ax.text(x, 0.05,
+            'flip_h={flip_horizontal}, flip_v={flip_vertical}, '
+            'linewidth={linewidth}, color={color}'.format(**grid_kwargs),
+            size='small')
+
         header_ax.set_axis_off()
 
         ax = fig.add_axes([
@@ -249,15 +259,15 @@ def digits(digits, pattern, direction='horizontal', nr_cols=40,
         ax.set_xlim(0, 1)
         ax.set_ylim(1, 0)
 
-        end_row = math.ceil(len(digits)/nr_cols)
-        if True:
-            index = grid(ax, grid_pos_x, grid_pos_y[:end_row + 1],
-                         pattern, direction, **grid_kwargs)
+        nr_digits_on_this_page = min(nr_rows*nr_cols,
+                                     len(digits) - page_i*nr_rows*nr_cols)
+        end_row = math.ceil(nr_digits_on_this_page/nr_cols)
+        index_color = add_grid(ax, grid_pos_x, grid_pos_y[:end_row + 1],
+                               direction, **grid_kwargs)
 
 
         def item_colorer(p, item):
-            return 'black'
-            color = pattern.color[index(*p)]
+            color = index_color(*p)
             if color:
                 return color
             else:
@@ -295,28 +305,35 @@ def digits(digits, pattern, direction='horizontal', nr_cols=40,
                 bbox=dict(boxstyle="round", ec='black', fc='silver', alpha=0.2)
             )
 
-        pp.savefig(fig, figsize=A4)
+        if target == 'pdf':
+            pp.savefig(fig, figsize=A4)
+        elif target == 'png':
+            fig.savefig(f'{filename}_{page_i}.png', dpi=200)
         fig.clear()
 
-    pp.close()
+    if target == 'pdf':
+        pp.close()
 
 if __name__ == '__main__':
 
-    x = [random.randint(0, 9) for _ in range(30*12)]
+    x = [random.randint(0, 9) for _ in range(1600)]
+
+    p = Pattern([11, 3], 2, ['blue', 'yellow'])
+
     header_kwargs = dict(title='Svenska Minnesförbundet',
                          a1='Decimal Numbers; 2320',
                          a2='Memo id: 78',
                          b1='Memo. time: 30 Min',
                          b2='Recall time: 60 Min')
-    grid_kwargs = dict(flip_horizontal=False,
-                       flip_vertical=False,
+    grid_kwargs = dict(pattern=p,
+                       flip_horizontal=True,
+                       flip_vertical=True,
                        linewidth=0.1,
                        color='black')
-
     item_colors = {0: 'black', 1: 'red', 2: 'blue', 3: 'brown', 4: 'green'}
 
-    p = Pattern([3], 2, ['pink'])
 
-    digits(x, p, 'vertical', nr_cols=30, example=False,
-           item_colors=item_colors,
-           header_kwargs=header_kwargs, grid_kwargs=grid_kwargs)
+    digits(x, direction='horizontal', nr_cols=40, example=False,
+           item_colors=item_colors, print_parameters=False,
+           header_kwargs=header_kwargs, grid_kwargs=grid_kwargs,
+           target='pdf')
