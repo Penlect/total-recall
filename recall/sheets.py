@@ -16,14 +16,80 @@ Margins = namedtuple('Margins', 'left right top bottom')
 FONT = ['Arial']
 c = ['C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9']
 
+class InvalidPattern(Exception):
+    pass
 
-def pairs(seq, step=1):
-    seq = list(seq)
-    step = int(step)
-    for i in range(0, len(seq) - step, step):
-        yield (seq[i], seq[i + step])
-    if seq and seq[i + step] != seq[-1]:
-        yield (seq[i + step], seq[-1])
+
+class Pattern:
+
+    def __init__(self, pattern, size=1, color=''):
+        if isinstance(pattern, str):
+            try:
+                self.pattern = [int(pattern)]
+            except ValueError:
+                raise InvalidPattern(f'Invalid Pattern: "{pattern}"')
+        elif isinstance(pattern, int):
+            self.pattern = [pattern]
+        else:
+            self.pattern = pattern
+        self.size = int(size)
+        if isinstance(color, str):
+            self.color = [color]*len(pattern)
+        else:
+            self.color = color
+        if sum(self.pattern) > 0 and len(self.pattern) != len(self.color):
+            raise InvalidPattern(f'Pattern and color length does not match')
+
+        self._sum = sum(self.pattern)
+        acc = list(itertools.accumulate(self.pattern))
+        self._endpoints = {s - 1 for s in acc}
+        self._boundaries = [0] + [s - 1 for s in acc]
+        self._boundary_pairs = list(enumerate((pairs(self._boundaries, step=1))))
+
+    def __repr__(self):
+        return f'Pattern({self.pattern!r}, {self.size!r}, {self.color!r})'
+
+    def __str__(self):
+        pc = ', '.join(f'{p}:{c}' if c else str(p)
+                       for p, c in zip(self.pattern, self.color))
+        return f'<Pattern size={self.size}; {pc}>'
+
+    @classmethod
+    def from_string(cls, pattern_with_colors, size=1):
+        pattern = list()
+        color = list()
+        for n, c in pattern_with_colors.split(':'):
+            pattern.append(int(n))
+            color.append(c.lower().strip())
+        return cls(pattern, size, color)
+
+    def is_at_boundary(self, cell_i):
+        if self._sum == 0 or self.size == 0:
+            return False
+        return cell_i < 0 or cell_i%self._sum in self._endpoints
+
+    def get_pattern_index(self, nr_cols, nr_rows, direction,
+                          flip_horizontal, flip_vertical):
+        def index(row_i, col_i):
+            if flip_horizontal:
+                col_i = nr_cols - 1 - col_i
+            if flip_vertical:
+                row_i = nr_rows - 1 - row_i
+            if direction == 'horizontal':
+                row_i //= abs(self.size)
+            elif direction == 'vertical':
+                col_i //= abs(self.size)
+            if direction == 'horizontal':
+                cell_i = nr_cols*row_i + col_i
+            elif direction == 'vertical':
+                cell_i = nr_rows*col_i + row_i
+            pos = cell_i%self._sum
+            if pos == 0:
+                return 0
+            for i, (b0, b1) in self._boundary_pairs:
+                if b0 < pos <= b1:
+                    return i
+        return index
 
 
 def get_boundary_finder(pattern):
@@ -34,25 +100,13 @@ def get_boundary_finder(pattern):
     return boundary
 
 
-# Remove?
-def get_pattern_index(pattern, nr_cols, nr_rows, flip_horizontal,
-                      flip_vertical):
-    pattern_sum = sum(pattern)
-    boundaries = [0] + [s - 1 for s in itertools.accumulate(pattern)]
-    bs = list(enumerate((pairs(boundaries, step=1))))
-    def index(row_i, col_i):
-        if flip_horizontal:
-            col_i = nr_cols - 1 - col_i
-        if flip_vertical:
-            row_i = nr_rows - 1 - row_i
-        cell_i = nr_cols*row_i + col_i
-        pos = cell_i%pattern_sum
-        if pos == 0:
-            return 0
-        for i, (b0, b1) in bs:
-            if b0 < pos <= b1:
-                return i
-    return index
+def pairs(seq, step=1):
+    seq = list(seq)
+    step = int(step)
+    for i in range(0, len(seq) - step, step):
+        yield (seq[i], seq[i + step])
+    if seq and seq[i + step] != seq[-1]:
+        yield (seq[i + step], seq[-1])
 
 
 def add_row_enumeration(ax, item_pos_y, pos_x, start=1, **kwargs):
@@ -84,7 +138,7 @@ def add_items(ax, item_pos_x, item_pos_y, data, direction, item_colorer=None,
                         **kwargs)
 
 
-def grid(ax, grid_pos_x, grid_pos_y, pattern, size, direction,
+def grid(ax, grid_pos_x, grid_pos_y, pattern, direction,
          flip_horizontal=False, flip_vertical=False, **kwargs):
     if flip_horizontal:
         grid_pos_x = list(reversed(grid_pos_x))
@@ -100,46 +154,26 @@ def grid(ax, grid_pos_x, grid_pos_y, pattern, size, direction,
                               [1, 0]], dtype=np.float64)
     else:
         raise ValueError(f'Invalid direction: {direction}')
-    boundary = get_boundary_finder(pattern)
     lines = list()
     nr_cols = len(x) - 1
-    for row_i, (y0, y1) in enumerate(pairs(y, step=size), start=0):
+
+    for row_i, (y0, y1) in enumerate(pairs(y, step=max(abs(pattern.size), 1)), start=0):
         for col_i, (x0, x1) in enumerate(pairs(x, step=1), start=0):
             cell_i = nr_cols * row_i + col_i
-            if col_i == 0 and boundary(cell_i - 1):
+            if col_i == 0 and pattern.is_at_boundary(cell_i - 1):
                 lines.append(np.array([[x0, y0], [x0, y1]], dtype=np.float64))
-            if boundary(cell_i):
+            if pattern.is_at_boundary(cell_i):
                 lines.append(np.array([[x1, y0], [x1, y1]], dtype=np.float64))
-        lines.append(np.array([[min(x), y0], [max(x), y0]]))
-    if (row_i + 1)*size == len(y) - 1:
+        if pattern.size > 0:
+            lines.append(np.array([[min(x), y0], [max(x), y0]]))
+    if pattern.size > 0 and (row_i + 1)*pattern.size == len(y) - 1:
         lines.append(np.array([[min(x), y1], [max(x), y1]]))
     for index in range(len(lines)):
         lines[index] = np.dot(lines[index], transform)
     ax.add_collection(LineCollection(lines, **kwargs))
 
-    pattern_sum = sum(pattern)
-    boundaries = [0] + [s - 1 for s in itertools.accumulate(pattern)]
-    bs = list(enumerate((pairs(boundaries, step=1))))
-    def index(row_i, col_i):
-        if flip_horizontal:
-            col_i = len(grid_pos_x) - 2 - col_i
-        if flip_vertical:
-            row_i = len(grid_pos_y) - 2 - row_i
-        if direction == 'horizontal':
-            row_i //= size
-        elif direction == 'vertical':
-            col_i //= size
-        if direction == 'horizontal':
-            cell_i = (len(grid_pos_x) - 1)*row_i + col_i
-        elif direction == 'vertical':
-            cell_i = (len(grid_pos_y) - 1)*col_i + row_i
-        pos = cell_i%pattern_sum
-        if pos == 0:
-            return 0
-        for i, (b0, b1) in bs:
-            if b0 < pos <= b1:
-                return i
-    return index
+    return pattern.get_pattern_index(len(grid_pos_x) - 1, len(grid_pos_y) - 1,
+                                     direction, flip_horizontal, flip_vertical)
 
 
 def header(ax, a, b, title='title', a1='a1', a2='a2', b1='b1', b2='b2'):
@@ -152,26 +186,22 @@ def header(ax, a, b, title='title', a1='a1', a2='a2', b1='b1', b2='b2'):
     ax.text(1, b, b2, fontproperties=fp_header, ha='right')
 
 
-def digits(digits, pattern=None, size=0, direction='horizontal', nr_cols=40,
+def digits(digits, pattern, direction='horizontal', nr_cols=40,
            nr_rows=25, wide=False, example=False, item_colors=None,
            bold=False, filename='digits.pdf',
            header_kwargs=None, grid_kwargs=None):
     digits = list(digits)
-    if pattern is None:
-        pattern = [0]
     if not len(digits) % nr_cols == 0:
         raise ValueError('Nr digits must be a multiple of nr_cols')
     max_nr_cols = 40
     if not 0 < nr_cols <= max_nr_cols:
         raise ValueError(f'Invalid nr_cols: 0 < {nr_cols} <= {max_nr_cols}')
-    size = int(size)
 
     grid_x_start = 0
     grid_x_end = 0.89
     enumeration_offset = 0.03
     m = Margins(left=0.1, right=0.1, top=0.18, bottom=0.1)
     header_m = Margins(left=0.085, right=0.085, top=0.05, bottom=1 - m.top)
-    # footer_m = Margins(left=0, right=0, top=0.9, bottom=0)
 
     grid_y_adjustment = 1 / 1.3
     _pos_y = np.linspace(0, 1, nr_rows + 2)
@@ -220,15 +250,18 @@ def digits(digits, pattern=None, size=0, direction='horizontal', nr_cols=40,
         ax.set_ylim(1, 0)
 
         end_row = math.ceil(len(digits)/nr_cols)
-        if sum(pattern) > 0 and size > 0:
+        if True:
             index = grid(ax, grid_pos_x, grid_pos_y[:end_row + 1],
-                 pattern, size, direction, **grid_kwargs)
-            #index = get_pattern_index(pattern, len(item_pos_x), end_row,
-            #                          grid_kwargs['flip_horizontal'],
-            #                          grid_kwargs['flip_vertical'])
+                         pattern, direction, **grid_kwargs)
+
+
         def item_colorer(p, item):
-            color = c[index(*p)]
-            return color
+            return 'black'
+            color = pattern.color[index(*p)]
+            if color:
+                return color
+            else:
+                return item_colors.get(item, 'black')
 
         add_items(
             ax, item_pos_x, item_pos_y,
@@ -269,7 +302,7 @@ def digits(digits, pattern=None, size=0, direction='horizontal', nr_cols=40,
 
 if __name__ == '__main__':
 
-    x = [random.randint(0, 9) for _ in range(30*12 + 40)]
+    x = [random.randint(0, 9) for _ in range(30*12)]
     header_kwargs = dict(title='Svenska Minnesförbundet',
                          a1='Decimal Numbers; 2320',
                          a2='Memo id: 78',
@@ -279,8 +312,11 @@ if __name__ == '__main__':
                        flip_vertical=False,
                        linewidth=0.1,
                        color='black')
+
     item_colors = {0: 'black', 1: 'red', 2: 'blue', 3: 'brown', 4: 'green'}
 
-    digits(x, [3, 5, 3], 2, 'horizontal', nr_cols=40, example=False,
+    p = Pattern([3], 2, ['pink'])
+
+    digits(x, p, 'vertical', nr_cols=30, example=False,
            item_colors=item_colors,
            header_kwargs=header_kwargs, grid_kwargs=grid_kwargs)
